@@ -3,7 +3,7 @@
         Options -MultiViews -Indexes
     </IfModule>
 
-    RewriteEngine On
+    RewriteBase /portal_nou/
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
