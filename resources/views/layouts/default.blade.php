@@ -9,11 +9,15 @@
     <!-- Styles -->
     <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/portal.css') }}">
+
+    <!-- Scripts -->
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
 </head>
 
 <body class="antialiased">
     <header>
-        <nav class="navbar navbar-fixed-top container-fluid" id="navbar_top">
+        <nav class="navbar navbar-fixed-top" id="navbar_top">
             <div class="container-fluid">
                 <a href="https://educacio.gencat.cat/ca/inici/" target="_blank" class="brand departament hidden-phone">
                     <img src="{{ asset('images/departament.png') }}" alt="Departament d'Ensenyament" title=""/>
@@ -21,12 +25,14 @@
                 <a href="https://xtec.gencat.cat/ca/inici" target="_blank" class="brand xtec hidden-phone">
                     <img src="{{ asset('images/xtec.png') }}" alt="Xarxa Telemàtica Educativa de Catalunya" title=""/>
                 </a>
-                <a class="brand mainbrand" href="{{ route('home') }}">{{ __('layout.header') }}</a>
                 <div class="pull-right">
-                    Menú
+                    @include('usermenu')
                 </div>
             </div>
         </nav>
+        <h1>
+            <a class="brand mainbrand visible-md visible-lg" href="{{ route('home') }}">{{ __('layout.header') }}</a>
+        </h1>
     </header>
 
     <div id="maincontent" class="container-fluid">
