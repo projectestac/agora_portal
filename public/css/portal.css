@@ -170,6 +170,42 @@ header h1 {
     background-position: 10px;
 }
 
+.nav > li > form > a {
+    display: block;
+    padding: 15px 15px;
+}
+
+
+/** Login page **/
+.login-form fieldset {
+    border: 1px #ddd solid;
+    margin: 0 0 1em 0;
+    padding: 0.5em 1em;
+    color: #333;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background: #fafafa;
+    background: -webkit-gradient(linear,left top, left bottom,from(#fafafa),to(#f2f2f2));
+    background: -moz-linear-gradient(top, #fafafa, #f2f2f2);
+    background: linear-gradient(#fafafa, #f2f2f2);
+}
+
+.login-form fieldset .row-form {
+    padding: 0.5em 0;
+    min-height: 2em;
+}
+
+.login-form fieldset .row-form label {
+    display: block;
+    float: left;
+    padding: 0.3em 1% 0.3em 0;
+    text-align: right;
+    width: 28%;
+    font-weight: normal;
+    color: #333;
+}
+
 
 /**************** Blocks **************************/
 
