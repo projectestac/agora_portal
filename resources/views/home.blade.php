@@ -1,4 +1,4 @@
-@extends('layouts.default')
+@extends('layout.default')
 
 @section('content')
     Contingut principal
