@@ -159,7 +159,7 @@ header h1 {
 }
 
 .navbar-default .navbar-nav > li > a,
-.navbar-default .navbar-nav > li.active > a{
+.navbar-default .navbar-nav > li.active > a {
     color: #59110A;
 }
 
@@ -186,7 +186,7 @@ header h1 {
     -moz-border-radius: 3px;
     border-radius: 3px;
     background: #fafafa;
-    background: -webkit-gradient(linear,left top, left bottom,from(#fafafa),to(#f2f2f2));
+    background: -webkit-gradient(linear, left top, left bottom, from(#fafafa), to(#f2f2f2));
     background: -moz-linear-gradient(top, #fafafa, #f2f2f2);
     background: linear-gradient(#fafafa, #f2f2f2);
 }
@@ -469,27 +469,6 @@ table.datatable tbody tr th:hover {
 }
 
 
-/* Special block: Horizontal menú block */
-.menublock ul {
-    list-style: none;
-    margin: 0px;
-}
-
-.menublock li {
-    float: left;
-    padding: 4px 10px 4px 10px;
-    border-left: 1px solid #fff;
-}
-
-
-#menu {
-    margin-top: -20px;
-    height: 25px;
-    clear: both;
-    background-color: #EEEEEE;
-}
-
-
 /**************** Body and tag styles ****************/
 /*
  *TEMA: Grana   Escull  Or      Llima   Tardor  Nostalgia
@@ -500,64 +479,53 @@ COLOR4: #59110A #008888 #145C61 #000000 #4E7104 #457FB9
 COLOR5: #D0D0D0 #BBEEEE #87BDC1 #FFEDBA #B3CD7B #B3CADB
 */
 
-/**************** Header and navigation styles ****************/
 
-#theme_header h1, #theme_header h1 a {
-    color: #AC2013; /*COLOR1*/
+/** Admin menu **/
+
+.admin-menu-container {
+    margin: 0.8em 0;
+    min-height: 50px;
 }
 
-#theme_header h2 {
-    color: #303030; /*COLOR3*/
-}
-
-#theme_navigation_bar {
-    background-color: #D0D0D0; /*COLOR5*/
-}
-
-#theme_navigation_bar .selected, #theme_navigation_bar li:hover {
-    background-color: #AC2013; /*COLOR2*/
-}
-
-
-#admintabs-container * {
-    -webkit-box-sizing: initial;
-    -moz-box-sizing: initial;
-    box-sizing: initial;
-}
-
-/**************** Blocks **************************/
-
-h4.block-title {
-    background-color: #AC2013; /*COLOR2*/
-    border-color: #AC2013; /*COLOR2*/
-}
-
-
-/*IW Menu*/
-
-#iw_menu li:hover { /*Personalizable*/
-    background-color: #AC2013 !important;
-    color: #FFFFFF !important;
-}
-
-#iw_menu > ul > li.branch {
-    border-bottom: 1px solid #AC2013 !important; /*Personalizable*/
-}
-
-#iw_menu li li:hover { /*Personalizable*/
-    background-color: #AC2013 !important;
-    color: #FFFFFF !important;
-}
-
-#iw_menu li li.branch { /*Personalizable*/
-    border-right: 3px solid #AC2013 !important;
-}
-
-div.tab-content {
-    background: #fff;
+.admin-menu > ul.primary {
+    font-size: large;
+    background: #eee;
     color: #333;
-    width: auto;
-    border: 1px solid #ccc;
-    border-top: none;
-    padding: 5px 1%;
+    width: 100%;
+}
+
+.admin-menu > ul.secondary {
+    font-size: large;
+    background: #ddd;
+    color: #333;
+    width: 100%;
+}
+
+.admin-menu > ul.primary > li:hover {
+    background-color: #ccc;
+    color: #fff;
+}
+
+.admin-menu > ul.primary > li > a.selected {
+    background-color: #ddd;
+}
+
+.admin-menu > ul.secondary > li > a {
+    background-color: #ddd;
+}
+
+.admin-menu > ul.secondary > li:hover {
+    background-color: #aaa;
+    color: #fff;
+}
+
+.admin-menu > ul.secondary > li > a.selected {
+    background-color: #bbb;
+}
+
+
+/** Pagination **/
+
+.pagination {
+    margin: 0;
 }
