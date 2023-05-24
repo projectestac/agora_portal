@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             RequestTypeSeeder::class,
             RequestTypeServiceSeeder::class,
             RequestSeeder::class,
+            RolesTableSeeder::class,
         ]);
     }
 }
