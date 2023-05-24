@@ -1,7 +1,14 @@
 <?php
 
+use App\Http\Controllers\BatchController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ClientTypeController;
+use App\Http\Controllers\ConfigController;
+use App\Http\Controllers\InstanceController;
+use App\Http\Controllers\LocationController;
+use App\Http\Controllers\ModelTypeController;
 use App\Http\Controllers\RequestController;
+use App\Http\Controllers\RequestTypeController;
 use App\Http\Controllers\ServiceController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +31,21 @@ Route::middleware('auth')->group(function () {
     Route::resource('/services', ServiceController::class);
     Route::resource('/clients', ClientController::class);
     Route::resource('/requests', RequestController::class);
+    Route::resource('/instances', InstanceController::class);
+
+    Route::get('/instance', [InstanceController::class, 'index'])->name('instance');
+
+    Route::get('/batch', [BatchController::class, 'batch'])->name('batch');
+    Route::get('/batch/query', [BatchController::class, 'query'])->name('query');
+    Route::get('/batch/queue', [BatchController::class, 'queue'])->name('queue');
+    Route::get('/batch/operation', [BatchController::class, 'operation'])->name('operation');
+    Route::get('/batch/create', [BatchController::class, 'create'])->name('create');
+
+    Route::get('/config', [ConfigController::class, 'settings'])->name('config');
+    Route::resource('/config/models', ModelTypeController::class);
+    Route::resource('/config/request-types', RequestTypeController::class);
+    Route::resource('/config/locations', LocationController::class);
+    Route::resource('/config/client-types', ClientTypeController::class);
 });
 
 require __DIR__.'/auth.php';
