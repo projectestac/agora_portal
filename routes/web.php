@@ -7,6 +7,7 @@ use App\Http\Controllers\ConfigController;
 use App\Http\Controllers\InstanceController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ModelTypeController;
+use App\Http\Controllers\MyAgoraController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\RequestTypeController;
 use App\Http\Controllers\ServiceController;
@@ -27,13 +28,11 @@ Route::get('/', static function () {
     return view('home');
 })->name('home');
 
-Route::middleware('auth')->group(function () {
+Route::group(['middleware' => ['auth', 'permission:Administrate site']], static function () {
     Route::resource('/services', ServiceController::class);
     Route::resource('/clients', ClientController::class);
     Route::resource('/requests', RequestController::class);
     Route::resource('/instances', InstanceController::class);
-
-    Route::get('/instance', [InstanceController::class, 'index'])->name('instance');
 
     Route::get('/batch', [BatchController::class, 'batch'])->name('batch');
     Route::get('/batch/query', [BatchController::class, 'query'])->name('query');
@@ -46,6 +45,15 @@ Route::middleware('auth')->group(function () {
     Route::resource('/config/request-types', RequestTypeController::class);
     Route::resource('/config/locations', LocationController::class);
     Route::resource('/config/client-types', ClientTypeController::class);
+});
+
+Route::group(['middleware' => ['auth', 'permission:Administrate site|Manage own managers|Manage clients']], static function () {
+    Route::get('/myagora', [MyAgoraController::class, 'myagora'])->name('myagora');
+    Route::get('/myagora/instances', [MyAgoraController::class, 'instances'])->name('myagora.instances');
+    Route::get('/myagora/files', [MyAgoraController::class, 'instances'])->name('myagora.files');
+    Route::get('/myagora/requests', [MyAgoraController::class, 'instances'])->name('myagora.requests');
+    Route::get('/myagora/managers', [MyAgoraController::class, 'instances'])->name('myagora.managers');
+    Route::get('/myagora/logs', [MyAgoraController::class, 'instances'])->name('myagora.logs');
 });
 
 require __DIR__.'/auth.php';
