@@ -1,7 +1,8 @@
+@can('Administrate site')
 <nav class="navbar-default admin-menu" role="navigation">
     <ul class="nav navbar-nav primary">
         <li>
-            <a href="{{ route('instance') }}" @if (str_contains(request()->url(), 'instance')) class="selected" @endif>
+            <a href="{{ route('instances.index') }}" @if (str_contains(request()->url(), 'instance')) class="selected" @endif>
                 {{ __('service.instances') }}
             </a>
         </li>
@@ -102,3 +103,4 @@
         </ul>
     @endif
 </nav>
+@endcan
