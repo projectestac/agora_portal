@@ -50,6 +50,10 @@ class Client extends Model {
         return $this->hasManyThrough(User::class, Manager::class);
     }
 
+    public function logs(): HasMany {
+        return $this->hasMany(Log::class);
+    }
+
     public function services(): BelongsToMany {
         return $this->belongsToMany(Service::class)
             ->withPivot([
