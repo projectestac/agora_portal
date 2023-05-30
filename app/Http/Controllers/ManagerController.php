@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Helpers\Cache;
 use App\Http\Requests\StoreManagerRequest;
 use App\Http\Requests\UpdateManagerRequest;
+use App\Models\Log;
 use App\Models\Manager;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ManagerController extends Controller {
@@ -67,6 +69,15 @@ class ManagerController extends Controller {
         ]);
         $manager->save();
 
+        Log::insert([
+            'client_id' => $current_client['id'],
+            'user_id' => Auth::user()->id,
+            'action_type' => Log::ACTION_TYPE_ADD,
+            'action_description' => __('manager.manager_added_detail', ['username' => $manager->user->name]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         return redirect()->back()->with('success', __('manager.manager_added'));
     }
 
@@ -94,8 +105,20 @@ class ManagerController extends Controller {
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Manager $manager) {
+    public function destroy(Manager $manager): RedirectResponse {
+
         $manager->delete();
+
+        Log::insert([
+            'client_id' => $manager->client_id,
+            'user_id' => Auth::user()->id,
+            'action_type' => Log::ACTION_TYPE_DELETE,
+            'action_description' => __('manager.manager_removed_detail', ['username' => $manager->user->name]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         return redirect()->back()->with('success', __('manager.manager_removed'));
+
     }
 }

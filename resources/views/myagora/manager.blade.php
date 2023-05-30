@@ -6,7 +6,9 @@
     </div>
 
     <div class="content myagora">
-        <h3>{{ __('manager.manager_list', ['name' => $current_client['name']]) }}</h3>
+        @if (isset($current_client['name']))
+            <h3>{{ __('manager.manager_list', ['name' => $current_client['name']]) }}</h3>
+        @endif
 
         @include('components.messages')
 
@@ -28,7 +30,9 @@
                             <form action="{{ route('managers.destroy', $manager->id) }}" method="POST" style="display: inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger">{{ __('common.delete') }}</button>
+                                <button type="submit" class="btn btn-danger" title="{{ __('standardlog.delete', ['name' => $manager->name]) }}">
+                                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                </button>
                             </form>
                         </td>
                     </tr>
