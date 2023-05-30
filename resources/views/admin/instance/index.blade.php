@@ -6,7 +6,7 @@
     </div>
 
     <div class="content service">
-        <p class="h3">{{ __('instance.instance_list') }}</p>
+        <h3>{{ __('instance.instance_list') }}</h3>
 
         @if(!empty($instances))
 
