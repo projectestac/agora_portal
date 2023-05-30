@@ -21,7 +21,7 @@ class InstanceController extends Controller {
             ->select('client_service.*', 'clients.name as client_name', 'services.name as service_name', 'locations.name as location_name', 'client_types.name as client_type_name')
             ->paginate(10);
 
-        return view('instance.index')->with('instances', $instances);
+        return view('admin.instance.index')->with('instances', $instances);
     }
 
 }
