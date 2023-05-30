@@ -11,9 +11,13 @@
     </div>
 
     <div class="content myagora">
-        <h3>{{ __('myagora.instance_list', ['name' => $current_client['name']]) }}</h3>
-        @if (!empty($instances))
+        @if (isset($current_client['name']))
+            <h3>{{ __('myagora.instance_list', ['name' => $current_client['name']]) }}</h3>
+        @endif
 
+        @include('components.messages')
+
+        @if (!empty($instances))
             @foreach($instances as $instance)
                 @php
                     $date = Carbon::parse($instance->pivot->created_at);
@@ -35,7 +39,6 @@
                         </ul>
                     </div>
                 </div>
-
             @endforeach
         @else
             <div class="alert alert-warning">{{ __('myagora.no_instances') }}</div>
