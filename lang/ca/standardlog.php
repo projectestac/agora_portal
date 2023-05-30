@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'title' => 'Registre d\'accions',
     'action_type' => 'Tipus d\'acció',
     'action_description' => 'Descripció',
     'delete' => 'Esborra :name com a gestor',
