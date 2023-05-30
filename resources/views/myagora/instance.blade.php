@@ -1,6 +1,9 @@
 @extends('layout.default')
 
-@php use Carbon\Carbon; @endphp
+@php
+    use Carbon\Carbon;
+    use App\Helpers\Util;
+@endphp
 
 @section('content')
     <div class="myagora-menu-container">
@@ -8,11 +11,15 @@
     </div>
 
     <div class="content myagora">
+        <h3>{{ __('myagora.instance_list', ['name' => $current_client['name']]) }}</h3>
         @if (!empty($instances))
-            <h3>{{ __('myagora.instance_list', ['name' => $current_client['name']]) }}</h3>
 
             @foreach($instances as $instance)
-                @php $date = Carbon::parse($instance->pivot->created_at); @endphp
+                @php
+                    $date = Carbon::parse($instance->pivot->created_at);
+                    $quota = Util::formatBytes($instance->pivot->quota);
+                    $usedQuota = Util::formatBytes($instance->pivot->used_quota);
+                @endphp
 
                 <div class="panel panel-default">
                     <div class="panel-heading row-fluid clearfix">
@@ -24,7 +31,7 @@
                             <li><strong>{{ __('myagora.active_date') }}:</strong> {{ $date->format('d/m/Y') }}</li>
                             <li><strong>{{ __('common.status') }}:</strong> {{ $instance->pivot->status }}</li>
                             <li><strong>{{ __('myagora.database') }}:</strong> {{ $instance->pivot->db_id }}</li>
-                            <li><strong>{{ __('service.quota') }}:</strong> ({{ $instance->pivot->used_quota }} / {{ $instance->pivot->quota }})</li>
+                            <li><strong>{{ __('service.quota') }}:</strong> ({{ $usedQuota }} / {{ $quota }})</li>
                         </ul>
                     </div>
                 </div>
