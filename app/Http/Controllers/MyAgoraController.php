@@ -6,6 +6,7 @@ use App\Helpers\Access;
 use App\Helpers\Cache;
 use App\Helpers\Util;
 use App\Models\Client;
+use App\Models\Log;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -81,7 +82,24 @@ class MyAgoraController extends Controller {
             ->with('max_managers', self::MAX_MANAGERS);
     }
 
-    public function logs(): View|Application|Factory|ApplicationContract {
-        return view('myagora.log');
+    public function logs(Request $request): View|Application|Factory|ApplicationContract {
+
+        if (Access::isAdmin(Auth::user())) {
+            $current_client = Util::get_client_from_url($request);
+        } else {
+            $current_client = Cache::get_current_client($request);
+        }
+
+        if (empty($current_client)) {
+            return view('myagora.log')->with('log', []);
+        }
+
+        $log = Log::where('client_id', $current_client['id'])
+            ->latest()
+            ->with('user')
+            ->paginate(25);
+
+        return view('myagora.log')->with('log', $log);
+
     }
 }
