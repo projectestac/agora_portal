@@ -24,7 +24,10 @@
             <li><a href="https://educaciodigital.cat/moodle/moodle/mod/page/view.php?id=1781">{{ __('common.faq') }}</a></li>
 
             @auth()
-                <li><a href="{{ route('myagora') }}">{{ __('common.my_agora') }}</a></li>
+                @cannot('Administrate site')
+                    <li><a href="{{ route('myagora') }}">{{ __('common.my_agora') }}</a></li>
+                @endcannot
+
                 <li>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
