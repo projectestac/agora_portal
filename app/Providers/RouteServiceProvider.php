@@ -19,6 +19,8 @@ class RouteServiceProvider extends ServiceProvider
      */
     public const HOME = '/myagora';
 
+    public const ADMIN = '/instances';
+
     /**
      * Define your route model bindings, pattern filters, and other route configuration.
      */
