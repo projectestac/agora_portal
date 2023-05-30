@@ -57,7 +57,7 @@ class Util {
      * @return boolean True if specified code is correct, false otherwise.
      */
     public function isValidCode(string $code): bool {
-        return !(strlen($code) === 8 || !preg_match("/^(a|b|c|e)\d{7}$/", $code));
+        return (strlen($code) === 8 && preg_match("/^([abce])\d{7}$/", $code));
     }
 
     /**
@@ -114,4 +114,20 @@ class Util {
 
         return $clientCode;
     }
+
+    /**
+     * Function to convert a number representing a disk size in bytes to a human-readable format.
+     */
+    public static function formatBytes($bytes, $precision = 2): string {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+
+        $bytes /= 1024 ** $pow;
+
+        return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+
 }
