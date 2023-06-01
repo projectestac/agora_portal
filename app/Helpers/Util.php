@@ -13,29 +13,29 @@ class Util {
      * @param Request $request
      * @return array
      */
-    public static function get_client_from_url(Request $request): array {
+    public static function getClientFromUrl(Request $request): array {
         if ($request->has('code')) {
-            $client_code = $request->get('code');
+            $clientCode = $request->get('code');
 
-            if (!(new self)->isValidCode($client_code)) {
+            if (!(new self)->isValidCode($clientCode)) {
                 return [];
             }
 
-            $client = Client::where('code', $client_code)->first();
+            $client = Client::where('code', $clientCode)->first();
 
             if (!is_null($client)) {
-                $current_client = [
+                $currentClient = [
                     'id' => $client->id,
                     'name' => $client->name,
                     'code' => $client->code,
                     'dns' => $client->dns,
                 ];
 
-                $request->session()->put('current_client', $current_client);
+                $request->session()->put('currentClient', $currentClient);
             }
         }
 
-        return $current_client ?? [];
+        return $currentClient ?? [];
     }
 
     /**
@@ -66,7 +66,7 @@ class Util {
      * @param string $domain Domain to compare
      * @return bool
      */
-    public function is_in_domain(string $domain): bool {
+    public function isInDomain(string $domain): bool {
         $length = strlen($_SERVER['HTTP_HOST']);
         $start = $length * -1; // Negative
 
