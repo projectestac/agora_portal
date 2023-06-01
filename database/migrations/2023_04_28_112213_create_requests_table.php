@@ -16,9 +16,9 @@ return new class extends Migration {
             $table->integer('client_id')->unsigned();
             $table->bigInteger('user_id')->unsigned();
             $table->enum('status', ['pending', 'under_study', 'solved', 'denied'])->default('pending');
-            $table->text('user_comment');
-            $table->text('admin_comment');
-            $table->text('private_note');
+            $table->text('user_comment')->nullable();
+            $table->text('admin_comment')->nullable();
+            $table->text('private_note')->nullable();
             $table->timestamps();
 
             $table->foreign('request_type_id')->references('id')->on('request_types');
