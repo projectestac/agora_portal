@@ -12,8 +12,8 @@ return new class extends Migration {
         Schema::create('request_types', static function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->default('');
-            $table->text('description');
-            $table->text('prompt');
+            $table->text('description')->nullable();
+            $table->text('prompt')->nullable();
             $table->timestamps();
         });
     }
