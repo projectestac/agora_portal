@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Helpers\Cache;
 use App\Http\Requests\StoreRequestRequest;
 use App\Http\Requests\UpdateRequestRequest;
+use App\Models\Log;
 use App\Models\Request;
+use App\Models\RequestType;
+use App\Models\Service;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -44,6 +47,18 @@ class RequestController extends Controller {
             'user_comment' => $userComment ?? '',
         ]);
         $requestData->save();
+
+        Log::insert([
+            'client_id' => Cache::getCurrentClient($request)['id'],
+            'user_id' => Auth::user()->id,
+            'action_type' => Log::ACTION_TYPE_ADD,
+            'action_description' => __('request.request_created_detail', [
+                'request_name' => RequestType::find($requestTypeId)->name,
+                'service_name' => Service::find($serviceId)->name,
+            ]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         return redirect()->back()->with('success', __('request.request_created'));
     }
