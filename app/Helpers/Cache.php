@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
  * The Laravel session will be used as a cache to store several data.
  */
 class Cache {
-    public static function get_clients(Request $request): mixed {
+    public static function getClients(Request $request): mixed {
         $clients = $request->session()->get('clients');
 
         $user = Auth::user();
@@ -52,19 +52,19 @@ class Cache {
         return is_null($clients) ? [] : $clients;
     }
 
-    public static function get_current_client(Request $request) {
+    public static function getCurrentClient(Request $request) {
 
-        $clients = self::get_clients($request);
-        $current_client = $request->session()->get('current_client');
+        $clients = self::getClients($request);
+        $currentClient = $request->session()->get('currentClient');
 
         // If there is no current client, get the first client from the list of clients if there is any.
-        if (is_null($current_client) && count($clients) > 0) {
-            $current_client = $clients[0];
-            $request->session()->put('current_client', $current_client);
-        } elseif (is_null($current_client)) {
-            $current_client = [];
+        if (is_null($currentClient) && count($clients) > 0) {
+            $currentClient = $clients[0];
+            $request->session()->put('currentClient', $currentClient);
+        } elseif (is_null($currentClient)) {
+            $currentClient = [];
         }
 
-        return $current_client;
+        return $currentClient;
     }
 }
