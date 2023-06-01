@@ -14,6 +14,8 @@ class Manager extends Model {
         'user_id',
     ];
 
+    public const MAX_MANAGERS_PER_CLIENT = 4;
+
     public function client(): BelongsTo {
         return $this->belongsTo(Client::class);
     }
