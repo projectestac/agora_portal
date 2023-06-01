@@ -19,4 +19,5 @@ return [
     'chose_request' => 'Trieu una sol·licitud',
     'observations' => 'Observacions (Opcional)',
     'request_created' => 'S\'ha registrat la vostra sol·licitud',
+    'request_created_detail' => 'S\'ha fet la sol·licitud de :request_name del servei :service_name.',
 ];
