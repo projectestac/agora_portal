@@ -2,16 +2,17 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\Access;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreRequestRequest extends FormRequest
-{
+class StoreRequestRequest extends FormRequest {
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
-    {
-        return false;
+    public function authorize(): bool {
+        return Access::isAdmin($this->user()) ||
+            Access::isClient($this->user()) ||
+            Access::isManager($this->user());
     }
 
     /**
@@ -19,10 +20,12 @@ class StoreRequestRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
-    public function rules(): array
-    {
+    public function rules(): array {
         return [
-            //
+            'user_comment' => 'string',
+            'admin_comment' => 'string',
+            'private_note' => 'string',
+            'request_select_request' => 'regex:/^\d+:\d+$/',
         ];
     }
 }

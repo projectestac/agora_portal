@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Cache;
 use App\Http\Requests\StoreRequestRequest;
 use App\Http\Requests\UpdateRequestRequest;
 use App\Models\Request;
@@ -9,6 +10,8 @@ use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 
 class RequestController extends Controller {
     /**
@@ -16,7 +19,7 @@ class RequestController extends Controller {
      */
     public function index(): View|Application|Factory|ApplicationContract {
         $requests = Request::with('requestType', 'service', 'client', 'user')->get();
-        return view('request.index')->with('requests', $requests);
+        return view('admin.request.index')->with('requests', $requests);
     }
 
     /**
@@ -29,8 +32,20 @@ class RequestController extends Controller {
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRequestRequest $request) {
-        //
+    public function store(StoreRequestRequest $request): RedirectResponse {
+        [$serviceId, $requestTypeId] = explode(':', $request->get('request-select-request'));
+        $userComment = $request->get('user-comment');
+
+        $requestData = new Request([
+            'service_id' => $serviceId,
+            'request_type_id' => $requestTypeId,
+            'client_id' => Cache::getCurrentClient($request)['id'],
+            'user_id' => Auth::user()->id,
+            'user_comment' => $userComment ?? '',
+        ]);
+        $requestData->save();
+
+        return redirect()->back()->with('success', __('request.request_created'));
     }
 
     /**
