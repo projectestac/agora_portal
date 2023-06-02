@@ -48,6 +48,10 @@ p form {
 
 }
 
+img {
+    border: none;
+}
+
 img.left, img.center, img.right {
     padding: 4px;
     border: 1px solid #a0a0a0;
@@ -177,6 +181,7 @@ header h1 {
 
 
 /** Login page **/
+
 .login-form fieldset {
     border: 1px #ddd solid;
     margin: 0 0 1em 0;
@@ -207,106 +212,7 @@ header h1 {
 }
 
 
-/**************** Blocks **************************/
-
-.blockposition-center {
-    margin: 20px;
-}
-
-.block-content {
-    -moz-border-radius-bottomright: 5px;
-    -moz-border-radius-bottomleft: 5px;
-    -moz-box-shadow: 3px 3px 3px #BBBBBB;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    box-shadow: 3px 3px 3px #bbb;
-    -webkit-box-shadow: 3px 3px 3px #bbb;
-    background-image: url("../images/borderbottom.png");
-    background-position: center bottom;
-    background-repeat: repeat-x;
-    background-color: #FCFCFC;
-    border: #DDDDDD 1px solid;
-    font-size: 0.9em;
-    line-height: 1.2em;
-    margin-bottom: 16px;
-    padding: 10px 5px 15px 10px;
-}
-
-.block-content-complete {
-    -moz-border-radius-topleft: 5px;
-    -moz-border-radius-topright: 5px;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-}
-
-h4.block-title {
-    -moz-border-radius-topleft: 5px;
-    -moz-border-radius-topright: 5px;
-    -moz-box-shadow: 3px 3px 3px #BBBBBB;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    background-color: #AC2013; /*COLOR2*/
-    color: white;
-    background-image: url("../images/topbar.png");
-    background-position: center bottom;
-    background-repeat: repeat-x;
-    border: #AC2013 1px solid; /*COLOR2*/
-    font-size: 1em;
-    font-weight: bold;
-    margin: 0;
-    padding: 4px;
-    text-align: left;
-}
-
-.admin_messages_block {
-    border: 0 !important;
-    background: transparent !important;
-}
-
-.admin-breadcrumbs {
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-/**************** Menublock styles ****************/
-
-div.navcontainer ul, div#navcontainer ul {
-    margin: 0 0 20px 20px;
-    font-size: 0.9em;
-}
-
-.bkey-menu li, .bkey-extmenu li {
-    list-style: none;
-    display: block;
-    padding: 2px;
-    margin-bottom: 2px;
-}
-
-.bkey-menu li a, .bkey-extmenu li a {
-    font-weight: bold;
-    text-decoration: none;
-}
-
-.bkey-menu li a:hover, .pn-bkey-extmenu li a:hover {
-    text-decoration: none;
-}
-
-.bkey-menu li ul, .bkey-extmenu li ul {
-    margin: 3px 0 3px 15px;
-    font-size: 1em;
-    font-weight: normal;
-}
-
-.bkey-menu li ul li, .bkey-extmenu li ul li {
-    margin-bottom: 0;
-}
-
-.bkey-menu li ul a, .bkey-extmenu li ul a {
-    font-weight: normal;
-}
-
-
-/**************** Footer styles ****************/
+/** Footer **/
 
 footer {
     border-top: 1px solid #CCC;
@@ -315,28 +221,6 @@ footer {
     padding: 30px 0;
     margin-top: 30px;
 }
-
-#theme_footer a, #theme_footer img {
-    vertical-align: middle;
-}
-
-#theme_footer p {
-    padding: 0;
-    margin: 0;
-    text-align: center;
-}
-
-#theme_footer a {
-    color: #f0f0f0;
-    background-color: inherit;
-    font-weight: bold;
-}
-
-#theme_footer a:hover {
-    color: #ffffff;
-    text-decoration: underline;
-}
-
 
 /**************** Misc classes and styles ****************/
 
@@ -362,11 +246,11 @@ footer {
     display: none;
 }
 
-.textcenter {
+.text-center {
     text-align: center;
 }
 
-.textright {
+.text-right {
     text-align: right;
 }
 
@@ -376,9 +260,12 @@ footer {
     font-weight: bold;
 }
 
-/* images */
-img {
-    border: none;
+.margin-1 {
+    margin: 1em;
+}
+
+.margin-left-2 {
+    margin-left: 2em;
 }
 
 .theme_box {
@@ -482,7 +369,8 @@ COLOR5: #D0D0D0 #BBEEEE #87BDC1 #FFEDBA #B3CD7B #B3CADB
 
 /** Admin menu **/
 
-.admin-menu-container {
+.admin-menu-container,
+.myagora-menu-container {
     margin: 0.8em 0;
     min-height: 50px;
 }
@@ -529,3 +417,11 @@ COLOR5: #D0D0D0 #BBEEEE #87BDC1 #FFEDBA #B3CD7B #B3CADB
 .pagination {
     margin: 0;
 }
+
+
+/** My Agora **/
+
+.myagora h3 {
+    border-bottom: 1px solid #ddd;
+}
+
