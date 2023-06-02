@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->integer('client_id')->unsigned()->default('0');
             $table->bigInteger('user_id')->unsigned()->default('0');
             $table->tinyInteger('action_type')->default(0);
-            $table->text('action_description');
+            $table->text('action_description')->nullable();
             $table->timestamps();
 
             $table->foreign('client_id')->references('id')->on('clients');

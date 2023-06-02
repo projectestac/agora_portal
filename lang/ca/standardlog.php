@@ -2,6 +2,7 @@
 
 return [
     'title' => 'Registre d\'accions',
+    'log_list' => 'Registres del centre :name',
     'action_type' => 'Tipus d\'acció',
     'action_description' => 'Descripció',
     'delete' => 'Esborra :name com a gestor',
