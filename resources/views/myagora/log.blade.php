@@ -8,8 +8,8 @@
     </div>
 
     <div class="content myagora">
-        @if (isset($current_client['name']))
-            <h3>{{ __('manager.log_list', ['name' => $current_client['name']]) }}</h3>
+        @if (isset($currentClient['name']))
+            <h3>{{ __('standardlog.log_list', ['name' => $currentClient['name']]) }}</h3>
         @endif
 
         @include('components.messages')
