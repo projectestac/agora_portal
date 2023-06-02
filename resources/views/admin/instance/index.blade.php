@@ -21,8 +21,8 @@
                         <th>{{ __('client.name') }}</th>
                         <th>{{ __('common.type') }}</th>
                         <th>{{ __('common.status') }}</th>
-                        <th>{{ __('service.name') }}</th>
-                        <th>{{ __('location.name') }}</th>
+                        <th>{{ __('service.service') }}</th>
+                        <th>{{ __('instance.location_long') }}</th>
                         <th>{{ __('common.actions') }}</th>
                     </tr>
                 </thead>
@@ -31,20 +31,26 @@
                     <tr>
                         <td>{{ $instance->db_id }}</td>
                         <td>{{ $instance->client_name }}</td>
-                        <td>{{ $instance->client_type_name }}</td>
+                        <td>{{ $instance->modelType->description }}</td>
                         <td>{{ $instance->status }}</td>
-                        <td>{{ $instance->service_name }}</td>
+                        <td>
+                            <img src="{{ asset('images/' . mb_strtolower($instance->service_name . '.gif')) }}"
+                                 alt="{{ $instance->service_name }}"
+                                 title="{{ $instance->service_name }}"
+                            >
+                        </td>
                         <td>{{ $instance->location_name }}</td>
                         <td>
-                            <a href="{{ route('instances.show', $instance->id) }}"
-                               class="btn btn-info">{{ __('common.show') }}</a>
-                            <a href="{{ route('instances.edit', $instance->id) }}"
-                               class="btn btn-primary">{{ __('common.edit') }}</a>
+                            <a class="btn btn-info" href="{{ route('instances.edit', $instance->id) }}" title="{{ __('service.edit') }}">
+                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                            </a>
                             <form action="{{ route('instances.destroy', $instance->id) }}" method="POST"
                                   style="display: inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger">{{ __('common.delete') }}</button>
+                                <button type="submit" class="btn btn-danger" title="{{ __('service.delete') }}">
+                                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                </button>
                             </form>
                         </td>
                     </tr>
