@@ -57,20 +57,20 @@ class ManagerController extends Controller {
             $user->save();
         }
 
-        $current_client = Cache::get_current_client($request);
+        $currentClient = Cache::getCurrentClient($request);
 
-        if (Manager::where('user_id', $user->id)->where('client_id', $current_client['id'])->exists()) {
+        if (Manager::where('user_id', $user->id)->where('client_id', $currentClient['id'])->exists()) {
             return redirect()->back()->withErrors(__('manager.manager_already_exists'));
         }
 
         $manager = new Manager([
             'user_id' => $user->id,
-            'client_id' => $current_client['id'],
+            'client_id' => $currentClient['id'],
         ]);
         $manager->save();
 
         Log::insert([
-            'client_id' => $current_client['id'],
+            'client_id' => $currentClient['id'],
             'user_id' => Auth::user()->id,
             'action_type' => Log::ACTION_TYPE_ADD,
             'action_description' => __('manager.manager_added_detail', ['username' => $manager->user->name]),

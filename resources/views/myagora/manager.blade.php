@@ -6,8 +6,8 @@
     </div>
 
     <div class="content myagora">
-        @if (isset($current_client['name']))
-            <h3>{{ __('manager.manager_list', ['name' => $current_client['name']]) }}</h3>
+        @if (isset($currentClient['name']))
+            <h3>{{ __('manager.manager_list', ['name' => $currentClient['name']]) }}</h3>
         @endif
 
         @include('components.messages')
@@ -53,7 +53,7 @@
                     <form action="{{ route('managers.store') }}" method="POST">
                         @csrf
                         <div class="form-group row">
-                            <label for="username" class="col-xs-12 col-sm-4 textright">
+                            <label for="username" class="col-xs-12 col-sm-4 text-right">
                                 {{ __('manager.add_manager_text') }}
                             </label>
                             <div class="col-xs-12 col-sm-8">
