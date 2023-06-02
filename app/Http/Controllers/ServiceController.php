@@ -15,7 +15,7 @@ class ServiceController extends Controller {
      * Display a listing of the resource.
      */
     public function index(): View|Application|Factory|ApplicationContract {
-        return view('service.index')->with('services', Service::all());
+        return view('admin.service.index')->with('services', Service::all());
     }
 
     /**
