@@ -9,7 +9,7 @@ return new class extends Migration {
      * Run the migrations.
      */
     public function up(): void {
-        Schema::create('client_service', static function (Blueprint $table) {
+        Schema::create('instances', static function (Blueprint $table) {
             $status = [
                 'pending',
                 'active',
@@ -30,8 +30,8 @@ return new class extends Migration {
             $table->integer('model_type_id')->unsigned()->default('0');
             $table->string('contact_name', 150)->default('');
             $table->string('contact_profile', 150)->default('');
-            $table->text('observations');
-            $table->text('annotations');
+            $table->text('observations')->nullable();
+            $table->text('annotations')->nullable();
             $table->timestamp('requested_at')->nullable();
             $table->timestamps();
 
