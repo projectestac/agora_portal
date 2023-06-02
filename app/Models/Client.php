@@ -54,25 +54,8 @@ class Client extends Model {
         return $this->hasMany(Log::class);
     }
 
-    public function services(): BelongsToMany {
-        return $this->belongsToMany(Service::class)
-            ->withPivot([
-                'id',
-                'status',
-                'db_id',
-                'db_host',
-                'quota',
-                'used_quota',
-                'visible',
-                'model_type_id',
-                'contact_name',
-                'contact_profile',
-                'observations',
-                'annotations',
-                'requested_at',
-                'created_at',
-                'updated_at',
-            ]);
+    public function instances(): HasMany {
+        return $this->hasMany(Instance::class);
     }
 
 }
