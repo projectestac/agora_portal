@@ -4,7 +4,7 @@ return [
     'client' => 'Client',
     'clients' => 'Clients',
     'code' => 'Codi de centre',
-    'name' => 'Nom',
+    'name' => 'Nom del client',
     'dns' => 'Nom propi',
     'old_dns' => 'Nom propi antic',
     'url_type' => 'Tipus d\'URL',

@@ -17,7 +17,7 @@ class ClientController extends Controller
      */
     public function index(): View|Application|Factory|ApplicationContract
     {
-        return view('client.index')->with('clients', Client::all());
+        return view('admin.client.index')->with('clients', Client::all());
     }
 
     /**
