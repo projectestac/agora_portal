@@ -15,7 +15,7 @@ class ModelTypeController extends Controller {
      * Display a listing of the resource.
      */
     public function index(): View|Application|Factory|ApplicationContract  {
-        return view('model.index');
+        return view('admin.model.index');
     }
 
     /**
