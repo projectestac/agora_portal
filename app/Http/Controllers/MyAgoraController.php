@@ -6,9 +6,11 @@ use App\Helpers\Access;
 use App\Helpers\Cache;
 use App\Helpers\Util;
 use App\Models\Client;
+use App\Models\Instance;
 use App\Models\Log;
 use App\Models\Manager;
 use App\Models\RequestType;
+use App\Models\Service;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -17,6 +19,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class MyAgoraController extends Controller {
 
@@ -40,9 +43,25 @@ class MyAgoraController extends Controller {
             return view('myagora.instance')->with('instances', []);
         }
 
-        $instances = Client::find($currentClient['id'])->services;
+        $instances = Instance::where('client_id', $currentClient['id'])
+            ->with('service')
+            ->with('client')
+            ->get();
 
-        return view('myagora.instance', compact('instances', 'currentClient'));
+        $activeInstancesClient = Instance::where('client_id', $currentClient['id'])
+            ->whereIn('status', ['active', 'pending'])
+            ->pluck('service_id')
+            ->toArray();
+
+        $availableServices = Service::where('status', 'active')
+            ->whereNotIn('id', $activeInstancesClient)
+            ->get()
+            ->toArray();
+
+        return view('myagora.instance')
+            ->with('instances', $instances)
+            ->with('currentClient', $currentClient)
+            ->with('availableServices', $availableServices);
 
     }
 
@@ -73,11 +92,16 @@ class MyAgoraController extends Controller {
 
         $availableRequests = [];
         if (!Access::isClient(Auth::user())) {
-            $client = Client::find($currentClient['id']);
-            $services = $client->services;
-            foreach ($services as $service) {
-                if ($service->status === 'active') {
-                    $availableRequests[$service->name] = $service->requestTypes()->orderby('id')->get()->toArray();
+            $instances = Instance::where('client_id', $currentClient['id'])
+                ->with('service')
+                ->get();
+            foreach ($instances as $instance) {
+                if ($instance->status === 'active') {
+                    $availableRequests[$instance->service->name] = DB::table('request_type_service')
+                        ->where('service_id', $instance->service->id)
+                        ->join('request_types', 'request_type_service.request_type_id', '=', 'request_types.id')
+                        ->get()
+                        ->toArray();
                 }
             }
         }
@@ -146,6 +170,12 @@ class MyAgoraController extends Controller {
 
     }
 
+    /**
+     * Endpoint for AJAX call used when creating a new request.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getRequestDetails(Request $request): JsonResponse {
 
         $option = $request->validate([
