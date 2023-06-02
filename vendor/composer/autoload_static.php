@@ -523,6 +523,13 @@ class ComposerStaticInit7680d4369dd743fb517b588a8f0126ce
                 0 => __DIR__ . '/..' . '/mockery/mockery/library',
             ),
         ),
+        'J' => 
+        array (
+            'JildertMiedema\\LaravelPlupload' => 
+            array (
+                0 => __DIR__ . '/..' . '/jildertmiedema/laravel-plupload/src',
+            ),
+        ),
     );
 
     public static $classMap = array (
@@ -2717,6 +2724,13 @@ class ComposerStaticInit7680d4369dd743fb517b588a8f0126ce
         'Illuminate\\View\\ViewFinderInterface' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewFinderInterface.php',
         'Illuminate\\View\\ViewName' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewName.php',
         'Illuminate\\View\\ViewServiceProvider' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/View/ViewServiceProvider.php',
+        'JildertMiedema\\LaravelPlupload\\Builder' => __DIR__ . '/..' . '/jildertmiedema/laravel-plupload/src/JildertMiedema/LaravelPlupload/Builder.php',
+        'JildertMiedema\\LaravelPlupload\\Facades\\Plupload' => __DIR__ . '/..' . '/jildertmiedema/laravel-plupload/src/JildertMiedema/LaravelPlupload/Facades/Plupload.php',
+        'JildertMiedema\\LaravelPlupload\\LaravelPluploadServiceProvider' => __DIR__ . '/..' . '/jildertmiedema/laravel-plupload/src/JildertMiedema/LaravelPlupload/LaravelPluploadServiceProvider.php',
+        'JildertMiedema\\LaravelPlupload\\Manager' => __DIR__ . '/..' . '/jildertmiedema/laravel-plupload/src/JildertMiedema/LaravelPlupload/Manager.php',
+        'JildertMiedema\\LaravelPlupload\\Plupload' => __DIR__ . '/..' . '/jildertmiedema/laravel-plupload/src/JildertMiedema/LaravelPlupload/Plupload.php',
+        'JildertMiedema\\LaravelPlupload\\PluploadException' => __DIR__ . '/..' . '/jildertmiedema/laravel-plupload/src/JildertMiedema/LaravelPlupload/PluploadException.php',
+        'JildertMiedema\\LaravelPlupload\\Receiver' => __DIR__ . '/..' . '/jildertmiedema/laravel-plupload/src/JildertMiedema/LaravelPlupload/Receiver.php',
         'Laravel\\Breeze\\BreezeServiceProvider' => __DIR__ . '/..' . '/laravel/breeze/src/BreezeServiceProvider.php',
         'Laravel\\Breeze\\Console\\InstallCommand' => __DIR__ . '/..' . '/laravel/breeze/src/Console/InstallCommand.php',
         'Laravel\\Breeze\\Console\\InstallsApiStack' => __DIR__ . '/..' . '/laravel/breeze/src/Console/InstallsApiStack.php',

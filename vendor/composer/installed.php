@@ -5,7 +5,7 @@
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '8555cbc08042d14893ee7d5404d5601faff5b765',
+        'reference' => 'ee2da126ba569b6b9e65ec677758cf087e8f98d3',
         'name' => 'laravel/laravel',
         'dev' => true,
     ),
@@ -355,6 +355,15 @@
                 0 => 'v10.8.0',
             ),
         ),
+        'jildertmiedema/laravel-plupload' => array(
+            'pretty_version' => 'V0.9.0',
+            'version' => '0.9.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../jildertmiedema/laravel-plupload',
+            'aliases' => array(),
+            'reference' => '75119f70655b4509275656621eb81f3e457e1135',
+            'dev_requirement' => false,
+        ),
         'kodova/hamcrest-php' => array(
             'dev_requirement' => true,
             'replaced' => array(
@@ -385,7 +394,7 @@
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '8555cbc08042d14893ee7d5404d5601faff5b765',
+            'reference' => 'ee2da126ba569b6b9e65ec677758cf087e8f98d3',
             'dev_requirement' => false,
         ),
         'laravel/pint' => array(
