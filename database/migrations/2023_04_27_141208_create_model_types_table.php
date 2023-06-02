@@ -11,11 +11,14 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('model_types', static function (Blueprint $table) {
             $table->increments('id');
-            $table->string('short_code', 10)->unique();
+            $table->integer('service_id')->unsigned();
+            $table->string('short_code', 10);
             $table->string('description')->default('');
             $table->string('url')->default('');
             $table->string('db', 25)->default('');
             $table->timestamps();
+
+            $table->foreign('service_id')->references('id')->on('services');
         });
     }
 
