@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
 
-class ClientServiceSeeder extends Seeder
+class InstanceSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -19,28 +19,28 @@ class ClientServiceSeeder extends Seeder
                 'client_id' => 1,
                 'service_id' => 4,
                 'db_id' => 1,
-                'model_type_id' => 1,
+                'model_type_id' => 2,
                 'contact_name' => 'Manager 1',
             ],
             [
                 'client_id' => 2,
                 'service_id' => 4,
                 'db_id' => 2,
-                'model_type_id' => 2,
+                'model_type_id' => 3,
                 'contact_name' => 'Manager 2',
             ],
             [
                 'client_id' => 3,
                 'service_id' => 4,
                 'db_id' => 3,
-                'model_type_id' => 1,
+                'model_type_id' => 2,
                 'contact_name' => 'Manager 3',
             ],
             [
                 'client_id' => 4,
                 'service_id' => 4,
                 'db_id' => 4,
-                'model_type_id' => 2,
+                'model_type_id' => 3,
                 'contact_name' => 'Manager 4',
             ],
             [
@@ -109,7 +109,7 @@ class ClientServiceSeeder extends Seeder
         ];
 
         foreach ($client_services as $client_service) {
-            DB::table('client_service')->insert([
+            DB::table('instances')->insert([
                 'client_id' => $client_service['client_id'],
                 'service_id' => $client_service['service_id'],
                 'status' => 'active',
