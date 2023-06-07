@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'name' => 'Nom',
     'status' => 'Estat',
     'created_at' => 'Data de creació',
     'updated_at' => 'Data de modificació',
@@ -15,7 +16,10 @@ return [
     'my_agora' => 'El meu Àgora',
     'admin' => 'Administració',
     'submit' => 'Tramet',
+    'send' => 'Envia',
     'save' => 'Desa',
     'add' => 'Afegeix',
+    'cancel' => 'Cancel·la',
+    'update' => 'Actualitza',
     'date' => 'Data',
 ];

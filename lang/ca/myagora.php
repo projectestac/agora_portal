@@ -7,4 +7,9 @@ return [
     'active_date' => 'Data d\'alta',
     'requested_by' => 'Ha fet la sol·licitud',
     'database' => 'Base de dades',
+    'other_services_available' => 'Altres serveis disponibles',
+    'request_now' => 'Sol·licita\'l ara',
+    'request_service' => 'Sol·licita el servei',
+    'request_by' => 'Sol·licitud enviada per',
+    'contact_profile' => 'Càrrec en el centre',
 ];
