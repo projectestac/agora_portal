@@ -23,6 +23,8 @@
                     $date = Carbon::parse($instance->created_at);
                     $quota = Util::formatBytes($instance->quota);
                     $usedQuota = Util::formatBytes($instance->used_quota);
+                    $percent = round($instance->used_quota / $instance->quota * 100);
+                    $instanceId = $instance->id;
                 @endphp
 
                 <div class="panel panel-default">
@@ -30,13 +32,13 @@
                         {{ $instance->service->name }}: {{ $instance->service->description }}
                     </div>
                     <div class="panel-body">
-                        <ul>
-                            <li><strong>{{ __('myagora.requested_by') }}:</strong> {{ $instance->contact_name }}</li>
-                            <li><strong>{{ __('myagora.active_date') }}:</strong> {{ $date->format('d/m/Y') }}</li>
-                            <li><strong>{{ __('common.status') }}:</strong> {{ $instance->status }}</li>
-                            <li><strong>{{ __('myagora.database') }}:</strong> {{ $instance->db_id }}</li>
-                            <li><strong>{{ __('service.quota') }}:</strong> ({{ $usedQuota }} / {{ $quota }})</li>
-                        </ul>
+                        <div><strong>{{ __('myagora.requested_by') }}:</strong> {{ $instance->contact_name }}</div>
+                        <div><strong>{{ __('myagora.active_date') }}:</strong> {{ $date->format('d/m/Y') }}</div>
+                        <div><strong>{{ __('common.status') }}:</strong> {{ $instance->status }}</div>
+                        @if($instance->status === \App\Models\Instance::STATUS_ACTIVE)
+                            <div><strong>{{ __('myagora.database') }}:</strong> {{ $instance->db_id }}</div>
+                            @include('components.quota-usage')
+                        @endif
                     </div>
                 </div>
             @endforeach
