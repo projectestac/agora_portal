@@ -13,6 +13,7 @@ use App\Http\Controllers\RequestController;
 use App\Http\Controllers\RequestTypeController;
 use App\Http\Controllers\ServiceController;
 use Illuminate\Support\Facades\Route;
+use JildertMiedema\LaravelPlupload\Plupload;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,4 +63,18 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site|Manage own 
 // AJAX routes
 Route::get('/myagora/request/details', [MyAgoraController::class, 'getRequestDetails']);
 
-require __DIR__.'/auth.php';
+// plupload route
+Route::group(['middleware' => ['auth', 'permission:Administrate site|Manage clients']], static function () {
+    Route::post('/upload', [MyAgoraController::class, 'uploadFile'])->name('upload');
+});
+
+
+/*
+Route::post('/upload', function () {
+    return Plupload::receive('file', function ($file) {
+        $file->move(storage_path() . '/test/', $file->getClientOriginalName());
+        return 'ready';
+    });
+})->name('upload');
+*/
+require __DIR__ . '/auth.php';
