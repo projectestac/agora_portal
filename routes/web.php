@@ -54,7 +54,6 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site|Manage own 
     Route::resource('/instances', InstanceController::class);
     Route::get('/myagora', [MyAgoraController::class, 'myagora'])->name('myagora');
     Route::get('/myagora/instances', [MyAgoraController::class, 'instances'])->name('myagora.instances');
-    Route::get('/myagora/files', [MyAgoraController::class, 'files'])->name('myagora.files');
     Route::get('/myagora/requests', [MyAgoraController::class, 'requests'])->name('myagora.requests');
     Route::get('/myagora/managers', [MyAgoraController::class, 'managers'])->name('myagora.managers');
     Route::get('/myagora/logs', [MyAgoraController::class, 'logs'])->name('myagora.logs');
@@ -63,18 +62,13 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site|Manage own 
 // AJAX routes
 Route::get('/myagora/request/details', [MyAgoraController::class, 'getRequestDetails']);
 
-// plupload route
+// Files routes
 Route::group(['middleware' => ['auth', 'permission:Administrate site|Manage clients']], static function () {
+    Route::get('/myagora/files', [MyAgoraController::class, 'files'])->name('myagora.files');
+    Route::get('/myagora/file/download', [MyAgoraController::class, 'downloadFile'])->name('myagora.file.download');
+    Route::get('/myagora/file/delete', [MyAgoraController::class, 'deleteFile'])->name('myagora.file.delete');
+    Route::get('/myagora/quota/recalc', [MyAgoraController::class, 'recalcQuota'])->name('myagora.quota.recalc');
     Route::post('/upload', [MyAgoraController::class, 'uploadFile'])->name('upload');
 });
 
-
-/*
-Route::post('/upload', function () {
-    return Plupload::receive('file', function ($file) {
-        $file->move(storage_path() . '/test/', $file->getClientOriginalName());
-        return 'ready';
-    });
-})->name('upload');
-*/
 require __DIR__ . '/auth.php';
