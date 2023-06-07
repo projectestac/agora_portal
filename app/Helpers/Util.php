@@ -3,7 +3,10 @@
 namespace App\Helpers;
 
 use App\Models\Client;
+use App\Models\Instance;
+use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class Util {
 
@@ -118,7 +121,7 @@ class Util {
     /**
      * Function to convert a number representing a disk size in bytes to a human-readable format.
      */
-    public static function formatBytes($bytes, $precision = 2): string {
+    public static function formatBytes(int $bytes, int $precision = 2): string {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
 
         $bytes = max($bytes, 0);
@@ -128,6 +131,53 @@ class Util {
         $bytes /= 1024 ** $pow;
 
         return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+
+    public static function getAgoraVar(string $varName = '', Request $request = null): string {
+        if (empty($varName)) {
+            return '';
+        }
+
+        switch ($varName) {
+            case 'portaldata':
+                return Config::get('app.agora.server.root') .
+                    Config::get('app.agora.admin.datadir');
+
+            case 'moodledata':
+                return Config::get('app.agora.server.root') .
+                    Config::get('app.agora.moodle2.datadir');
+
+            case 'moodledata_repo':
+                return Config::get('app.agora.server.root') .
+                    Config::get('app.agora.moodle2.datadir') .
+                    Cache::getDBName($request, 'Moodle') .
+                    Config::get('app.agora.moodle2.repository_files');
+
+            default:
+                return '';
+        }
+    }
+
+    public static function getQuota(int $instanceId): array {
+        if (empty($instanceId)) {
+            return [];
+        }
+
+        $instance = Instance::where('id', $instanceId)->first();
+
+        return [
+            'quota' => $instance->quota,
+            'used_quota' => $instance->used_quota,
+        ];
+    }
+
+    public static function addToQuota(Request $request, int $size = 0) {
+
+        $currentInstanceId = Cache::getCurrentInstance($request)['id'];
+        $instance = Instance::where('id', $currentInstanceId)->first();
+        $instance->used_quota += $size;
+
+        return $instance->save();
     }
 
 }
