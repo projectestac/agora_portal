@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 
+include_once dirname(__DIR__, 2) . '/config/env-config.php';
+global $agora;
+
 return [
 
     /*
@@ -16,7 +19,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Àgora - Portal de Serveis'),
 
     /*
     |--------------------------------------------------------------------------
@@ -55,7 +58,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'https://educaciodigital.cat/portal'),
 
     'asset_url' => env('ASSET_URL'),
 
@@ -70,7 +73,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Europe/Madrid',
 
     /*
     |--------------------------------------------------------------------------
@@ -185,5 +188,8 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
+
+    // Global Àgora configuration.
+    'agora' => $agora,
 
 ];
