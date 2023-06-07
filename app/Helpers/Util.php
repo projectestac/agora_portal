@@ -143,9 +143,23 @@ class Util {
                 return Config::get('app.agora.server.root') .
                     Config::get('app.agora.admin.datadir');
 
+            case 'nodesdata':
+                return Config::get('app.agora.server.root') .
+                    Config::get('app.agora.nodes.datadir');
+
+            case 'nodesdata_db':
+                return Config::get('app.agora.server.root') .
+                    Config::get('app.agora.nodes.datadir') .
+                    Cache::getDBName($request, 'Nodes') . '/';
+
             case 'moodledata':
                 return Config::get('app.agora.server.root') .
                     Config::get('app.agora.moodle2.datadir');
+
+            case 'moodledata_db':
+                return Config::get('app.agora.server.root') .
+                    Config::get('app.agora.moodle2.datadir') .
+                    Cache::getDBName($request, 'Moodle') . '/';
 
             case 'moodledata_repo':
                 return Config::get('app.agora.server.root') .
@@ -158,26 +172,25 @@ class Util {
         }
     }
 
-    public static function getQuota(int $instanceId): array {
-        if (empty($instanceId)) {
+    public static function getFiles(string $dir = ''): array {
+
+        if (empty($dir)) {
             return [];
         }
 
-        $instance = Instance::where('id', $instanceId)->first();
+        $files = array_diff(scandir($dir), ['.', '..']);
 
-        return [
-            'quota' => $instance->quota,
-            'used_quota' => $instance->used_quota,
-        ];
-    }
+        foreach ($files as $file) {
+            $path = $dir . '/' . $file;
+            $result[] = [
+                'name' => $file,
+                'size' => filesize($path),
+                'updated_at' => date('d/m/Y H:i', filemtime($path)),
+            ];
+        }
 
-    public static function addToQuota(Request $request, int $size = 0) {
+        return $result ?? [];
 
-        $currentInstanceId = Cache::getCurrentInstance($request)['id'];
-        $instance = Instance::where('id', $currentInstanceId)->first();
-        $instance->used_quota += $size;
-
-        return $instance->save();
     }
 
 }

@@ -72,7 +72,16 @@ class Cache {
         return $currentClient;
     }
 
-    public static function getCurrentInstance(Request $request, $clientId = 0, $serviceName = 'Moodle') {
+    /**
+     * This function is used to help in the quota update of Moodle instances when large files are uploaded or removed to the
+     * repository. It stores the instance id in the Laravel session. Right now, only can be used for Moodle instances.
+     *
+     * @param Request $request
+     * @param int $clientId
+     * @param string $serviceName
+     * @return Array
+     */
+    public static function getCurrentInstance(Request $request, int $clientId = 0, string $serviceName = 'Moodle'): Array {
 
         $currentInstance = $request->session()->get('currentInstance');
 
