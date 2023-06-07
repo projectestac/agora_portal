@@ -27,6 +27,12 @@ class Instance extends Model {
         'requested_at',
     ];
 
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_INACTIVE = 'inactive';
+    public const STATUS_DENIED = 'denied';
+    public const STATUS_WITHDRAWN = 'withdrawn';
+
     public function service(): BelongsTo {
         return $this->belongsTo(Service::class);
     }

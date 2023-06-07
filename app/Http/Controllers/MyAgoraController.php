@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Access;
 use App\Helpers\Cache;
+use App\Helpers\Quota;
 use App\Helpers\Util;
 use App\Models\Client;
 use App\Models\Instance;
@@ -21,6 +22,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class MyAgoraController extends Controller {
 
@@ -87,15 +89,19 @@ class MyAgoraController extends Controller {
 
         // The quota information in the cache can be out of date. Using getQuota() it is ensured that is updated.
         $currentInstance = Cache::getCurrentInstance($request);
-        $quota = Util::getQuota($currentInstance['id']);
+        $quota = Quota::getQuota($currentInstance['id']);
         $percent = round($quota['used_quota'] / $quota['quota'] * 100);
+
+        $files = Util::getFiles(Util::getAgoraVar('moodledata_repo', $request));
 
         return view('myagora.file')
             ->with('maxFileSize', $maxFileSize)
             ->with('extensions', $extensions)
-            ->with('used_quota', Util::formatBytes($quota['used_quota'], 2))
+            ->with('usedQuota', Util::formatBytes($quota['used_quota'], 2))
             ->with('quota', Util::formatBytes($quota['quota'], 2))
-            ->with('percent', $percent);
+            ->with('percent', $percent)
+            ->with('instanceId', $currentInstance['id'])
+            ->with('files', $files);
 
     }
 
@@ -192,7 +198,7 @@ class MyAgoraController extends Controller {
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
-                Util::addToQuota($request, filesize($moodleDataDir . DIRECTORY_SEPARATOR . $fileName));
+                Quota::addToQuota($request, filesize($moodleDataDir . DIRECTORY_SEPARATOR . $fileName));
             }
 
             // Return Success JSON-RPC response
@@ -201,6 +207,58 @@ class MyAgoraController extends Controller {
 
         // If the user is not admin or manager, abort the request.
         abort(403, 'No tens permís per executar aquest fitxer.');
+
+    }
+
+    public function downloadFile(Request $request): BinaryFileResponse {
+
+        $fileName = $request->input('file');
+
+        if (empty($fileName)) {
+            abort(404);
+        }
+
+        $dir = Util::getAgoraVar('moodledata_repo', $request);
+        $path = $dir . DIRECTORY_SEPARATOR . $fileName;
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        return response()->download($path);
+
+    }
+
+    public function deleteFile(Request $request): RedirectResponse {
+
+        $fileName = $request->input('file');
+
+        if (empty($fileName)) {
+            abort(404);
+        }
+
+        $dir = Util::getAgoraVar('moodledata_repo', $request);
+        $path = $dir . DIRECTORY_SEPARATOR . $fileName;
+        $fileSize = filesize($path);
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        unlink($path);
+
+        Log::insert([
+            'client_id' => Cache::getCurrentClient($request)['id'],
+            'user_id' => Auth::user()->id,
+            'action_type' => Log::ACTION_TYPE_DELETE,
+            'action_description' => __('file.deleted_from_moodle', ['filename' => $fileName]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Quota::subtractFromQuota($request, $fileSize);
+
+        return redirect()->route('myagora.files');
 
     }
 
@@ -321,6 +379,19 @@ class MyAgoraController extends Controller {
             ->render();
 
         return response()->json(['html' => $content]);
+    }
+
+    public function recalcQuota(Request $request) {
+        $instanceId = $request->input('id');
+
+        $instance = Instance::where('id', $instanceId)->first();
+        $service = Service::find($instance->service_id);
+        $dataDir = Util::getAgoraVar(mb_strtolower($service->name) . 'data_db', $request);
+
+        $instance->used_quota = Quota::getDiskUsage($dataDir);
+        $instance->save();
+
+        return redirect()->route('myagora.instances')->with('success', __('file.quota_updated'));
     }
 
 }
