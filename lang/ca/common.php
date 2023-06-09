@@ -22,4 +22,6 @@ return [
     'cancel' => 'Cancel·la',
     'update' => 'Actualitza',
     'date' => 'Data',
+    'town' => 'Població',
+    'search' => 'Cerca',
 ];
