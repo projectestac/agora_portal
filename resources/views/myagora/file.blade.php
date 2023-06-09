@@ -20,7 +20,7 @@
                 <meta name="csrf-token" content="{{ csrf_token() }}">
 
                 <div class="margin-top-2">
-                    @include('components.quota-usage')
+                    @include('myagora.components.quota-usage')
                 </div>
 
                 <div id="container" class="margin-top-2">
