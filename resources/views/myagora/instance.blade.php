@@ -37,7 +37,7 @@
                         <div><strong>{{ __('common.status') }}:</strong> {{ $instance->status }}</div>
                         @if($instance->status === \App\Models\Instance::STATUS_ACTIVE)
                             <div><strong>{{ __('myagora.database') }}:</strong> {{ $instance->db_id }}</div>
-                            @include('components.quota-usage')
+                            @include('myagora.components.quota-usage')
                         @endif
                     </div>
                 </div>
