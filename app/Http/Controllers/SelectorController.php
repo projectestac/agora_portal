@@ -46,8 +46,6 @@ class SelectorController extends Controller {
             $instances = [];
         }
 
-//        dump($services, $selectedService, $instances);
-
         return [
             'services' => $services,
             'selectedService' => $selectedService,

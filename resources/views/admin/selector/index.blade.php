@@ -1,7 +1,7 @@
 <div class="col-md-4">
     <div class="form-group">
-        <label for="service-sel">{{ __('service.service') }}</label>
-        <select class="form-control" id="service-sel" name="service-sel" style="width:100%;">
+        <label for="serviceSel">{{ __('service.service') }}</label>
+        <select class="form-control" id="serviceSel" name="serviceSel">
             @foreach($viewData['services'] as $service)
                 <option value="{{ $service['id'] }}"
                         @if($service['selected']) selected="selected" @endif>
@@ -13,24 +13,24 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <label for="service-selector">{{ __('batch.client_selection') }}</label>
+            <label for="serviceSelector">{{ __('batch.client_selection') }}</label>
             <span id="reload"></span>
         </div>
         <div class="panel-body">
-            <select class="form-control" id="service-selector" name="service-selector" style="width:100%;">
+            <select class="form-control" id="serviceSelector" name="serviceSelector">
                 <option value="all" selected="selected">{{ __('batch.all_clients') }}</option>
                 <option value="selected">{{ __('batch.only_selected') }}</option>
             </select>
             <br/>
 
-            <div id="search-engine" style="display:none;">
-                <div id="clientslist" name="clients-list" style="width:100%;">
+            <div id="searchEngine" style="display:none;">
+                <div id="clientslist" name="clients-list">
                     @include('admin.selector.client-select')
                 </div>
 
                 <div class="form-group">
                     <label for="order">{{ __('batch.order_by') }}</label>
-                    <select class="form-control" id="order" name="order" style="width:100%;">
+                    <select class="form-control" id="order" name="order">
                         <option value="clientname" selected="selected">{{ __('client.name') }}</option>
                         <option value="dbid">{{ __('instance.db_id') }}</option>
                         <option value="clientcode">{{ __('client.code') }}</option>
@@ -39,7 +39,9 @@
                 </div>
 
                 <div class="panel panel-default">
-                    <div class="panel-heading"><label for="search">{{ __('batch.search_engine') }}</label></div>
+                    <div class="panel-heading">
+                        <label for="search">{{ __('batch.search_engine') }}</label>
+                    </div>
                     <div class="panel-body">
                         <div class="form-inline form-group">
                             <select class="form-control" id="search" name="search">
@@ -64,18 +66,20 @@
 <script>
     $(document).ready(function () {
         // Show/Hide the client selector and the search box.
-        $('#service-selector').on('change', function () {
+        $('#serviceSelector').on('change', function () {
             let selectedOption = $(this).val();
             if (selectedOption === 'selected') {
-                $('#search-engine').show();
+                $('#searchEngine').show();
             } else {
-                $('#search-engine').hide();
+                $('#searchEngine').hide();
             }
         });
 
         // Update the client list using AJAX. Honors the selected service, the order and the search box.
         function filter_client_list() {
-            let serviceSel = $('#service-sel').val();
+            $('#reload').html('<span class="glyphicon glyphicon-refresh"></span>');
+
+            let serviceSel = $('#serviceSel').val();
             let order = $('#order').val();
             let search = $('#search').val();
             let textToSearch = $('#textToSearch').val();
@@ -92,9 +96,11 @@
                     },
                     success: function (response) {
                         $('#clientslist').html(response.html);
+                        $('#reload').html('');
                     },
                     error: function (xhr, status, error) {
                         console.error(error);
+                        $('#reload').html('');
                     }
                 });
             }
@@ -103,14 +109,14 @@
         // Bind the events to the elements.
         $('#order').on('change', filter_client_list);
         $('#submit-search').on('click', filter_client_list);
-        $('#service-sel').on('change', filter_client_list);
+        $('#serviceSel').on('change', filter_client_list);
 
         // If the user selects service "portal" then hide the client list and the search box.
-        $('#service-sel').on('change', function () {
-            let serviceSel = $('#service-sel').val();
+        $('#serviceSel').on('change', function () {
+            let serviceSel = $('#serviceSel').val();
             if (serviceSel === '0') {
-                $('#search-engine').hide();
-                $('#service-selector').val('all');
+                $('#searchEngine').hide();
+                $('#serviceSelector').val('all');
             }
         });
     });

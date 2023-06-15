@@ -19,7 +19,7 @@ class QuerySeeder extends Seeder {
                 'type' => 'update',
             ],
             [
-                'service_id' => 6,
+                'service_id' => 4,
                 'query' => 'UPDATE m2user SET password = MD5(\'agora\') WHERE username = \'admin\';',
                 'description' => 'Canvia la contrasenya a l\'usuari admin',
                 'type' => 'update',
