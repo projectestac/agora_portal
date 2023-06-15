@@ -2,16 +2,15 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\Access;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateQueryRequest extends FormRequest
-{
+class UpdateQueryRequest extends FormRequest {
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
-    {
-        return false;
+    public function authorize(): bool {
+        return Access::isAdmin($this->user());
     }
 
     /**
@@ -19,10 +18,12 @@ class UpdateQueryRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
-    public function rules(): array
-    {
+    public function rules(): array {
         return [
-            //
+            'serviceSelModalEdit' => 'required|integer',
+            'sqlQueryModalEditEncoded' => 'required|string',
+            'descriptionModalEdit' => 'string|nullable',
+            'queryTypeModalEdit' => 'string',
         ];
     }
 }

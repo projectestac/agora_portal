@@ -21,9 +21,9 @@ class StoreQueryRequest extends FormRequest {
     public function rules(): array {
         return [
             'serviceSelModal' => 'required|integer',
-            'sqlQueryModal' => 'required|string',
-            'descriptionModal' => 'string',
-            'queryType' => 'string',
+            'sqlQueryModalAddEncoded' => 'required|string',
+            'descriptionModalAdd' => 'string|nullable',
+            'queryTypeAdd' => 'string',
         ];
     }
 }

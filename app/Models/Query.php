@@ -12,12 +12,9 @@ class Query extends Model
 
     protected $fillable = [
         'service_id',
-        'command',
+        'query',
         'description',
         'type',
     ];
 
-    public function service(): BelongsTo {
-        return $this->belongsTo(Service::class);
-    }
 }

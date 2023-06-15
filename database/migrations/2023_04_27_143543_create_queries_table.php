@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->integer('service_id')->unsigned();
             $table->text('query')->nullable();
             $table->text('description')->nullable();
-            $table->enum('type', ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'ALTER', 'DROP'])->default('SELECT');
+            $table->enum('type', ['select', 'insert', 'update', 'delete', 'alter', 'drop'])->default('select');
             $table->timestamps();
          });
     }
