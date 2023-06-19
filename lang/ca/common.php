@@ -16,6 +16,7 @@ return [
     'my_agora' => 'El meu Àgora',
     'admin' => 'Administració',
     'submit' => 'Tramet',
+    'execute' => 'Executa',
     'send' => 'Envia',
     'save' => 'Desa',
     'add' => 'Afegeix',
@@ -24,4 +25,6 @@ return [
     'date' => 'Data',
     'town' => 'Població',
     'search' => 'Cerca',
+    'close' => 'Tanca',
+    'database' => 'Base de dades',
 ];
