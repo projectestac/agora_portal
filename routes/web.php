@@ -3,6 +3,7 @@
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClientTypeController;
+use App\Http\Controllers\QueryController;
 use App\Http\Controllers\ConfigController;
 use App\Http\Controllers\InstanceController;
 use App\Http\Controllers\LocationController;
@@ -11,9 +12,9 @@ use App\Http\Controllers\ModelTypeController;
 use App\Http\Controllers\MyAgoraController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\RequestTypeController;
+use App\Http\Controllers\SelectorController;
 use App\Http\Controllers\ServiceController;
 use Illuminate\Support\Facades\Route;
-use JildertMiedema\LaravelPlupload\Plupload;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,13 +31,17 @@ Route::get('/', static function () {
     return view('home');
 })->name('home');
 
+Route::resource('/queries', QueryController::class);
+
 // Routes for administrators only.
 Route::group(['middleware' => ['auth', 'permission:Administrate site']], static function () {
     Route::resource('/services', ServiceController::class);
     Route::resource('/clients', ClientController::class);
 
     Route::get('/batch', [BatchController::class, 'batch'])->name('batch');
-    Route::get('/batch/query', [BatchController::class, 'query'])->name('query');
+    Route::get('/batch/query', [BatchController::class, 'query'])->name('batch.query');
+    Route::post('/batch/query/confirm', [QueryController::class, 'confirmQuery'])->name('batch.query.confirm');
+    Route::post('/batch/query/exec', [QueryController::class, 'executeQuery'])->name('batch.query.exec');
     Route::get('/batch/queue', [BatchController::class, 'queue'])->name('queue');
     Route::get('/batch/operation', [BatchController::class, 'operation'])->name('operation');
     Route::get('/batch/create', [BatchController::class, 'create'])->name('create');
@@ -61,6 +66,7 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site|Manage own 
 
 // AJAX routes
 Route::get('/myagora/request/details', [MyAgoraController::class, 'getRequestDetails']);
+Route::get('/search', [SelectorController::class, 'getClients'])->name('search');
 
 // Files routes
 Route::group(['middleware' => ['auth', 'permission:Administrate site|Manage clients']], static function () {
