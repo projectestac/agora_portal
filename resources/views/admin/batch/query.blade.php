@@ -11,13 +11,14 @@
         @include('components.messages')
 
         <a id="sqlQueryLink"></a>
-        <form action="" method="POST">
+        <form id="queryExecForm" action="{{ route('batch.query.confirm') }}" method="POST">
             @csrf
             <div id="query-container" class="col-md-8">
                 <!-- Textarea for SQL query -->
                 <div class="form-group">
                     <label for="sqlQuery">{{ __('batch.sql_query') }}</label>
-                    <textarea class="form-control" id="sqlQuery" name="sqlQuery" rows="8"></textarea>
+                    <textarea class="form-control" id="sqlQuery" name="sqlQuery" rows="8">@if(!is_null($query)){{ $query }}@endif</textarea>
+                    <input type="hidden" id="sqlQueryEncoded" name="sqlQueryEncoded">
                 </div>
 
                 <!-- Row of buttons -->
@@ -31,7 +32,7 @@
                         <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
                         {{ __('batch.save_query') }}
                     </span>
-                    <button type="submit" class="btn btn-primary" id="run-query" name="runQuery">
+                    <button type="submit" class="btn btn-primary" id="runQuery" name="runQuery">
                         <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
                         {{ __('batch.run_query') }}
                     </button>
@@ -209,5 +210,14 @@
                     });
                 }
             }
+
+            // Encode query in base64 before submitting the form to avoid blockages from firewalls.
+            $('#queryExecForm').submit(function () {
+                let queryPlain = $('#sqlQuery').val();
+                let queryEncoded = btoa(queryPlain);
+                $('#sqlQueryEncoded').val(queryEncoded);
+                $('#sqlQuery').val(''); // Clear the textarea to avoid sending the query in plain text.
+            });
         </script>
+    </div>
 @endsection

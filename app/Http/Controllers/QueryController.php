@@ -4,11 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreQueryRequest;
 use App\Http\Requests\UpdateQueryRequest;
+use App\Models\Client;
+use App\Models\Instance;
 use App\Models\Query;
 use App\Models\Service;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class QueryController extends Controller {
     /**
@@ -58,7 +63,7 @@ class QueryController extends Controller {
 
         $query->save();
 
-        return redirect()->route('query')->with('success', __('batch.query_added'));
+        return redirect()->route('batch.query')->with('success', __('batch.query_added'));
     }
 
     /**
@@ -85,13 +90,12 @@ class QueryController extends Controller {
             ->render();
 
         return response()->json(['html' => $content]);
-
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateQueryRequest $request, Query $query) {
+    public function update(UpdateQueryRequest $request, Query $query): RedirectResponse {
         $query->service_id = $request->input('serviceSelModalEdit');
         $query->query = base64_decode($request->input('sqlQueryModalEditEncoded'));
         $query->description = $request->input('descriptionModalEdit');
@@ -99,7 +103,7 @@ class QueryController extends Controller {
 
         $query->save();
 
-        return redirect()->route('query')->with('success', __('batch.query_updated'));
+        return redirect()->route('batch.query')->with('success', __('batch.query_updated'));
     }
 
     /**
@@ -113,4 +117,198 @@ class QueryController extends Controller {
             'html' => '<span class="alert alert-danger">' . __('batch.query_deleted') . '</span>',
         ]);
     }
+
+    public function confirmQuery(Request $request): View {
+        $validatedData = $request->validate([
+            'sqlQueryEncoded' => 'required|string',
+            'serviceSel' => 'required|int',
+            'serviceSelector' => 'string|max:10', // 'all' or 'selected'
+            'clientsSel' => 'array',
+        ]);
+
+        $sqlQueryEncoded = $validatedData['sqlQueryEncoded'];
+        $serviceSel = $validatedData['serviceSel'];
+        $serviceSelector = $validatedData['serviceSelector'];
+        $clientsSel = $validatedData['clientsSel'] ?? [];
+
+        if ((int)$serviceSel === 0) {
+            $serviceName = 'Portal';
+            $image = 'agora';
+            $clients = [];
+        } else {
+            $serviceName = Service::find($serviceSel)->name;
+            $image = mb_strtolower($serviceName);
+
+            // In case of 'all' clients, we need to get the full list of clients of the service.
+            if ($serviceSelector === 'all') {
+                $clients = Instance::select(['clients.id', 'clients.name', 'clients.code'])
+                    ->join('clients', 'instances.client_id', '=', 'clients.id')
+                    ->where('instances.service_id', $serviceSel)
+                    ->where('instances.status', 'active')
+                    ->orderBy('clients.name')
+                    ->get()->toArray();
+            } else {
+                $clients = Client::select(['id', 'name', 'code'])
+                    ->whereIn('id', $clientsSel)
+                    ->orderBy('name')
+                    ->get()->toArray();
+            }
+        }
+
+        return view('admin.batch.query-confirm')
+            ->with('sqlQueryEncoded', $sqlQueryEncoded)
+            ->with('serviceSel', $serviceSel)
+            ->with('clients', $clients)
+            ->with('serviceName', $serviceName)
+            ->with('image', $image);
+    }
+
+    public function executeQuery(Request $request): View {
+        $validatedData = $request->validate([
+            'sqlQueryEncoded' => 'required|string',
+            'serviceSel' => 'required|int',
+            'clientsSel' => 'array',
+            'serviceName' => 'string|max:15',
+            'image' => 'string|max:15',
+        ]);
+
+        $sqlQueryEncoded = $validatedData['sqlQueryEncoded'];
+        $serviceSel = $validatedData['serviceSel'];
+        $clientsSel = $validatedData['clientsSel'] ?? [];
+        $serviceName = $validatedData['serviceName'];
+        $image = $validatedData['image'];
+
+        $sqlQuery = trim(base64_decode($sqlQueryEncoded));
+        $isSelect = Str::startsWith(Str::lower($sqlQuery), 'select');
+
+        $request->session()->put('query', $sqlQuery);
+
+        $serviceNameLower = Str::lower($serviceName);
+        $globalResults = [];
+        $fullResults = [];
+        $summary = [];
+        $attributes = [];
+
+        // Query executed to the Portal database.
+        if ((int)$serviceSel === 0) {
+            if ($isSelect) {
+                $execResult = DB::select($sqlQuery);
+            } else {
+                $execResult = DB::statement($sqlQuery);
+            }
+
+            [$fullResults, $attributes, $result] = $this->processQueryResults($execResult, env('DB_DATABASE'), 'Portal');
+
+            $globalResults[env('DB_DATABASE')] = [
+                'database' => env('DB_DATABASE'),
+                'clientName' => 'Portal',
+                'result' => $result,
+            ];
+
+            return view('admin.batch.query-execute')
+                ->with('sqlQueryEncoded', $sqlQueryEncoded)
+                ->with('serviceName', $serviceName)
+                ->with('image', $image)
+                ->with('globalResults', $globalResults)
+                ->with('fullResults', $fullResults)
+                ->with('attributes', $attributes);
+        }
+
+        $userName = '';
+        switch ($serviceName) {
+            case 'Moodle':
+                $serviceKey = 'moodle2';
+                $userPassword = config('app.agora.moodle2.userpwd');
+                break;
+            case 'Nodes':
+                $serviceKey = 'nodes';
+                $userName = config("app.agora.nodes.username");
+                $userPassword = config("app.agora.nodes.userpwd");
+                break;
+        }
+
+        $instances = Instance::select('db_id', 'db_host', 'clients.name as client_name')
+            ->join('clients', 'instances.client_id', '=', 'clients.id')
+            ->where('instances.service_id', $serviceSel)
+            ->whereIn('instances.client_id', $clientsSel)
+            ->orderBy('instances.id')
+            ->get()->toArray();
+
+        config(["database.connections.$serviceKey.userpwd" => $userPassword]);
+
+        foreach ($instances as $instance) {
+            $dbName = config("app.agora.$serviceKey.userprefix") . $instance['db_id'];
+            $userName = ($serviceName === 'Nodes') ? $userName : $dbName;
+
+            config(["database.connections.$serviceKey.host" => $instance['db_host']]);
+            config(["database.connections.$serviceKey.database" => $dbName]);
+            config(["database.connections.$serviceKey.username" => $userName]);
+
+            DB::connection($serviceKey)->reconnect();
+
+            // Execute query
+            if ($isSelect) {
+                $execResult = DB::connection($serviceNameLower)->select($sqlQuery);
+            } else {
+                $execResult = DB::connection($serviceNameLower)->statement($sqlQuery);
+            }
+
+            [$fullResults, $attributes, $result, $numRows] = $this->processQueryResults($execResult, $dbName, $instance['client_name']);
+
+            if ($numRows === 1) {
+                $summary[$result] = isset($summary[$result]) ? ++$summary[$result] : 1;
+            }
+
+            $globalResults[$dbName] = [
+                'database' => $dbName,
+                'clientName' => $instance['client_name'],
+                'result' => $result,
+            ];
+        }
+
+        return view('admin.batch.query-execute')
+            ->with('sqlQueryEncoded', $sqlQueryEncoded)
+            ->with('serviceName', $serviceName)
+            ->with('image', $image)
+            ->with('globalResults', $globalResults)
+            ->with('fullResults', $fullResults)
+            ->with('attributes', $attributes)
+            ->with('summary', $summary);
+
+    }
+
+    private function processQueryResults(mixed $execResult, string $dbName, string $clientName): array {
+
+        $fullResults = [];
+        $attributes = [];
+
+        if ($execResult === true) {
+            $execResult = 'OK';
+            $numRows = 1;
+        }
+
+        if (is_array($execResult)) {
+            $numRows = count($execResult);
+
+            if ($numRows === 0) {
+                $execResult = 0;
+            } elseif ($numRows === 1) {
+                // In this case, there is only one row, so it is not necessary to get the name of the database field. The
+                // $result variable will contain the value of the field.
+                $attribute = get_object_vars(reset($execResult));
+                $execResult = reset($attribute);
+            } elseif ($numRows > 1) {
+                // If $fullResults is not empty, the template will iterate over it to show a table for each instance. The
+                // name of the database fields is kept in the $attributes variable and the $result variable will contain
+                // the number of records returned by the query.
+                $fullResults[$dbName . ' - ' . $clientName] = $execResult;
+                $attributes = array_keys(get_object_vars(reset($execResult)));
+                $execResult = $numRows;
+            }
+        }
+
+        return [$fullResults, $attributes, $execResult, $numRows];
+
+    }
+
 }

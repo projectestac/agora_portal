@@ -6,7 +6,6 @@ return [
     'no_client_access' => 'Per accedir a aquesta pàgina has de ser gestor/a d\'algun centre.',
     'active_date' => 'Data d\'alta',
     'requested_by' => 'Ha fet la sol·licitud',
-    'database' => 'Base de dades',
     'other_services_available' => 'Altres serveis disponibles',
     'request_now' => 'Sol·licita\'l ara',
     'request_service' => 'Sol·licita el servei',
