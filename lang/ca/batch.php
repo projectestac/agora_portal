@@ -31,4 +31,13 @@ return [
     'result_or_num_results' => 'Resultat o nombre de resultats',
     'result' => 'Resultat',
     'num_ocurrences' => 'Nombre d\'ocurrències',
+    'operations' => 'Operacions',
+    'url_has_not_returned_actions' => 'L\'URL :url no ha retornat cap acció',
+    'action' => 'Acció',
+    'priority' => 'Prioritat',
+    'low' => 'Baixa',
+    'medium' => 'Mitjana',
+    'high' => 'Alta',
+    'highest' => 'La més alta',
+    'send_to_queue' => 'Envia a la cua',
 ];

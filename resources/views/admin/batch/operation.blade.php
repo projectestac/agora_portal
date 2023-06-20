@@ -6,6 +6,39 @@
     </div>
 
     <div class="content batch operation">
-        Operacions
+        <h3>{{ __('batch.operations') }}</h3>
+
+        @include('components.messages')
+
+        <form action="" method="POST">
+            @csrf
+            <div id="operationContainer" class="col-md-8">
+                @include('admin.batch.operation-selector')
+            </div>
+
+            <!-- Block to select the clients -->
+            <div id="client-selector">
+                @include('admin.selector.index')
+            </div>
+
+            <div class="row form-inline clear text-center">
+                <label for="priority">{{ __('batch.priority') }}</label>
+                <select class="form-control" id="priority" name="priority" style="width:auto;">
+                    @foreach($priority as $key => $value)
+                        <option value="{{ $key }}" @if($value === __('batch.medium')) selected="selected" @endif>{{ $value }}</option>
+                    @endforeach
+                </select>
+                <button type="submit" class="btn btn-primary">{{ __('batch.send_to_queue') }}</button>
+            </div>
+        </form>
+
     </div>
+
+    <script>
+        document.getElementById("serviceSel").addEventListener("change", function () {
+            let serviceId = $('#serviceSel').val();
+            let action = $('#operationAction').val();
+            updateAction(action, serviceId);
+        });
+    </script>
 @endsection
