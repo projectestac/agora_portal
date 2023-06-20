@@ -32,7 +32,7 @@
                                 @foreach ($availableRequests as $serviceName => $availableRequest)
                                     <optgroup label="{{ $serviceName }}">
                                     @foreach ($availableRequest as $request)
-                                        <option value="{{ $request['pivot']['service_id'] }}:{{ $request['id'] }}">{{ $request['name'] }}</option>
+                                        <option value="{{ $request->service_id }}:{{ $request->id }}">{{ $request->name }}</option>
                                     @endforeach
                                 @endforeach
                             </select>
@@ -48,7 +48,9 @@
                         $.ajax({
                             url: '{{ url('/myagora/request/details') }}',
                             method: 'GET',
-                            data: {option: $(this).val()},
+                            data: {
+                                option: $(this).val()
+                            },
                             success: function (response) {
                                 $('#request-user-messages').html(response.html);
                             },
