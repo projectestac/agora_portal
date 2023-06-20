@@ -22,4 +22,10 @@ return [
             <li>Mantingueu una còpia del fitxer en local fins que hàgiu comprovat que el fitxer s\'ha enviat correctament.</li>
             <li>Si en el repositori <strong>Fitxers</strong> n\'hi ha un amb el mateix nom, serà sobreescrit.</li>
         </ul>',
+    'size' => 'Mida',
+    'download' => 'Descarrega',
+    'deleted_from_moodle' => 'S\'ha esborrat el fitxer :filename del servidor',
+    'confirm_deletion' => 'Confirmeu que voleu esborrar el fitxer :filename del servidor?',
+    'no_files' => 'No hi ha cap fitxer al repositori',
+    'quota_updated' => 'S\'ha actualitzat la quota',
 ];
