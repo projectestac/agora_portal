@@ -36,7 +36,7 @@
                         <div><strong>{{ __('myagora.active_date') }}:</strong> {{ $date->format('d/m/Y') }}</div>
                         <div><strong>{{ __('common.status') }}:</strong> {{ $instance->status }}</div>
                         @if($instance->status === \App\Models\Instance::STATUS_ACTIVE)
-                            <div><strong>{{ __('myagora.database') }}:</strong> {{ $instance->db_id }}</div>
+                            <div><strong>{{ __('common.database') }}:</strong> {{ $instance->db_id }}</div>
                             @include('myagora.components.quota-usage')
                         @endif
                     </div>

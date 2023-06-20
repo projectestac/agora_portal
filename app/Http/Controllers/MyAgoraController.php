@@ -381,7 +381,7 @@ class MyAgoraController extends Controller {
         return response()->json(['html' => $content]);
     }
 
-    public function recalcQuota(Request $request) {
+    public function recalcQuota(Request $request): RedirectResponse {
         $instanceId = $request->input('id');
 
         $instance = Instance::where('id', $instanceId)->first();
