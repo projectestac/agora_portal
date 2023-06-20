@@ -167,6 +167,21 @@ class Util {
                     Cache::getDBName($request, 'Moodle') .
                     Config::get('app.agora.moodle2.repository_files');
 
+            case 'nodes_domain':
+                return Config::get('app.agora.server.nodes');
+
+            case 'moodle_domain':
+                return Config::get('app.agora.server.server');
+
+            case 'se_domain':
+                return Config::get('app.agora.server.se-url');
+
+            case 'projectes_domain':
+                return Config::get('app.agora.server.projectes');
+
+            case 'eoi_domain':
+                return Config::get('app.agora.server.eoi');
+
             default:
                 return '';
         }
