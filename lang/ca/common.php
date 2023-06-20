@@ -27,4 +27,7 @@ return [
     'search' => 'Cerca',
     'close' => 'Tanca',
     'database' => 'Base de dades',
+    'choose_an_option' => 'Tria una opció',
+    'description' => 'Descripció',
+    'params' => 'Paràmetres',
 ];

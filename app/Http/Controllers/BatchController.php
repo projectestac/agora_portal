@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
-use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use JsonException;
 
 class BatchController extends Controller {
     public function batch(Request $request): RedirectResponse {
@@ -16,7 +14,7 @@ class BatchController extends Controller {
 
     public function query(Request $request): View {
         $selector = new SelectorController();
-        $viewData = $selector->getSelector($request, 'Nodes');
+        $viewData = $selector->getSelector($request, 'Moodle');
         $query = $request->session()->get('query');
 
         return view('admin.batch.query')
@@ -24,15 +22,31 @@ class BatchController extends Controller {
             ->with('query', $query);
     }
 
-    public function operation(Request $request): View|Application|Factory|ApplicationContract {
-        return view('admin.batch.operation');
+    /**
+     * @throws JsonException
+     */
+    public function operation(Request $request): View {
+        $selector = new SelectorController();
+        $viewData = $selector->getSelector($request, 'Moodle', false);
+
+        $operationController = new OperationController();
+        $operations = $operationController->get_operations_list($viewData['selectedService']);
+        $action = current($operations);
+
+        $priority = [0 => __('batch.low'), 1 => __('batch.medium'), 2 => __('batch.high'), 3 => __('batch.highest')];
+
+        return view('admin.batch.operation')
+            ->with('viewData', $viewData)
+            ->with('operations', $operations)
+            ->with('action', $action)
+            ->with('priority', $priority);
     }
 
-    public function queue(Request $request): View|Application|Factory|ApplicationContract {
+    public function queue(Request $request): View {
         return view('admin.batch.queue');
     }
 
-    public function create(Request $request): View|Application|Factory|ApplicationContract {
+    public function create(Request $request): View {
         return view('admin.batch.create');
     }
 
