@@ -10,8 +10,10 @@
 
         @include('components.messages')
 
-        <form action="" method="POST">
+        <form action="{{ route('batch.operation.confirm', ['action' => $action['action']]) }}" method="POST">
             @csrf
+
+            <!-- Block to select the operation and fill the parameters list -->
             <div id="operationContainer" class="col-md-8">
                 @include('admin.batch.operation-selector')
             </div>
@@ -28,7 +30,7 @@
                         <option value="{{ $key }}" @if($value === __('batch.medium')) selected="selected" @endif>{{ $value }}</option>
                     @endforeach
                 </select>
-                <button type="submit" class="btn btn-primary">{{ __('batch.send_to_queue') }}</button>
+                <button type="submit" class="btn btn-primary">{{ __('batch.continue') }}</button>
             </div>
         </form>
 

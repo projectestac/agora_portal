@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Util;
+use App\Models\Client;
 use App\Models\Instance;
 use App\Models\Service;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use JsonException;
 
 class OperationController extends Controller {
@@ -89,7 +91,68 @@ class OperationController extends Controller {
 
     }
 
-    public function store(Request $request): JsonResponse {
+    public function confirmOperation(Request $request): View {
+        $action = $request->input('action');
+        $priority = $request->input('priority');
+        $serviceId = $request->input('serviceSel');
+        $serviceSelector = $request->input('serviceSelector');
+        $clientsIds = $request->input('clientsSel');
+
+        $requestParams = $request->all();
+
+        $operationParams = [];
+        foreach ($requestParams as $key => $value) {
+            if (str_starts_with($key, 'param_')) {
+                $operationParams[substr($key, strlen('param_'))] = $value;
+            }
+        }
+
+        $serviceName = Service::find($serviceId)->name;
+
+        if ($serviceSelector === 'all') {
+            $instances = Instance::select('instances.id', 'clients.name')
+                ->join('clients', 'instances.client_id', '=', 'clients.id')
+                ->where('instances.service_id', $serviceId)
+                ->where('instances.status', 'active')
+                ->orderBy('clients.name')
+                ->get()
+                ->toArray();
+        } else {
+            $instances = [];
+            if (!empty($clientsIds)) {
+                foreach ($clientsIds as $clientId) {
+                    $instances[] = [
+                        'id' => $clientId,
+                        'name' => Client::find($clientId)->name,
+                    ];
+                }
+            }
+        }
+
+        // Save the variables to the session.
+        $request->session()->put('batch', [
+            'action' => $action,
+            'priority' => $priority,
+            'params' => $operationParams,
+            'service_id' => $serviceId,
+            'service_name' => $serviceName,
+            'instances' => $instances,
+        ]);
+
+        return view('admin.batch.operation-confirm')
+            ->with('action', $action)
+            ->with('priority', $priority)
+            ->with('params', $operationParams)
+            ->with('serviceId', $serviceId)
+            ->with('serviceName', $serviceName)
+            ->with('image', mb_strtolower($serviceName))
+            ->with('instances', $instances);
+
+    }
+
+    public function enqueue(Request $request): JsonResponse {
+        $batch = $request->session()->get('batch');
+
         $request->validate([
             'serviceId' => 'required|integer',
             'action' => 'required|string',
