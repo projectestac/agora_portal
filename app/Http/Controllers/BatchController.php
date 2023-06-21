@@ -33,7 +33,12 @@ class BatchController extends Controller {
         $operations = $operationController->get_operations_list($viewData['selectedService']);
         $action = current($operations);
 
-        $priority = [0 => __('batch.low'), 1 => __('batch.medium'), 2 => __('batch.high'), 3 => __('batch.highest')];
+        $priority = [
+            'low' => __('batch.low'),
+            'medium' => __('batch.medium'),
+            'high' => __('batch.high'),
+            'highest' => __('batch.highest')
+        ];
 
         return view('admin.batch.operation')
             ->with('viewData', $viewData)
