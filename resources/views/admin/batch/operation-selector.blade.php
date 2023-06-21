@@ -10,25 +10,28 @@
         @endforeach
     </select>
 
+    <input type="hidden" name="action" value="{{ $action['action'] }}">
+
     <br>
     <label>{{ __('common.description') }}</label>
     <div class="alert alert-info">{!! $action['description'] !!}</div>
 
-    <br>
+    <label>{{ __('common.params') }}</label>
     @if(!empty($action['params']))
-        <label>{{ __('common.params') }}</label>
         <div class="form-horizontal">
             @foreach($action['params'] as $param)
                 <div class="form-group">
-                    <label for="{{ $action['action'] }}-{{ $param }}" class="col-sm-4 control-label">
+                    <label for="param_{{ $param }}" class="col-sm-4 control-label">
                         {{ $param }}
                     </label>
                     <div class="col-sm-8">
-                        <input class="form-control" type="text" id="{{ $action['action'] }}-{{ $param }}" name="{{ $action['action'] }}-{{ $param }}">
+                        <input class="form-control" type="text" id="param_{{ $param }}" name="param_{{ $param }}">
                     </div>
                 </div>
             @endforeach
         </div>
+    @else
+        <div class="alert alert-info">{{ __('batch.no_params') }}</div>
     @endif
 
 @else

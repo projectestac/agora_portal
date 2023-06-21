@@ -40,4 +40,7 @@ return [
     'high' => 'Alta',
     'highest' => 'La més alta',
     'send_to_queue' => 'Envia a la cua',
+    'no_params' => 'Sense paràmetres',
+    'operation_to_enqueue' => 'Operació a afegir a la cua',
+    'instances_on_execute' => 'Instàncies on s\'executarà l\'operació',
 ];
