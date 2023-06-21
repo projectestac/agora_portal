@@ -30,4 +30,5 @@ return [
     'choose_an_option' => 'Tria una opció',
     'description' => 'Descripció',
     'params' => 'Paràmetres',
+    'continue' => 'Continua',
 ];
