@@ -30,7 +30,7 @@
                         <option value="{{ $key }}" @if($value === __('batch.medium')) selected="selected" @endif>{{ $value }}</option>
                     @endforeach
                 </select>
-                <button type="submit" class="btn btn-primary">{{ __('batch.continue') }}</button>
+                <button type="submit" class="btn btn-primary">{{ __('common.continue') }}</button>
             </div>
         </form>
 

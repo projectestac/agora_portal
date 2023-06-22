@@ -43,4 +43,5 @@ return [
     'no_params' => 'Sense paràmetres',
     'operation_to_enqueue' => 'Operació a afegir a la cua',
     'instances_on_execute' => 'Instàncies on s\'executarà l\'operació',
+    'operation_enqueued' => 'L\'operació s\'ha afegit a la cua correctament',
 ];

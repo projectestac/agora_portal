@@ -3,19 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Util;
+use App\Jobs\ProcessOperation;
 use App\Models\Client;
 use App\Models\Instance;
 use App\Models\Service;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use JsonException;
 
 class OperationController extends Controller {
-    public function get_operations_file(string $service): string {
+
+    const MOODLE_OPERATIONS_LIST_FILE = 'local/agora/scripts/list.php';
+    const NODES_OPERATIONS_LIST_FILE = 'wp-includes/xtec/scripts/list.php';
+    const MOODLE_OPERATIONS_EXEC_FILE = '/dades/html/moodle2/local/agora/scripts/cli.php';
+    const NODES_OPERATIONS_EXEC_FILE = '/dades/html/wordpress/wp-includes/xtec/scripts/cli.php';
+
+    public static function get_operations_file(string $service): string {
         return match ($service) {
-            'Moodle' => 'local/agora/scripts/list.php',
-            'Nodes' => 'wp-includes/xtec/scripts/list.php',
+            'Moodle' => OperationController::MOODLE_OPERATIONS_LIST_FILE,
+            'Nodes' => OperationController::NODES_OPERATIONS_LIST_FILE,
+            default => '',
+        };
+    }
+
+    public static function get_operations_exec_file(string $service): string {
+        return match ($service) {
+            'Moodle' => OperationController::MOODLE_OPERATIONS_EXEC_FILE,
+            'Nodes' => OperationController::NODES_OPERATIONS_EXEC_FILE,
             default => '',
         };
     }
@@ -36,7 +52,7 @@ class OperationController extends Controller {
         $dns = $instance['dns'];
         $slug = $service['slug'];
         $domain = Util::getAgoraVar(mb_strtolower($service['name']) . '_domain');
-        $operationsFile = $this->get_operations_file($service['name']);
+        $operationsFile = OperationController::get_operations_file($service['name']);
 
         $operationsUrl = $domain . '/' . $dns . '/';
         $operationsUrl .= empty($slug) ? '' : $slug . '/';
@@ -110,7 +126,7 @@ class OperationController extends Controller {
         $serviceName = Service::find($serviceId)->name;
 
         if ($serviceSelector === 'all') {
-            $instances = Instance::select('instances.id', 'clients.name')
+            $instances = Instance::select('instances.id', 'clients.name', 'clients.dns')
                 ->join('clients', 'instances.client_id', '=', 'clients.id')
                 ->where('instances.service_id', $serviceId)
                 ->where('instances.status', 'active')
@@ -121,9 +137,11 @@ class OperationController extends Controller {
             $instances = [];
             if (!empty($clientsIds)) {
                 foreach ($clientsIds as $clientId) {
+                    $client = Client::find($clientId);
                     $instances[] = [
                         'id' => $clientId,
-                        'name' => Client::find($clientId)->name,
+                        'name' => $client->name,
+                        'dns' => $client->dns,
                     ];
                 }
             }
@@ -150,39 +168,33 @@ class OperationController extends Controller {
 
     }
 
-    public function enqueue(Request $request): JsonResponse {
-        $batch = $request->session()->get('batch');
+    /**
+     * Create a new job ProcessOperation and dispatch it. Recover the data from the session.
+     *
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function enqueue(Request $request) {
+        $data = $request->session()->get('batch');
+        $instances = $data['instances'];
 
-        $request->validate([
-            'serviceId' => 'required|integer',
-            'action' => 'required|string',
-            'priority' => 'required|integer',
-            'params' => 'nullable|string',
-        ]);
+        foreach ($instances as $instance) {
+            ProcessOperation::dispatch([
+                'action' => $data['action'],
+                'priority' => $data['priority'],
+                'params' => $data['params'],
+                'service_id' => $data['service_id'],
+                'service_name' => $data['service_name'],
+                'instance_id' => $instance['id'],
+                'instance_name' => $instance['name'],
+                'instance_dns' => $instance['dns'],
+            ]);
+        }
 
-        $serviceId = $request->get('serviceId');
-        $action = $request->get('action');
-        $priority = $request->get('priority');
-        $params = $request->get('params');
+        $request->session()->forget('batch');
 
-        $service = Service::find($serviceId)->toArray();
-        $operations = $this->get_operations_list($service);
-
-        $action = array_filter($operations, static function ($element) use ($action) {
-            return $element['action'] === $action;
-        });
-        $action = current($action);
-
-        $operation = [
-            'serviceId' => $serviceId,
-            'action' => $action['action'],
-            'priority' => $priority,
-            'params' => $params,
-        ];
-
-        $request->session()->push('operations', $operation);
-
-        return response()->json(['success' => true]);
+        return redirect()->route('operation')
+            ->with('success', __('batch.operation_enqueued'));
     }
 
 }
