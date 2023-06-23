@@ -15,8 +15,10 @@ class ProcessOperation implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public array $data;
-    const TIMEOUT = 1800; // Half an hour.
+    public array $result = [];
+    public bool $success = false;
 
+    public const TIMEOUT = 1800; // Half an hour.
 
     public function __construct($data) {
         $this->data = $data;
@@ -24,8 +26,10 @@ class ProcessOperation implements ShouldQueue {
 
     /**
      * Execute the job.
+     *
+     * @throws \JsonException
      */
-    public function handle() {
+    public function handle(): bool {
 
         $action = $this->data['action'];
         $serviceName = $this->data['service_name'];
@@ -42,8 +46,7 @@ class ProcessOperation implements ShouldQueue {
 
         if (is_array($params) && count($params) > 0) {
             foreach ($params as $key => $value) {
-                $value = str_replace("\r", '<br/>', $value);
-                $value = str_replace("\n", '<br/>', $value);
+                $value = str_replace(["\r", "\n"], '<br/>', $value);
                 $paramsCommand .= ' --' . $key . '="' . html_entity_decode($value) . '"';
             }
         }
@@ -51,9 +54,13 @@ class ProcessOperation implements ShouldQueue {
         $command = 'php ' . $file . $paramsCommand . ' > /dev/stdout 2>&1';
 
         $last = exec($command, $result);
-        $success = $last === 'success';
+        $this->job->result = json_encode($result, JSON_THROW_ON_ERROR);
 
-        return true;
+        $success = $last === 'success';
+        $this->success = $success;
+
+        return $success;
 
     }
+
 }
