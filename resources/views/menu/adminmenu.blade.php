@@ -23,27 +23,27 @@
         </li>
         <li>
             <a href="{{ route('home') }}" @if (str_contains(request()->url(), 'stats')) class="selected" @endif>
-                Estadístiques
+                {{ __('stats.stats') }}
             </a>
         </li>
         <li>
             <a href="{{ route('home') }}" @if (str_contains(request()->url(), 'files')) class="selected" @endif>
-                Fitxers
+                {{ __('common.files') }}
             </a>
         </li>
         <li>
             <a href="{{ route('batch') }}" @if (str_contains(request()->url(), 'batch')) class="selected" @endif>
-                Accions massives
+                {{ __('batch.batch_actions') }}
             </a>
         </li>
         <li>
             <a href="{{ route('config') }}" @if (str_contains(request()->url(), 'config')) class="selected" @endif>
-                Configuració
+                {{ __('config.configuration') }}
             </a>
         </li>
         <li>
             <a href="{{ route('home') }}" @if (str_contains(request()->url(), 'usuaris')) class="selected" @endif>
-                Usuaris
+                {{ __('user.users') }}
             </a>
         </li>
     </ul>
@@ -51,23 +51,23 @@
     @if (str_contains(request()->url(), 'batch'))
         <ul class="nav navbar-nav secondary">
             <li>
-                <a href="{{ route('query') }}" @if (str_contains(request()->url(), 'query')) class="selected" @endif>
-                    Execució de consultes
+                <a href="{{ route('batch.query') }}" @if (str_contains(request()->url(), 'query')) class="selected" @endif>
+                    {{ __('batch.queries') }}
                 </a>
             </li>
             <li>
                 <a href="{{ route('operation') }}" @if (str_contains(request()->url(), 'operation')) class="selected" @endif>
-                    Operacions
+                    {{ __('batch.operations') }}
                 </a>
             </li>
             <li>
                 <a href="{{ route('queue') }}" @if (str_contains(request()->url(), 'queue')) class="selected" @endif>
-                    Cues
+                    {{ __('batch.queues') }}
                 </a>
             </li>
             <li>
                 <a href="{{ route('create') }}" @if (str_contains(request()->url(), 'create')) class="selected" @endif>
-                    Creació massiva
+                    {{ __('batch.batch_creation') }}
                 </a>
             </li>
         </ul>
@@ -77,27 +77,32 @@
         <ul class="nav navbar-nav secondary">
             <li>
                 <a href="{{ route('config') }}" @if (str_ends_with(request()->url(), 'config')) class="selected" @endif>
-                    Paràmetres
+                    {{ __('common.params') }}
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('requests.index') }}" @if (str_contains(request()->url(), 'requests')) class="selected" @endif>
+                    {{ __('request.requests') }}
                 </a>
             </li>
             <li>
                 <a href="{{ route('models.index') }}" @if (str_contains(request()->url(), 'models')) class="selected" @endif>
-                    Maquetes
+                    {{ __('model.models') }}
                 </a>
             </li>
             <li>
                 <a href="{{ route('request-types.index') }}" @if (str_contains(request()->url(), 'request-types')) class="selected" @endif>
-                    Sol·licituds
+                    {{ __('request.request_types') }}
                 </a>
             </li>
             <li>
                 <a href="{{ route('locations.index') }}" @if (str_contains(request()->url(), 'locations')) class="selected" @endif>
-                    Serveis Territorials
+                    {{ __('config.locations') }}
                 </a>
             </li>
             <li>
                 <a href="{{ route('client-types.index') }}" @if (str_contains(request()->url(), 'client-types')) class="selected" @endif>
-                    Creació massiva
+                    {{ __('client.client_types') }}
                 </a>
             </li>
         </ul>
