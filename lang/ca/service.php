@@ -16,4 +16,5 @@ return [
     'instances' => 'Instàncies',
     'instance_list' => 'Llista d\'instàncies',
     'no_services' => 'No hi ha serveis',
+    'portal' => 'Portal',
 ];
