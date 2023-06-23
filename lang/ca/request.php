@@ -7,7 +7,8 @@ return [
     'admin_comment' => 'Comentaris de l\'administrador',
     'admin_reply' => 'Resposta dels administradors',
     'private_note' => 'Notes privades',
-    'request_list' => 'Llista de sol·licituds del centre :name',
+    'request_list' => 'Llista de sol·licituds',
+    'request_client_list' => 'Llista de sol·licituds del centre :name',
     'no_requests' => 'No hi ha sol·licituds',
     'requester' => 'Sol·licitant',
     'request_date' => 'Data de sol·licitud',
@@ -20,4 +21,5 @@ return [
     'observations' => 'Observacions (Opcional)',
     'request_created' => 'S\'ha registrat la vostra sol·licitud',
     'request_created_detail' => 'S\'ha fet la sol·licitud de :request_name del servei :service_name.',
+    'request_types' => 'Tipus de sol·licitud',
 ];
