@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'batch_actions' => 'Accions massives',
     'queries' => 'Consultes',
     'query_execution' => 'Executa una consulta',
     'query_execution_confirm' => 'Confirma l\'execució de la consulta',
@@ -44,4 +45,6 @@ return [
     'operation_to_enqueue' => 'Operació a afegir a la cua',
     'instances_on_execute' => 'Instàncies on s\'executarà l\'operació',
     'operation_enqueued' => 'L\'operació s\'ha afegit a la cua correctament',
+    'queues' => 'Cues',
+    'batch_creation' => 'Creació massiva',
 ];

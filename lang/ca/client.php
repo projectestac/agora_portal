@@ -17,4 +17,5 @@ return [
     'visible' => 'Visible',
     'no_clients' => 'No hi ha clients',
     'client_list' => 'Llista de clients',
+    'client_types' => 'Tipus de centres',
 ];
