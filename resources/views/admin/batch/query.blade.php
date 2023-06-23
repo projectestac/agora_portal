@@ -156,14 +156,14 @@
                 event.preventDefault();
                 $('.tab-item').removeClass('active');
                 $(event.target).parent().addClass('active');
-                let $serviceId = $('#serviceSel').val();
+                let serviceId = $('#serviceSel').val();
 
                 $.ajax({
                     url: '{{ route('queries.index') }}',
                     method: 'GET',
                     data: {
                         filter: filter,
-                        serviceId: $serviceId
+                        serviceId: serviceId
                     },
                     success: function (response) {
                         $('#queryList').html(response.html);

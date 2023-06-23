@@ -15,10 +15,10 @@ use JsonException;
 
 class OperationController extends Controller {
 
-    const MOODLE_OPERATIONS_LIST_FILE = 'local/agora/scripts/list.php';
-    const NODES_OPERATIONS_LIST_FILE = 'wp-includes/xtec/scripts/list.php';
-    const MOODLE_OPERATIONS_EXEC_FILE = '/dades/html/moodle2/local/agora/scripts/cli.php';
-    const NODES_OPERATIONS_EXEC_FILE = '/dades/html/wordpress/wp-includes/xtec/scripts/cli.php';
+    public const MOODLE_OPERATIONS_LIST_FILE = 'local/agora/scripts/list.php';
+    public const NODES_OPERATIONS_LIST_FILE = 'wp-includes/xtec/scripts/list.php';
+    public const MOODLE_OPERATIONS_EXEC_FILE = '/dades/html/moodle2/local/agora/scripts/cli.php';
+    public const NODES_OPERATIONS_EXEC_FILE = '/dades/html/wordpress/wp-includes/xtec/scripts/cli.php';
 
     public static function get_operations_file(string $service): string {
         return match ($service) {
@@ -174,7 +174,7 @@ class OperationController extends Controller {
      * @param Request $request
      * @return RedirectResponse
      */
-    public function enqueue(Request $request) {
+    public function enqueue(Request $request): RedirectResponse {
         $data = $request->session()->get('batch');
         $instances = $data['instances'];
 
