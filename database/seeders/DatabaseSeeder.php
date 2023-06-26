@@ -19,12 +19,13 @@ class DatabaseSeeder extends Seeder
             ServiceSeeder::class,
             ManagerSeeder::class,
             ModelTypeSeeder::class,
-            ClientServiceSeeder::class,
-            CommandSeeder::class,
+            InstanceSeeder::class,
+            QuerySeeder::class,
             RequestTypeSeeder::class,
             RequestTypeServiceSeeder::class,
             RequestSeeder::class,
             RolesTableSeeder::class,
+            LogSeeder::class,
         ]);
     }
 }
