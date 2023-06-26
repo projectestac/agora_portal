@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\InteractsWithQueue;
@@ -27,6 +28,7 @@ class LogOperationSuccess {
             'connection' => $job->getConnectionName(),
             'payload' => json_encode($job->payload(), JSON_THROW_ON_ERROR),
             'result' => json_encode($job->result, JSON_THROW_ON_ERROR),
+            'queued_at' => Carbon::parse($job->queued_at)->setTimezone(config('app.timezone')),
             'created_at' => now(),
             'updated_at' => now(),
         ]);

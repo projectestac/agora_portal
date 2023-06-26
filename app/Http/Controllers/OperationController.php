@@ -194,7 +194,7 @@ class OperationController extends Controller {
         $request->session()->forget('batch');
 
         return redirect()->route('operation')
-            ->with('success', __('batch.operation_enqueued'));
+            ->with('success', __('batch.operation_queued'));
     }
 
 }

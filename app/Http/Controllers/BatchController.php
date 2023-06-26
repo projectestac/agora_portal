@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use JsonException;
 
 class BatchController extends Controller {
-    public function batch(Request $request): RedirectResponse {
+    public function batch(): RedirectResponse {
         return redirect()->route('batch.query');
     }
 
@@ -47,11 +47,11 @@ class BatchController extends Controller {
             ->with('priority', $priority);
     }
 
-    public function queue(Request $request): View {
-        return view('admin.batch.queue');
+    public function queue(): RedirectResponse {
+        return redirect()->route('queue.pending');
     }
 
-    public function create(Request $request): View {
+    public function create(): View {
         return view('admin.batch.create');
     }
 
