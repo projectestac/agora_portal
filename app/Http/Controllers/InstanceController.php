@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Cache;
-use App\Models\Client;
 use App\Models\Instance;
 use App\Models\ModelType;
 use App\Models\Service;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class InstanceController extends Controller {
     public function index(): View {
@@ -38,8 +37,7 @@ class InstanceController extends Controller {
             ->with('client_id', $currentClient['id']);
     }
 
-    public function store(Request $request) {
-
+    public function store(Request $request): RedirectResponse {
         $clientId = $request->input('client_id');
         $serviceId = $request->input('service_id');
         $quota = Service::find($serviceId)->quota;
@@ -57,11 +55,7 @@ class InstanceController extends Controller {
         ]);
         $instance->save();
 
-        dump($request->all());
-        dump($instance);
-
         return redirect()->route('myagora.instances');
-
     }
 
 }
