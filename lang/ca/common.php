@@ -32,4 +32,5 @@ return [
     'params' => 'Paràmetres',
     'continue' => 'Continua',
     'files' => 'Fitxers',
+    'id' => 'ID',
 ];

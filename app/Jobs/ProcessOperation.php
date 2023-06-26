@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 
 class ProcessOperation implements ShouldQueue {
 
@@ -25,9 +26,7 @@ class ProcessOperation implements ShouldQueue {
     }
 
     /**
-     * Execute the job.
-     *
-     * @throws \JsonException
+     * Execute the job. To simulate a failed job, the function handle() must throw an exception.
      */
     public function handle(): bool {
 
@@ -54,7 +53,10 @@ class ProcessOperation implements ShouldQueue {
         $command = 'php ' . $file . $paramsCommand . ' > /dev/stdout 2>&1';
 
         $last = exec($command, $result);
-        $this->job->result = json_encode($result, JSON_THROW_ON_ERROR);
+        $this->job->result = $result;
+
+        $queued_at = DB::table('jobs')->where('id', $this->job->getJobId())->value('available_at');
+        $this->job->queued_at = $queued_at;
 
         $success = $last === 'success';
         $this->success = $success;
