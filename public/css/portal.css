@@ -86,6 +86,9 @@ textarea {
     animation: spin 1000ms infinite linear;
 }
 
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 
 /** Header and navigation styles **/
 
@@ -127,9 +130,7 @@ header h1 {
     background-image: -o-linear-gradient(top, #fff, #f2f2f2);
     background-image: linear-gradient(to bottom, #fff, #f2f2f2);
     background-repeat: repeat-x;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fff2f2f2', GradientType=0);
     -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
-    -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
     border-bottom: 2px solid #AC2013;
 }
@@ -179,6 +180,10 @@ header h1 {
     padding: 15px 15px;
 }
 
+.content h3 {
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 1em;
+}
 
 /** Login page **/
 
@@ -188,7 +193,6 @@ header h1 {
     padding: 0.5em 1em;
     color: #333;
     -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
     background: #fafafa;
     background: -webkit-gradient(linear, left top, left bottom, from(#fafafa), to(#f2f2f2));
@@ -262,6 +266,10 @@ footer {
 
 .margin-1 {
     margin: 1em;
+}
+
+.margin-top-2 {
+    margin-top: 2em;
 }
 
 .margin-left-2 {
@@ -369,10 +377,15 @@ COLOR5: #D0D0D0 #BBEEEE #87BDC1 #FFEDBA #B3CD7B #B3CADB
 
 /** Admin menu **/
 
-.admin-menu-container,
-.myagora-menu-container {
-    margin: 0.8em 0;
+.admin-menu-container .primary{
+    margin-top: 0.8em;
     min-height: 50px;
+}
+
+.admin-menu-container .secondary {
+    margin-bottom: 1em;
+    min-height: 50px;
+
 }
 
 .admin-menu > ul.primary {
@@ -421,7 +434,27 @@ COLOR5: #D0D0D0 #BBEEEE #87BDC1 #FFEDBA #B3CD7B #B3CADB
 
 /** My Agora **/
 
-.myagora h3 {
-    border-bottom: 1px solid #ddd;
+.myagora-menu-container {
+    margin: 0.8em 0;
+    min-height: 50px;
 }
 
+
+/** Queries **/
+.query-list {
+    max-height: 500px;
+    overflow: auto;
+}
+.query-item {
+    padding: 1em;
+    border-bottom: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+}
+.query-description {
+    min-height: 50px;
+}
+.query-query{
+    font-size: 0.8em;
+    color: #999;
+}
