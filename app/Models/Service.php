@@ -22,10 +22,6 @@ class Service extends Model {
         return $this->hasMany(Request::class);
     }
 
-    public function commands(): HasMany {
-        return $this->hasMany(Command::class);
-    }
-
     public function instances(): HasMany {
         return $this->hasMany(Instance::class);
     }
