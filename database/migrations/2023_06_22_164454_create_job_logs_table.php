@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('connection');
             $table->text('payload');
             $table->text('result')->nullable();
+            $table->timestamp('queued_at')->nullable();
             $table->timestamps();
         });
     }
