@@ -14,7 +14,7 @@
 
         <ul class="nav navbar-nav">
             @guest()
-                <li><a href="{{ route('login') }}">{{ __('common.login') }}</a></li>
+                <li><a href="{{ route('login.choose') }}">{{ __('common.login') }}</a></li>
             @endguest
 
             @can('Administrate site')
@@ -24,9 +24,10 @@
             <li><a href="https://educaciodigital.cat/moodle/moodle/mod/page/view.php?id=1781">{{ __('common.faq') }}</a></li>
 
             @auth()
-                @cannot('Administrate site')
+                {{-- The check for auth()->user()->can() must be done after a directive @auth() because will fail if the user is not logged in. --}}
+                @if(auth()->user()->can('Manage own managers') || auth()->user()->can('Manage clients'))
                     <li><a href="{{ route('myagora') }}">{{ __('common.my_agora') }}</a></li>
-                @endcannot
+                @endif
 
                 <li>
                     <form method="POST" action="{{ route('logout') }}">

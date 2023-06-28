@@ -17,7 +17,9 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/myagora';
+    public const HOME = '/';
+
+    public const MY_AGORA = '/myagora';
 
     public const ADMIN = '/instances';
 
