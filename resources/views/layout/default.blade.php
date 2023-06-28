@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Portal Àgora</title>
+    <title>{{ __('home.title') }}</title>
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
@@ -20,10 +20,10 @@
     <nav class="navbar navbar-fixed-top" id="navbar_top">
         <div class="container-fluid">
             <a href="https://educacio.gencat.cat/ca/inici/" target="_blank" class="brand departament hidden-phone">
-                <img src="{{ asset('images/departament.png') }}" alt="Departament d'Ensenyament" title=""/>
+                <img src="{{ asset('images/departament.png') }}" alt="{{ __('home.department') }}" title="{{ __('home.department') }}"/>
             </a>
             <a href="https://xtec.gencat.cat/ca/inici" target="_blank" class="brand xtec hidden-phone">
-                <img src="{{ asset('images/xtec.png') }}" alt="Xarxa Telemàtica Educativa de Catalunya" title=""/>
+                <img src="{{ asset('images/xtec.png') }}" alt="{{ __('home.xtec') }}" title="{{ __('home.xtec') }}"/>
             </a>
             <div class="pull-right">
                 @include('menu.usermenu')
@@ -41,7 +41,7 @@
 
 <footer>
     <a href="https://xtec.gencat.cat/ca/inici" target="_blank">
-        <img src="{{ asset('images/xtec.png') }}" alt="XTEC"/>
+        <img src="{{ asset('images/departament.png') }}" alt="{{ __('home.department') }}" title="{{ __('home.department') }}"/>
     </a>
 </footer>
 </body>

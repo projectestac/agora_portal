@@ -12,7 +12,7 @@
 
         <div class="panel panel-info">
             <div class="panel-heading">
-                {{ __('batch.operation_to_enqueue') }}: {{ $action }}
+                {{ __('batch.operation_to_queue') }}: {{ $action }}
             </div>
             <div class="panel-body">
                 <div class="form-horizontal">
