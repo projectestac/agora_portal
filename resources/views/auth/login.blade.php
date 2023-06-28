@@ -3,7 +3,7 @@
 @section('content')
 
     <div class="">
-        <h2>Entrada d'usuaris</h2>
+        <h2>{{ __('login.local_login_page') }}</h2>
     </div>
 
     <!-- Session Status -->
@@ -12,26 +12,25 @@
     <form method="POST" action="{{ route('login') }}" class="login-form">
         @csrf
 
-        <!-- Email Address -->
         <fieldset>
+            <!-- Email Address -->
             <div class="row-form">
-                <x-input-label for="email" :value="__('Email')"/>
-                <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')"
+                <x-input-label for="email" :value="__('login.email')"/>
+                <x-text-input id="email" class="block" type="email" name="email" :value="old('email')"
                               required autofocus
                               autocomplete="username"/>
-                <x-input-error :messages="$errors->get('email')" class="mt-2"/>
+                <x-input-error :messages="$errors->get('email')"/>
             </div>
 
             <!-- Password -->
             <div class="row-form">
-                <x-input-label for="password" :value="__('Password')"/>
-
-                <x-text-input id="password" class="block mt-1 w-full"
+                <x-input-label for="password" :value="__('login.password')"/>
+                <x-text-input id="password" class="block"
                               type="password"
                               name="password"
                               required autocomplete="current-password"/>
             </div>
-            <x-input-error :messages="$errors->get('password')" class="mt-2"/>
+            <x-input-error :messages="$errors->get('password')"/>
 
             <!-- Remember Me -->
             <div class="">
@@ -39,14 +38,14 @@
                     <input id="remember_me" type="checkbox"
                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
                            name="remember">
-                    <span class="ml-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+                    <span class="text-sm text-gray-600">{{ __('login.remember_me') }}</span>
                 </label>
             </div>
         </fieldset>
 
-        <div class="textcenter">
-            <x-primary-button class="ml-3">
-                {{ __('Log in') }}
+        <div class="text-center">
+            <x-primary-button>
+                {{ __('common.login') }}
             </x-primary-button>
         </div>
     </form>
