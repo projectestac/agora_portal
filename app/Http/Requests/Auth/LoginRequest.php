@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -40,6 +41,17 @@ class LoginRequest extends FormRequest
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
+
+        // Compatibility with old passwords. If the user is found, update the password to the new hash.
+        $user = User::where([
+            'email' => $this->email,
+            'password' => md5($this->password)
+        ])->first();
+
+        if ($user) {
+            $user->password = bcrypt($this->password);
+            $user->save();
+        }
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
