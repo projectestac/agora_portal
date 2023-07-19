@@ -77,8 +77,7 @@ class Util {
     }
 
     /**
-     * Convert a code starting with a letter to a code starting with a number
-     * and viceversa.
+     * Convert a code starting with a letter to a code starting with a number and viceversa.
      *
      * @param string $clientCode
      * @param string $type
@@ -120,6 +119,10 @@ class Util {
 
     /**
      * Function to convert a number representing a disk size in bytes to a human-readable format.
+     *
+     * @param int $bytes
+     * @param int $precision
+     * @return string
      */
     public static function formatBytes(int $bytes, int $precision = 2): string {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -133,58 +136,46 @@ class Util {
         return round($bytes, $precision) . ' ' . $units[$pow];
     }
 
+    /**
+     * Function to convert a number representing a disk size in bytes to GB (1024 * 1024 * 1024 bytes).
+     *
+     * @param int $bytes
+     * @param int $precision
+     * @return string
+     */
+    public static function formatGb(int $bytes, int $precision = 2): string {
+        return round($bytes / 1024 / 1024 / 1024, $precision);
+    }
+
     public static function getAgoraVar(string $varName = '', Request $request = null): string {
         if (empty($varName)) {
             return '';
         }
 
-        switch ($varName) {
-            case 'portaldata':
-                return Config::get('app.agora.server.root') .
-                    Config::get('app.agora.admin.datadir');
-
-            case 'nodesdata':
-                return Config::get('app.agora.server.root') .
-                    Config::get('app.agora.nodes.datadir');
-
-            case 'nodesdata_db':
-                return Config::get('app.agora.server.root') .
-                    Config::get('app.agora.nodes.datadir') .
-                    Cache::getDBName($request, 'Nodes') . '/';
-
-            case 'moodledata':
-                return Config::get('app.agora.server.root') .
-                    Config::get('app.agora.moodle2.datadir');
-
-            case 'moodledata_db':
-                return Config::get('app.agora.server.root') .
-                    Config::get('app.agora.moodle2.datadir') .
-                    Cache::getDBName($request, 'Moodle') . '/';
-
-            case 'moodledata_repo':
-                return Config::get('app.agora.server.root') .
-                    Config::get('app.agora.moodle2.datadir') .
-                    Cache::getDBName($request, 'Moodle') .
-                    Config::get('app.agora.moodle2.repository_files');
-
-            case 'nodes_domain':
-                return Config::get('app.agora.server.nodes');
-
-            case 'moodle_domain':
-                return Config::get('app.agora.server.server');
-
-            case 'se_domain':
-                return Config::get('app.agora.server.se-url');
-
-            case 'projectes_domain':
-                return Config::get('app.agora.server.projectes');
-
-            case 'eoi_domain':
-                return Config::get('app.agora.server.eoi');
-
-            default:
-                return '';
-        }
+        return match ($varName) {
+            'portaldata' => Config::get('app.agora.server.root') .
+                Config::get('app.agora.admin.datadir'),
+            'nodesdata' => Config::get('app.agora.server.root') .
+                Config::get('app.agora.nodes.datadir'),
+            'nodesdata_db' => Config::get('app.agora.server.root') .
+                Config::get('app.agora.nodes.datadir') .
+                Cache::getDBName($request, 'Nodes') . '/',
+            'moodledata' => Config::get('app.agora.server.root') .
+                Config::get('app.agora.moodle2.datadir'),
+            'moodledata_db' => Config::get('app.agora.server.root') .
+                Config::get('app.agora.moodle2.datadir') .
+                Cache::getDBName($request, 'Moodle') . '/',
+            'moodledata_repo' => Config::get('app.agora.server.root') .
+                Config::get('app.agora.moodle2.datadir') .
+                Cache::getDBName($request, 'Moodle') .
+                Config::get('app.agora.moodle2.repository_files'),
+            'nodes_domain' => Config::get('app.agora.server.nodes'),
+            'moodle_domain' => Config::get('app.agora.server.server'),
+            'se_domain' => Config::get('app.agora.server.se-url'),
+            'projectes_domain' => Config::get('app.agora.server.projectes'),
+            'eoi_domain' => Config::get('app.agora.server.eoi'),
+            default => '',
+        };
     }
 
     public static function getFiles(string $dir = ''): array {
