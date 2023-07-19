@@ -87,6 +87,7 @@ class QueryController extends Controller {
         $content = view('admin.batch.query-modal-edit')
             ->with('services', $services)
             ->with('query', $query)
+            ->with('type', self::getTypeList())
             ->render();
 
         return response()->json(['html' => $content]);
@@ -244,7 +245,7 @@ class QueryController extends Controller {
             config(["database.connections.$serviceKey.database" => $dbName]);
             config(["database.connections.$serviceKey.username" => $userName]);
 
-            DB::connection($serviceKey)->reconnect();
+//            DB::connection($serviceKey)->reconnect();
 
             // Execute query
             if ($isSelect) {
@@ -309,6 +310,18 @@ class QueryController extends Controller {
 
         return [$fullResults, $attributes, $execResult, $numRows];
 
+    }
+
+    public static function getTypeList(): array {
+        return [
+            Query::TYPE_SELECT => __('batch.query_type_select'),
+            Query::TYPE_INSERT => __('batch.query_type_insert'),
+            Query::TYPE_UPDATE => __('batch.query_type_update'),
+            Query::TYPE_DELETE => __('batch.query_type_delete'),
+            Query::TYPE_ALTER => __('batch.query_type_alter'),
+            Query::TYPE_DROP => __('batch.query_type_drop'),
+            Query::TYPE_OTHER => __('batch.query_type_other'),
+        ];
     }
 
 }
