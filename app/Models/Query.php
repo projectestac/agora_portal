@@ -17,4 +17,12 @@ class Query extends Model
         'type',
     ];
 
+    const TYPE_SELECT = 'select';
+    const TYPE_INSERT = 'insert';
+    const TYPE_UPDATE = 'update';
+    const TYPE_DELETE = 'delete';
+    const TYPE_ALTER = 'alter';
+    const TYPE_DROP = 'drop';
+    const TYPE_OTHER = 'other';
+
 }
