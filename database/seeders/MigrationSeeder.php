@@ -2,10 +2,18 @@
 
 namespace Database\Seeders;
 
+use App\Models\Client;
 use App\Models\Instance;
+use App\Models\Query;
+use App\Models\Request;
+use App\Models\RequestType;
+use App\Models\Service;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Permission;
 
 class MigrationSeeder extends Seeder {
     /**
@@ -14,6 +22,7 @@ class MigrationSeeder extends Seeder {
     public function run(): void {
 
         // Users migration.
+        echo 'Users migration started...' . "\n";
         $users = DB::connection('agoraportal')
             ->table('users')
             ->select(['uid', 'uname', 'email', 'pass', 'user_regdate', 'lastlogin', 'approved_date'])
@@ -21,8 +30,8 @@ class MigrationSeeder extends Seeder {
 
         foreach ($users as $user) {
             // MySQL doesn't accept '1970-01-01 00:00:00' as a valid date, so we need to change it to '1970-01-02 00:00:00'.
-            $lastLogin = ($user->lastlogin === '1970-01-01 00:00:00') ? '1970-01-02 00:00:00' : $user->lastlogin;
-            $userRegDate = ($user->user_regdate === '1970-01-01 00:00:00') ? '1970-01-02 00:00:00' : $user->user_regdate;
+            $lastLogin = ($user->lastlogin === '1970-01-01 00:00:00' || $user->lastlogin === '0000-00-00 00:00:00') ? '1970-01-01 02:00:00' : $user->lastlogin;
+            $userRegDate = ($user->user_regdate === '1970-01-01 00:00:00' || $user->user_regdate === '0000-00-00 00:00:00') ? '1970-01-01 02:00:00' : $user->user_regdate;
 
             DB::table('users')->insert([
                 'id' => $user->uid,
@@ -35,7 +44,8 @@ class MigrationSeeder extends Seeder {
             ]);
         }
 
-        // Groups migration.
+        // Groups to role migration.
+        echo 'Groups migration started...' . "\n";
         $groups = DB::connection('agoraportal')
             ->table('groups')
             ->select(['gid', 'name'])
@@ -47,6 +57,7 @@ class MigrationSeeder extends Seeder {
                 'Administrators' => 'admin',
                 'Clients' => 'client',
                 'Managers' => 'manager',
+                'Developers' => 'developer',
             ];
 
             DB::table('roles')->insert([
@@ -58,21 +69,42 @@ class MigrationSeeder extends Seeder {
             ]);
         }
 
+        // Assign permissions to roles.
+        echo 'Adding permissions to roles...' . "\n";
+        $permission = Permission::create(['name' => 'Administrate site']);
+        $permission->assignRole(DB::table('roles')->where('name', 'admin')->first()->id);
+
+        $permission = Permission::create(['name' => 'Manage own managers']);
+        $permission->assignRole(DB::table('roles')->where('name', 'client')->first()->id);
+
+        $permission = Permission::create(['name' => 'Manage clients']);
+        $permission->assignRole(DB::table('roles')->where('name', 'manager')->first()->id);
+
         // Group membership migration.
+        echo 'Membership migration started...' . "\n";
         $membership = DB::connection('agoraportal')
             ->table('group_membership')
             ->select(['gid', 'uid'])
             ->get();
 
         foreach ($membership as $member) {
-            DB::table('model_has_roles')->insert([
-                'role_id' => $member->gid,
-                'model_type' => 'App\Models\User',
-                'model_id' => $member->uid,
-            ]);
+            try {
+                DB::table('model_has_roles')->insert([
+                    'role_id' => $member->gid,
+                    'model_type' => 'App\Models\User',
+                    'model_id' => $member->uid,
+                ]);
+            } catch (\Exception $e) {
+                // There can be duplicates in the group membership table, so we need to catch the exception and continue.
+                echo $e->getMessage() . "\n";
+                echo 'gid: ' . $member->gid . "\n";
+                echo 'uid: ' . $member->uid . "\n";
+                echo 'Execution continues...' . "\n";
+            }
         }
 
         // Client types migration.
+        echo 'Client types migration started...' . "\n";
         $clientTypes = DB::connection('agoraportal')
             ->table('agoraportal_clientType')
             ->select(['typeId', 'typeName'])
@@ -88,6 +120,7 @@ class MigrationSeeder extends Seeder {
         }
 
         // Services migration.
+        echo 'Services migration started...' . "\n";
         $services = DB::connection('agoraportal')
             ->table('agoraportal_services')
             ->select(['serviceId', 'serviceName', 'URL', 'description', 'defaultDiskSpace'])
@@ -107,6 +140,7 @@ class MigrationSeeder extends Seeder {
         }
 
         // Locations migration.
+        echo 'Locations migration started...' . "\n";
         $locations = DB::connection('agoraportal')
             ->table('agoraportal_location')
             ->select(['locationId', 'locationName'])
@@ -122,6 +156,7 @@ class MigrationSeeder extends Seeder {
         }
 
         // Model types migration.
+        echo 'Model types migration started...' . "\n";
         $data = [
             [
                 'id' => 1,
@@ -169,6 +204,7 @@ class MigrationSeeder extends Seeder {
         }
 
         // Clients migration.
+        echo 'Clients migration started...' . "\n";
         $clients = DB::connection('agoraportal')
             ->table('agoraportal_clients')
             ->select(['clientId', 'clientCode', 'clientDNS', 'clientOldDNS', 'URLType', 'URLHost', 'OldURLHost', 'clientName',
@@ -190,7 +226,7 @@ class MigrationSeeder extends Seeder {
                 'city' => $client->clientCity,
                 'postal_code' => $client->clientPC,
                 'description' => $client->clientDescription,
-                'status' => $client->clientState,
+                'status' => ($client->clientState) ? Client::STATUS_ACTIVE : Client::STATUS_INACTIVE,
                 'location_id' => ($client->locationId > 0) ? $client->locationId : 1,
                 'type_id' => ($client->typeId > 0) ? $client->typeId : 1,
                 'visible' => ($client->noVisible === 0) ? 'yes' : 'no',
@@ -200,6 +236,7 @@ class MigrationSeeder extends Seeder {
         }
 
         // Managers migration.
+        echo 'Managers migration started...' . "\n";
         $managers = DB::connection('agoraportal')
             ->table('agoraportal_client_managers')
             ->select(['managerId', 'clientCode', 'managerUName'])
@@ -214,6 +251,11 @@ class MigrationSeeder extends Seeder {
                 ->where('name', $manager->managerUName)
                 ->value('id');
 
+            // If the client or the user doesn't exist, skip this manager.
+            if (is_null($clientId) || is_null($userId)) {
+                continue;
+            }
+
             DB::table('managers')->insert([
                 'id' => $manager->managerId,
                 'client_id' => $clientId,
@@ -224,10 +266,11 @@ class MigrationSeeder extends Seeder {
         }
 
         // Instances migration.
+        echo 'Instances migration started...' . "\n";
         $instances = DB::connection('agoraportal')
             ->table('agoraportal_client_services')
             ->select(['clientServiceId', 'serviceId', 'clientId', 'description', 'state', 'activedId', 'contactName', 'contactProfile',
-                'timeCreated', 'annotations', 'diskSpace', 'timeEdited', 'timeRequested', 'diskConsume', 'dbHost'])
+                'timeCreated', 'observations', 'annotations', 'diskSpace', 'timeEdited', 'timeRequested', 'diskConsume', 'dbHost'])
             ->get();
 
         $statusEquivalent = [
@@ -256,9 +299,147 @@ class MigrationSeeder extends Seeder {
                 'contact_profile' => $instance->contactProfile,
                 'observations' => $instance->observations,
                 'annotations' => $instance->annotations,
-                'requested_at' => $instance->timeRequested,
-                'created_at' => $instance->timeCreated,
-                'updated_at' => $instance->timeEdited,
+                // Set a time zone in UTC+3 to avoid conversion problems when the original timestamp is not set.
+                'requested_at' => Carbon::createFromTimestampUTC($instance->timeRequested)->setTimezone('Europe/Istanbul')
+                    ->toDateTimeString(),
+                'created_at' => Carbon::createFromTimestampUTC($instance->timeCreated)->setTimezone('Europe/Istanbul')
+                    ->toDateTimeString(),
+                'updated_at' => Carbon::createFromTimestampUTC($instance->timeEdited)->setTimezone('Europe/Istanbul')
+                    ->toDateTimeString(),
+            ]);
+        }
+
+        // Queries migration.
+        echo 'Queries migration started...' . "\n";
+        $queries = DB::connection('agoraportal')
+            ->table('agoraportal_mysql_comands')
+            ->select(['comandId', 'serviceId', 'comand', 'description', 'type'])
+            ->get();
+
+        $typeEquivalent = [
+            '0' => Query::TYPE_OTHER,
+            '1' => Query::TYPE_SELECT,
+            '2' => Query::TYPE_INSERT,
+            '3' => Query::TYPE_UPDATE,
+            '4' => Query::TYPE_DELETE,
+            '5' => Query::TYPE_ALTER,
+            '6' => Query::TYPE_DROP,
+        ];
+
+        foreach ($queries as $query) {
+            DB::table('queries')->insert([
+                'id' => $query->comandId,
+                'service_id' => $query->serviceId,
+                'query' => $query->comand,
+                'description' => $query->description,
+                'type' => $typeEquivalent[$query->type],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        // Request types migration.
+        echo 'Request types migration started...' . "\n";
+        $requestTypes = DB::connection('agoraportal')
+            ->table('agoraportal_requestTypes')
+            ->select(['requestTypeId', 'name', 'description', 'userCommentsText'])
+            ->get();
+
+        foreach ($requestTypes as $requestType) {
+            DB::table('request_types')->insert([
+                'id' => $requestType->requestTypeId,
+                'name' => $requestType->name,
+                'description' => $requestType->description,
+                'prompt' => $requestType->userCommentsText,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        // Requests migration.
+        echo 'Requests migration started...' . "\n";
+        $requests = DB::connection('agoraportal')
+            ->table('agoraportal_request')
+            ->select(['requestId', 'requestTypeId', 'serviceId', 'clientId', 'userId', 'userComments', 'adminComments',
+                'privateNotes', 'requestStateId', 'timeCreated', 'timeClosed'])
+            ->get();
+
+        $statusEquivalent = [
+            '1' => Request::STATUS_PENDING,
+            '2' => Request::STATUS_UNDER_STUDY,
+            '3' => Request::STATUS_SOLVED,
+            '4' => Request::STATUS_DENIED,
+        ];
+
+        foreach ($requests as $request) {
+            // Skip the request if the integrity in the original database is broken.
+            if (RequestType::where('id', $request->requestTypeId)->doesntExist() ||
+                Service::where('id', $request->serviceId)->doesntExist() ||
+                User::where('id', $request->userId)->doesntExist() ||
+                Client::where('id', $request->clientId)->doesntExist()) {
+                continue;
+            }
+
+            DB::table('requests')->insert([
+                'id' => $request->requestId,
+                'request_type_id' => $request->requestTypeId,
+                'service_id' => $request->serviceId,
+                'client_id' => $request->clientId,
+                'user_id' => $request->userId,
+                'status' => $statusEquivalent[$request->requestStateId],
+                'user_comment' => $request->userComments,
+                'admin_comment' => $request->adminComments,
+                'private_note' => $request->privateNotes,
+                'created_at' => Carbon::createFromTimestamp($request->timeCreated)->toDateTimeString(),
+                // Set a time zone in UTC+3 to avoid conversion problems when the original timestamp is not set.
+                'updated_at' => Carbon::createFromTimestampUTC($request->timeClosed)->setTimezone('Europe/Istanbul')
+                    ->toDateTimeString(),
+            ]);
+        }
+
+        // Request type services migration.
+        echo 'Request type services migration started...' . "\n";
+        $requestTypeServices = DB::connection('agoraportal')
+            ->table('agoraportal_requestTypesServices')
+            ->select(['requestTypeId', 'serviceId'])
+            ->get();
+
+        foreach ($requestTypeServices as $requestTypeService) {
+            DB::table('request_type_service')->insert([
+                'request_type_id' => $requestTypeService->requestTypeId,
+                'service_id' => $requestTypeService->serviceId,
+            ]);
+        }
+
+        // Logs migration.
+        echo 'Logs migration started...' . "\n";
+        $logs = DB::connection('agoraportal')
+            ->table('agoraportal_logs')
+            ->select(['logId', 'clientCode', 'uname', 'actionCode', 'action', 'time'])
+            ->get();
+
+        foreach ($logs as $log) {
+            $clientId = DB::table('clients')
+                ->where('code', $log->clientCode)
+                ->value('id');
+
+            $userId = DB::table('users')
+                ->where('name', $log->uname)
+                ->value('id');
+
+            // Skip the log if the integrity in the original database is broken.
+            if (is_null($clientId) || is_null($userId)) {
+                continue;
+            }
+
+            DB::table('standard_logs')->insert([
+                'id' => $log->logId,
+                'client_id' => $clientId,
+                'user_id' => $userId,
+                'action_type' => $log->actionCode,
+                'action_description' => $log->action,
+                'created_at' => Carbon::createFromTimestamp($log->time)->toDateTimeString(),
+                'updated_at' => Carbon::createFromTimestamp($log->time)->toDateTimeString(),
             ]);
         }
 
