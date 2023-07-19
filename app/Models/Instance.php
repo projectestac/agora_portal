@@ -32,6 +32,7 @@ class Instance extends Model {
     public const STATUS_INACTIVE = 'inactive';
     public const STATUS_DENIED = 'denied';
     public const STATUS_WITHDRAWN = 'withdrawn';
+    public const STATUS_BLOCKED = 'blocked';
 
     public function service(): BelongsTo {
         return $this->belongsTo(Service::class);
