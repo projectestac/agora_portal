@@ -11,11 +11,12 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('instances', static function (Blueprint $table) {
             $status = [
-                'pending',
-                'active',
-                'inactive',
-                'denied',
-                'withdrawn',
+                \App\Models\Instance::STATUS_PENDING,
+                \App\Models\Instance::STATUS_ACTIVE,
+                \App\Models\Instance::STATUS_INACTIVE,
+                \App\Models\Instance::STATUS_DENIED,
+                \App\Models\Instance::STATUS_WITHDRAWN,
+                \App\Models\Instance::STATUS_BLOCKED,
             ];
 
             $table->increments('id');
@@ -26,7 +27,6 @@ return new class extends Migration {
             $table->string('db_host')->default('');
             $table->bigInteger('quota')->unsigned()->default(0);
             $table->bigInteger('used_quota')->unsigned()->default(0);
-            $table->enum('visible', ['yes', 'no'])->default('yes');
             $table->integer('model_type_id')->unsigned()->default('0');
             $table->string('contact_name', 150)->default('');
             $table->string('contact_profile', 150)->default('');
