@@ -8,6 +8,8 @@
     <div class="content service">
         <h3>{{ __('instance.instance_list') }}</h3>
 
+        @include('components.messages')
+
         @if(!empty($instances))
 
             <div class="pull-right">
@@ -16,15 +18,15 @@
 
             <table class="table table-striped">
                 <thead>
-                    <tr>
-                        <th>{{ __('instance.db_id') }}</th>
-                        <th>{{ __('client.name') }}</th>
-                        <th>{{ __('common.type') }}</th>
-                        <th>{{ __('common.status') }}</th>
-                        <th>{{ __('service.service') }}</th>
-                        <th>{{ __('instance.location_long') }}</th>
-                        <th>{{ __('common.actions') }}</th>
-                    </tr>
+                <tr>
+                    <th>{{ __('instance.db_id') }}</th>
+                    <th>{{ __('client.name') }}</th>
+                    <th>{{ __('common.type') }}</th>
+                    <th>{{ __('common.status') }}</th>
+                    <th>{{ __('service.service') }}</th>
+                    <th>{{ __('instance.location_long') }}</th>
+                    <th>{{ __('common.actions') }}</th>
+                </tr>
                 </thead>
                 <tbody>
                 @foreach ($instances as $instance)

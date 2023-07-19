@@ -2,16 +2,16 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\Access;
+use App\Models\Instance;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateInstanceRequest extends FormRequest
-{
+class UpdateInstanceRequest extends FormRequest {
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
-    {
-        return false;
+    public function authorize(): bool {
+        return Access::isAdmin($this->user());
     }
 
     /**
@@ -19,10 +19,15 @@ class UpdateInstanceRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
-    public function rules(): array
-    {
+    public function rules(): array {
         return [
-            //
+            'status' => 'required|string|in:' . Instance::STATUS_PENDING . ',' . Instance::STATUS_ACTIVE . ',' .
+                Instance::STATUS_INACTIVE . ',' . Instance::STATUS_DENIED . ',' . Instance::STATUS_WITHDRAWN . ',' . Instance::STATUS_BLOCKED,
+            'db_host' => 'nullable|string',
+            'send_email' => 'nullable|in:on',
+            'quota' => 'required|numeric|min:1',
+            'observations' => 'nullable|string',
+            'annotations' => 'nullable|string',
         ];
     }
 }
