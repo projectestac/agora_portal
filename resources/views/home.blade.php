@@ -1,8 +1,17 @@
 @extends('layout.default')
 
 @section('content')
-    <div class="myagora-menu-container">
-        @include('menu.clientmenu')
+
+    @auth()
+        <div class="myagora-menu-container">
+            @include('menu.clientmenu')
+        </div>
+    @endauth
+
+    <h3>{{ __('home.active_instances') }}</h3>
+
+    <div class="alert alert-warning">
+        {{ __('home.temporarily_unavailable') }}
     </div>
 
     <div class="content myagora">
