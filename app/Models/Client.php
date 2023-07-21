@@ -30,6 +30,9 @@ class Client extends Model {
         'visible',
     ];
 
+    const STATUS_ACTIVE = 'active';
+    const STATUS_INACTIVE = 'inactive';
+
     public function location(): BelongsTo {
         return $this->belongsTo(Location::class);
     }
