@@ -127,9 +127,16 @@ class MigrationSeeder extends Seeder {
             ->get();
 
         foreach ($services as $service) {
+            // Remove old services
+            if (in_array($service->serviceName, ['intranet', 'moodle', 'marsupial'])) {
+                continue;
+            }
+            if ($service->serviceName === 'moodle2') {
+                $service->serviceName = 'moodle';
+            }
             DB::table('services')->insert([
                 'id' => $service->serviceId,
-                'name' => $service->serviceName,
+                'name' => ucfirst($service->serviceName),
                 'status' => 'active',
                 'description' => $service->description,
                 'slug' => $service->URL,

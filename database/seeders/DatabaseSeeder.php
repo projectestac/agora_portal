@@ -10,7 +10,6 @@ class DatabaseSeeder extends Seeder {
      */
     public function run(): void {
         $this->call([
-            /*
             UserSeeder::class,
             ClientTypeSeeder::class,
             LocationSeeder::class,
@@ -25,8 +24,7 @@ class DatabaseSeeder extends Seeder {
             RequestSeeder::class,
             RolesTableSeeder::class,
             LogSeeder::class,
-            */
-            MigrationSeeder::class,
+//            MigrationSeeder::class,
         ]);
     }
 }
