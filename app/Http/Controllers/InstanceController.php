@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Cache;
 use App\Helpers\Util;
+use App\Jobs\ProcessOperation;
 use App\Models\Instance;
+use App\Models\Log;
 use App\Models\ModelType;
 use App\Models\Service;
 use Illuminate\Contracts\View\View;
@@ -12,7 +14,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Throwable;
 use ZipArchive;
 
@@ -27,6 +28,7 @@ class InstanceController extends Controller {
             ->with('modelType')
             ->join('clients', 'instances.client_id', '=', 'clients.id')
             ->join('services', 'instances.service_id', '=', 'services.id')
+            ->orderBy('instances.updated_at', 'desc')
             ->paginate(10);
 
         return view('admin.instance.index')->with('instances', $instances);
@@ -69,7 +71,6 @@ class InstanceController extends Controller {
     }
 
     public function edit(Instance $instance): View {
-        dump(config('app.agora'));
         return view('admin.instance.edit')
             ->with('instance', $instance)
             ->with('statusList', $this->getStatusList());
@@ -77,28 +78,25 @@ class InstanceController extends Controller {
 
     public function update(Request $request, Instance $instance): RedirectResponse {
 
-        dump($instance);
-        $statusInitial = $instance->status;
         $statusFinal = $request->input('status');
 
-        $instance->status = $statusFinal;
         $instance->db_host = $request->input('db_host');
         $instance->quota = $request->input('quota') * 1024 * 1024 * 1024; // GB to Bytes
         $instance->observations = $request->input('observations');
         $instance->annotations = $request->input('annotations');
         $instance->save();
 
-        $changes = $instance->getChanges();
         $newDbId = 0;
         $error = [];
+        $messages = [];
 
         // If the status has changed, is possible that the db_id needs to be updated.
-        if (array_key_exists('status', $changes)) {
-            $newDbId = $this->getNewOrUpdatedDbId($instance, $statusInitial);
+        if ($statusFinal !== $instance->status) {
+            $newDbId = $this->getNewOrUpdatedDbId($instance, $statusFinal);
         }
 
         // When the db_id goes from 0 to a new value, it means that the database needs to be populated and the files created.
-        if ($newDbId !== 0 && $instance->db_id > 0) {
+        if ($instance->db_id === 0 && $newDbId > 0) {
             // First of all, ensure that the required files are available.
             $checkFiles = $this->checkFiles($instance);
             if (!empty($checkFiles['errors'])) {
@@ -106,37 +104,69 @@ class InstanceController extends Controller {
                     ->route('instances.index')
                     ->with('error', $checkFiles['errors']);
             }
+            if (isset($checkFiles['success'])) {
+                $messages[] = __('instance.dump_files_found');
+            }
 
-            $dumpDatabase = $this->dumpDatabase($instance, $checkFiles['success']['dbFile']);
+            $dumpDatabase = $this->dumpDatabase($instance, $newDbId, $checkFiles['success']['dbFile']);
             if (!empty($dumpDatabase['errors'])) {
                 return redirect()
                     ->route('instances.index')
                     ->with('error', $dumpDatabase['errors']);
             }
 
-            $unzipFiles = $this->unzipFiles($instance, $checkFiles['success']['dataFile']);
+            if (isset($dumpDatabase['success'])) {
+                $messages[] = __('instance.dump_success');
+            }
+
+            $unzipFiles = $this->unzipFiles($instance, $newDbId, $checkFiles['success']['dataFile']);
             if (!empty($unzipFiles['errors'])) {
                 return redirect()
                     ->route('instances.index')
                     ->with('error', $unzipFiles['errors']);
             }
 
-            if (!$this->programOperationEnable($instance)) {
-                $error[] = __('instance.error_program_operations');
+            if (isset($unzipFiles['success'])) {
+                $messages[] = __('instance.unzip_success_short');
             }
+
+            $password = Util::createRandomPass();
+            $programOperation = $this->programOperationEnable($instance, $newDbId, $password);
+            if (!empty($programOperation['errors'])) {
+                return redirect()
+                    ->route('instances.index')
+                    ->with('error', $unzipFiles['errors']);
+            }
+
+            if (isset($programOperation['success'])) {
+                $messages[] = $programOperation['success'];
+            }
+
+            $instance->status = $statusFinal;
+            $instance->db_id = $newDbId;
+            $instance->save();
+
+            Log::insert([
+                'client_id' => $instance->client->id,
+                'user_id' => Auth::user()->id,
+                'action_type' => Log::ACTION_TYPE_ADD,
+                'action_description' => __('instance.actived_instance', [
+                    'service' => $instance->service->name,
+                    'client' => $instance->client->name,
+                    'password' => $password,
+                ]),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
         }
 
-        dd($instance->getChanges());
-
-        if (!empty($error)) {
-            return redirect()
-                ->route('instances.index')
-                ->with('error', $error);
-        }
+        $messages[] = __('instance.instance_updated');
+        $messagesString = implode("\n", $messages);
 
         return redirect()
             ->route('instances.index')
-            ->with('success', __('instance.instance_updated'));
+            ->with('success', $messagesString);
     }
 
     public function getStatusColor(string $status): string {
@@ -169,16 +199,16 @@ class InstanceController extends Controller {
      * - active -> withdrawn (remove db assignation)
      *
      * @param Instance $instance
-     * @param string $statusInitial
+     * @param string $statusFinal
      * @return int
      */
-    private function getNewOrUpdatedDbId(Instance $instance, string $statusInitial): int {
+    private function getNewOrUpdatedDbId(Instance $instance, string $statusFinal): int {
 
-        if ($statusInitial === Instance::STATUS_PENDING && $instance->status === Instance::STATUS_ACTIVE && $instance->db_id === 0) {
+        if ($instance->status === Instance::STATUS_PENDING && $statusFinal === Instance::STATUS_ACTIVE && $instance->db_id === 0) {
             return $this->getNewDbId($instance->service_id);
         }
 
-        if ($instance->db_id !== 0 && $instance->status === Instance::STATUS_WITHDRAWN) {
+        if ($instance->db_id !== 0 && $statusFinal === Instance::STATUS_WITHDRAWN) {
             return 0;
         }
 
@@ -204,12 +234,12 @@ class InstanceController extends Controller {
         }
 
         // First, look for a free database (a gap in the list).
-        foreach ($dataBaseIds as $activeId) {
-            $activeId = (int)$activeId;
+        foreach ($dataBaseIds as $item) {
+            $dbId = (int)$item['db_id'];
 
             // Discard activeId's that are lower than firstID.
-            if ($activeId >= $firstID) {
-                if ($activeId !== $i) {
+            if ($dbId >= $firstID) {
+                if ($dbId !== $i) {
                     $free = $i;
                     break;
                 }
@@ -228,21 +258,38 @@ class InstanceController extends Controller {
     private function checkFiles(Instance $instance): array {
 
         $portalData = Util::getAgoraVar('portaldata') . 'data/';
-        $serviceName = mb_strtolower($instance->service()->name);
-        $shortCode = $instance->modelType()->short_code;
+        $serviceName = mb_strtolower($instance->service->name);
+        $shortCode = $instance->modelType->short_code;
+        $dbFile = '';
+        $dataFile = '';
 
-        $dbFile = $portalData . '/moodle/master' . $serviceName . $shortCode . '.sql';
-        $dataFile = $portalData . '/moodle/master' . $serviceName . $shortCode . '.zip';
+        if ($serviceName === 'nodes') {
+            $dbFile = $portalData . 'nodes/master' . $shortCode . '.sql';
+            $dataFile = $portalData . 'nodes/master' . $shortCode . '.zip';
+
+            if (!file_exists($dbFile)) {
+                $errors[] = __('instance.file_not_found', ['name' => $dbFile]);
+            }
+
+            if (!file_exists($dataFile)) {
+                $errors[] = __('instance.file_not_found', ['name' => $dataFile]);
+            }
+        }
+
+        if ($serviceName === 'moodle') {
+            $dbFile = $portalData . 'moodle/master' . $serviceName . $shortCode . '.sql';
+            $dataFile = $portalData . 'moodle/master' . $serviceName . $shortCode . '.zip';
+
+            if (!file_exists($dbFile)) {
+                $errors[] = __('instance.file_not_found', ['name' => $dbFile]);
+            }
+
+            if (!file_exists($dataFile)) {
+                $errors[] = __('instance.file_not_found', ['name' => $dataFile]);
+            }
+        }
 
         $errors = [];
-
-        if (!file_exists($dbFile)) {
-            $errors[] = __('instance.error_dbfile_not_found', $dbFile);
-        }
-
-        if (!file_exists($dataFile)) {
-            $errors[] = __('instance.error_dbfile_not_found', $dataFile);
-        }
 
         if (!empty($errors)) {
             return ['errors' => $errors];
@@ -254,10 +301,10 @@ class InstanceController extends Controller {
         ]];
     }
 
-    private function dumpDatabase(Instance $instance, string $dbFile): array {
+    private function dumpDatabase(Instance $instance, int $instanceId, string $dbFile): array {
 
-        $serviceName = mb_strtolower($instance->service()->name);
-        $serviceNameLower = Str::lower($serviceName);
+        $serviceName = $instance->service->name;
+        $serviceNameLower = mb_strtolower($serviceName);
 
         switch ($serviceName) {
             case 'Moodle':
@@ -271,15 +318,27 @@ class InstanceController extends Controller {
                 break;
         }
 
-        $dbName = config("app.agora.$serviceKey.userprefix") . $instance->db_id;
+        $dbName = config("app.agora.$serviceKey.userprefix") . $instanceId;
         $userName = ($serviceName === 'Nodes') ? $userName : $dbName;
 
-        config(["database.connections.$serviceKey.host" => $instance['db_host']]);
-        config(["database.connections.$serviceKey.database" => $dbName]);
-        config(["database.connections.$serviceKey.username" => $userName]);
-        config(["database.connections.$serviceKey.userpwd" => $userPassword]);
+        config([
+            "database.connections.$serviceNameLower.host" => $instance->db_host,
+            "database.connections.$serviceNameLower.database" => $dbName,
+            "database.connections.$serviceNameLower.username" => $userName,
+            "database.connections.$serviceNameLower.userpwd" => $userPassword,
+        ]);
 
-        DB::connection($serviceKey)->reconnect();
+        // Test the database connection.
+        try {
+            $pdo = DB::connection($serviceNameLower)->getPdo();
+        } catch (\Exception $e) {
+            return ['errors' => __('instance.db_connection_failed', [
+                'error' => $e->getMessage(),
+                'host' => $instance->db_host,
+                'db' => $dbName,
+                'user' => $userName,
+            ])];
+        }
 
         // Temporary variable, used to store current query.
         $currentSQL = '';
@@ -290,27 +349,37 @@ class InstanceController extends Controller {
         // Loop through each line.
         foreach ($lines as $line) {
             // Skip it if it's a comment or an empty line.
-            if ($line === '' || str_starts_with($line, '--') || str_starts_with($line, '/*!') || str_starts_with($line, '#')) {
+            if ($line === '' || $line === "\n" || str_starts_with($line, '--') || str_starts_with($line, '/*!') || str_starts_with($line, '#')) {
                 continue;
             }
 
             // Add this line to the current segment.
             $currentSQL .= $line;
 
-            // TODO: La comparació és diferent al Nodes!!!
+            // Detection of sentences.
+            $executeQuery = false;
 
-            // Detection of sentences: If is not an insert, and it has a semicolon at the end, it's the end of the query.
-            // If it is an insert, the end of the query is ');', but there is an exception for '});', which is the end
-            // of line in H5P definitions.
+            if ($serviceName === 'Nodes') {
+                // If it has a semicolon at the end, it's the end of the query.
+                $executeQuery = str_ends_with(trim($line), ';');
+            }
+
+            if ($serviceName === 'Moodle') {
+                // If is not an insert, and it has a semicolon at the end, it's the end of the query.
+                // If it is an insert, the end of the query is ');', but there is an exception for '});', which is the end
+                // of line in H5P definitions.
+                $executeQuery = ((!str_starts_with($currentSQL, 'INSERT')) && (str_ends_with(trim($line), ';')))
+                    || ((str_starts_with($currentSQL, 'INSERT')) && (str_ends_with(trim($line), ');'))
+                        && (!str_ends_with(trim($line), '});')));
+            }
+
             // Note: this script is not able to create the database. It must previously exist.
-            if (((!str_starts_with($currentSQL, 'INSERT')) && (str_ends_with(trim($line), ';')))
-                || ((str_starts_with($currentSQL, 'INSERT')) && (str_ends_with(trim($line), ');')) && (!str_ends_with(trim($line), '});')))) {
+            if ($executeQuery) {
                 try {
                     DB::connection($serviceNameLower)->statement($currentSQL);
                 } catch (Throwable $e) {
                     return ['error' => __('instance.query_failed', ['query' => $currentSQL, 'error' => $e->getMessage()])];
                 }
-
                 // Reset temp variable to empty
                 $currentSQL = '';
             }
@@ -319,46 +388,78 @@ class InstanceController extends Controller {
         return ['success' => __('instance.dump_success')];
     }
 
-    private function unzipFiles(Instance $instance, string $dataFile): array {
+    private function unzipFiles(Instance $instance, int $instanceId, string $dataFile): array {
+
+        switch ($instance->service->name) {
+            case 'Moodle':
+                $serviceKey = 'moodle2';
+                break;
+            case 'Nodes':
+                $serviceKey = 'nodes';
+                break;
+            default:
+                return ['error' => __('service.incorrect_service')];
+        }
+
+        $messages = [];
 
         // Directory for the new site files
-        $dbName = config("app.agora.$serviceKey.userprefix") . $instance->db_id;
+        $dbName = config("app.agora.$serviceKey.userprefix") . $instanceId;
         $targetDir = Util::getAgoraVar('moodledata') . $dbName . '/';
 
         // If the directory doesn't exist, create it.
-        if (!file_exists($targetDir)) {
-            $newDir = mkdir($targetDir, 0777, true);
-            if ($newDir) {
-                LogUtil::registerStatus(__f("S'ha creat el directori %s", $targetDir));
+        if (!is_dir($targetDir)) {
+            if (mkdir($targetDir, 0777, true) || is_dir($targetDir)) {
+                $messages[] = __('instances.dir_created', ['dir' => $targetDir]);
             } else {
-                LogUtil::registerError(__f("El directori %s no existia i no s'ha pogut crear", $targetDir));
-                return false;
+                return ['error' => __('instances.dir_not_created', ['dir' => $targetDir])];
             }
         }
 
-        // Uncompress the files
+        // Extract the files.
         $zip = new ZipArchive();
 
         $resource = $zip->open($dataFile);
         if (!$resource) {
-            LogUtil::registerError(__f("No s'ha pogut obrir el fitxer de base de %s", $dataFile));
-            return false;
+            return ['error' => __('instances.file_not_opened', ['file' => $dataFile])];
         }
 
-        // Try to extract the file
+        // Try to extract the file.
         if (!$zip->extractTo($targetDir)) {
-            LogUtil::registerError(__f("S'ha produït un error en descomprimir el fitxer %s al directori %s", array($dataFile, $targetDir)));
             $zip->close();
-            return false;
+            return ['error' => __('instances.unzip_error', ['file' => $dataFile, 'dir' => $targetDir])];
         }
 
         $zip->close();
 
-        return [];
+        $messages[] = __('instances.unzip_success', ['file' => $dataFile, 'dir' => $targetDir]);
+
+        return ['success' => $messages];
+
     }
 
-    private function programOperationEnable(Instance $instance) {
-        return true;
+    private function programOperationEnable(Instance $instance, int $instanceId, string $password): array {
+
+        ProcessOperation::dispatch([
+            'action' => 'script_enable_service',
+            'priority' => 'high',
+            'params' => [
+                'password' => md5($password),
+                'xtecadminPassword' => '',
+                'clientName' => $instance->client->name,
+                'clientCode' => $instance->client->code,
+                'clientAddress' => $instance->client->address,
+                'clientCity' => $instance->client->city,
+                'clientDNS' => $instance->client->dns,
+            ],
+            'service_id' => $instance->service->id,
+            'service_name' => $instance->service->name,
+            'instance_id' => $instanceId,
+            'instance_name' => $instance->client->name,
+            'instance_dns' => $instance->client->dns,
+        ]);
+
+        return ['success' => __('instances.operation_programmed')];
     }
 
 }
