@@ -25,12 +25,12 @@
                     <div class="form-group">
                         <label for="queryTypeModalAdd">{{ __('batch.query_type') }}</label>
                         <select class="form-control" id="queryTypeModalAdd" name="queryTypeModalAdd">
-                            <option value="SELECT">SELECT</option>
+                            <option value="select">SELECT</option>
                             <option value="insert">INSERT</option>
-                            <option value="INSERT">UPDATE</option>
-                            <option value="DELETE">DELETE</option>
-                            <option value="ALTER">ALTER</option>
-                            <option value="DROP">DROP</option>
+                            <option value="update">UPDATE</option>
+                            <option value="delete">DELETE</option>
+                            <option value="alter">ALTER</option>
+                            <option value="drop">DROP</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-success">

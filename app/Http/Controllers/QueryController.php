@@ -235,17 +235,16 @@ class QueryController extends Controller {
             ->orderBy('instances.id')
             ->get()->toArray();
 
-        config(["database.connections.$serviceKey.userpwd" => $userPassword]);
+        config(["database.connections.$serviceNameLower.userpwd" => $userPassword]);
+        $userPrefix = config("app.agora.$serviceKey.userprefix");
 
         foreach ($instances as $instance) {
-            $dbName = config("app.agora.$serviceKey.userprefix") . $instance['db_id'];
+            $dbName = $userPrefix . $instance['db_id'];
             $userName = ($serviceName === 'Nodes') ? $userName : $dbName;
 
-            config(["database.connections.$serviceKey.host" => $instance['db_host']]);
-            config(["database.connections.$serviceKey.database" => $dbName]);
-            config(["database.connections.$serviceKey.username" => $userName]);
-
-//            DB::connection($serviceKey)->reconnect();
+            config(["database.connections.$serviceNameLower.host" => $instance['db_host']]);
+            config(["database.connections.$serviceNameLower.database" => $dbName]);
+            config(["database.connections.$serviceNameLower.username" => $userName]);
 
             // Execute query
             if ($isSelect) {
