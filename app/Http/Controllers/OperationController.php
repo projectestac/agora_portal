@@ -22,16 +22,16 @@ class OperationController extends Controller {
 
     public static function get_operations_file(string $service): string {
         return match ($service) {
-            'Moodle' => OperationController::MOODLE_OPERATIONS_LIST_FILE,
-            'Nodes' => OperationController::NODES_OPERATIONS_LIST_FILE,
+            'Moodle' => self::MOODLE_OPERATIONS_LIST_FILE,
+            'Nodes' => self::NODES_OPERATIONS_LIST_FILE,
             default => '',
         };
     }
 
     public static function get_operations_exec_file(string $service): string {
         return match ($service) {
-            'Moodle' => OperationController::MOODLE_OPERATIONS_EXEC_FILE,
-            'Nodes' => OperationController::NODES_OPERATIONS_EXEC_FILE,
+            'Moodle' => self::MOODLE_OPERATIONS_EXEC_FILE,
+            'Nodes' => self::NODES_OPERATIONS_EXEC_FILE,
             default => '',
         };
     }
@@ -46,13 +46,14 @@ class OperationController extends Controller {
             ->join('clients', 'instances.client_id', '=', 'clients.id')
             ->where('instances.service_id', $service['id'])
             ->where('instances.status', 'active')
+            ->orderBy('instances.id')
             ->first()
             ->toArray();
 
         $dns = $instance['dns'];
         $slug = $service['slug'];
         $domain = Util::getAgoraVar(mb_strtolower($service['name']) . '_domain');
-        $operationsFile = OperationController::get_operations_file($service['name']);
+        $operationsFile = self::get_operations_file($service['name']);
 
         $operationsUrl = $domain . '/' . $dns . '/';
         $operationsUrl .= empty($slug) ? '' : $slug . '/';
@@ -183,9 +184,7 @@ class OperationController extends Controller {
                 'action' => $data['action'],
                 'priority' => $data['priority'],
                 'params' => $data['params'],
-                'service_id' => $data['service_id'],
                 'service_name' => $data['service_name'],
-                'instance_id' => $instance['id'],
                 'instance_name' => $instance['name'],
                 'instance_dns' => $instance['dns'],
             ]);
