@@ -199,4 +199,20 @@ class Util {
 
     }
 
+    public static function createRandomPass() {
+
+        // Chars allowed in password
+        $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz023456789";
+
+        // Sets the seed for rand function
+        srand((float) microtime() * 1000000);
+
+        for ($i = 0, $pass = ''; $i < 8; $i++) {
+            $num = rand() % strlen($chars);
+            $pass = $pass . substr($chars, $num, 1);
+        }
+
+        return $pass;
+    }
+
 }
