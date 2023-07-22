@@ -3,6 +3,7 @@
 return [
     'name' => 'Nom',
     'status' => 'Estat',
+    'requested_at' => 'Data de sol·licitud',
     'created_at' => 'Data de creació',
     'updated_at' => 'Data de modificació',
     'actions' => 'Accions',
@@ -33,4 +34,5 @@ return [
     'continue' => 'Continua',
     'files' => 'Fitxers',
     'id' => 'ID',
+    'error_occurred' => 'S\'ha produït un error',
 ];
