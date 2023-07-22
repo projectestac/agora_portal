@@ -1,6 +1,7 @@
 
 body {
     font-family: arial, helvetica, clean, sans-serif;
+    font-size: 16px;
     line-height: 20px;
     margin: 0;
     padding: 50px 0 0 0;
@@ -31,21 +32,6 @@ a.btn-info:hover,
 a.btn-warning:hover,
 a.btn-danger:hover {
     color: white;
-}
-
-p form {
-    margin-top: 0;
-    margin-bottom: 20px;
-}
-
-.form-horizontal .row .form-group {
-    margin: 0;
-}
-
-.form-inline-multiline .form-group {
-    margin-bottom: 15px;
-    vertical-align: baseline;
-
 }
 
 img {
@@ -86,9 +72,24 @@ textarea {
     animation: spin 1000ms infinite linear;
 }
 
-@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
-@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
-@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+@-moz-keyframes spin {
+    100% {
+        -moz-transform: rotate(360deg);
+    }
+}
+
+@-webkit-keyframes spin {
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
 
 /** Header and navigation styles **/
 
@@ -200,6 +201,10 @@ header h1 {
     background: linear-gradient(#fafafa, #f2f2f2);
 }
 
+.login-form fieldset .login-block {
+    min-height: 100px;
+}
+
 .login-form fieldset .row-form {
     padding: 0.5em 0;
     min-height: 2em;
@@ -213,6 +218,17 @@ header h1 {
     width: 28%;
     font-weight: normal;
     color: #333;
+}
+
+.center-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.center-image img {
+    max-width: 100%;
+    max-height: 100%;
 }
 
 
@@ -283,6 +299,10 @@ footer {
     background-color: #fafbfc;
     color: #505050;
     line-height: 1.5em;
+}
+
+table.first_column_bold td:first-child {
+    font-weight: bold;
 }
 
 
@@ -377,15 +397,23 @@ COLOR5: #D0D0D0 #BBEEEE #87BDC1 #FFEDBA #B3CD7B #B3CADB
 
 /** Admin menu **/
 
-.admin-menu-container .primary{
+.admin-menu-container {
+    overflow: auto;
+}
+
+.admin-menu-container::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.admin-menu-container .primary {
     margin-top: 0.8em;
     min-height: 50px;
 }
 
 .admin-menu-container .secondary {
-    margin-bottom: 1em;
     min-height: 50px;
-
 }
 
 .admin-menu > ul.primary {
@@ -445,16 +473,19 @@ COLOR5: #D0D0D0 #BBEEEE #87BDC1 #FFEDBA #B3CD7B #B3CADB
     max-height: 500px;
     overflow: auto;
 }
+
 .query-item {
     padding: 1em;
     border-bottom: 1px solid #ccc;
     border-left: 1px solid #ccc;
     border-right: 1px solid #ccc;
 }
+
 .query-description {
     min-height: 50px;
 }
-.query-query{
+
+.query-query {
     font-size: 0.8em;
     color: #999;
 }
