@@ -17,4 +17,5 @@ return [
     'instance_list' => 'Llista d\'instàncies',
     'no_services' => 'No hi ha serveis',
     'portal' => 'Portal',
+    'incorrect_service' => 'S\'ha indicat un servei que no existeix',
 ];
