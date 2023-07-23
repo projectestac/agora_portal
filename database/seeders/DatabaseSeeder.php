@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder {
             RequestSeeder::class,
             RolesTableSeeder::class,
             LogSeeder::class,
+            ConfigSeeder::class,
 //            MigrationSeeder::class,
         ]);
     }
