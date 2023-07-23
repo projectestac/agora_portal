@@ -227,7 +227,7 @@ class Util {
             ->where('name', $name)
             ->first();
 
-        return $param ?? '';
+        return $param->value ?? '';
     }
 
 }
