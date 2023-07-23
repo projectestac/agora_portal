@@ -158,9 +158,10 @@
 
                                 <div class="form-group">
                                     <div class="text-center">
-                                        <button type="submit">{{ __('common.save') }}</button>
+                                        <button type="submit" class="btn btn-success">{{ __('common.save') }}</button>
                                     </div>
                                 </div>
+                            </div>
                         </form>
 
                     </div>
