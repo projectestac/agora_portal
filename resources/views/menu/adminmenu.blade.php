@@ -37,7 +37,7 @@
             </a>
         </li>
         <li>
-            <a href="{{ route('config') }}" @if (str_contains(request()->url(), 'config')) class="selected" @endif>
+            <a href="{{ route('config.edit') }}" @if (str_contains(request()->url(), 'config')) class="selected" @endif>
                 {{ __('config.configuration') }}
             </a>
         </li>
@@ -76,7 +76,7 @@
     @if (str_contains(request()->url(), 'config'))
         <ul class="nav navbar-nav secondary">
             <li>
-                <a href="{{ route('config') }}" @if (str_ends_with(request()->url(), 'config')) class="selected" @endif>
+                <a href="{{ route('config.edit') }}" @if (str_ends_with(request()->url(), 'config')) class="selected" @endif>
                     {{ __('common.params') }}
                 </a>
             </li>
