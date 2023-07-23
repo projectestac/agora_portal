@@ -86,8 +86,7 @@ class InstanceController extends Controller {
         $instance->annotations = $request->input('annotations');
         $instance->save();
 
-        $newDbId = 0;
-        $error = [];
+        $newDbId = -1;
         $messages = [];
 
         // If the status has changed, is possible that the db_id needs to be updated.
@@ -159,6 +158,12 @@ class InstanceController extends Controller {
                 'updated_at' => now(),
             ]);
 
+        } else {
+            if ($newDbId === 0) {
+                $instance->db_id = 0;
+            }
+            $instance->status = $statusFinal;
+            $instance->save();
         }
 
         $messages[] = __('instance.instance_updated');
@@ -204,7 +209,8 @@ class InstanceController extends Controller {
      */
     private function getNewOrUpdatedDbId(Instance $instance, string $statusFinal): int {
 
-        if ($instance->status === Instance::STATUS_PENDING && $statusFinal === Instance::STATUS_ACTIVE && $instance->db_id === 0) {
+        if (($instance->status === Instance::STATUS_PENDING || $instance->status === Instance::STATUS_WITHDRAWN)
+            && $statusFinal === Instance::STATUS_ACTIVE && $instance->db_id === 0) {
             return $this->getNewDbId($instance->service_id);
         }
 
@@ -328,16 +334,11 @@ class InstanceController extends Controller {
             "database.connections.$serviceNameLower.userpwd" => $userPassword,
         ]);
 
-        // Test the database connection.
-        try {
-            $pdo = DB::connection($serviceNameLower)->getPdo();
-        } catch (\Exception $e) {
-            return ['errors' => __('instance.db_connection_failed', [
-                'error' => $e->getMessage(),
-                'host' => $instance->db_host,
-                'db' => $dbName,
-                'user' => $userName,
-            ])];
+        // Test the database connection. If the database is missing and the parameter 'nodes_create_db' is checked,
+        // the database will be created.
+        $test = $this->testConnectionAndCreateDb($serviceNameLower, $dbName, $userName, $instance);
+        if (!empty($errors['errors'])) {
+            return ['errors' => $errors];
         }
 
         // Temporary variable, used to store current query.
@@ -393,9 +394,11 @@ class InstanceController extends Controller {
         switch ($instance->service->name) {
             case 'Moodle':
                 $serviceKey = 'moodle2';
+                $dataDir = Util::getAgoraVar('moodledata');
                 break;
             case 'Nodes':
                 $serviceKey = 'nodes';
+                $dataDir = Util::getAgoraVar('nodesdata');
                 break;
             default:
                 return ['error' => __('service.incorrect_service')];
@@ -405,7 +408,7 @@ class InstanceController extends Controller {
 
         // Directory for the new site files
         $dbName = config("app.agora.$serviceKey.userprefix") . $instanceId;
-        $targetDir = Util::getAgoraVar('moodledata') . $dbName . '/';
+        $targetDir = $dataDir . $dbName . '/';
 
         // If the directory doesn't exist, create it.
         if (!is_dir($targetDir)) {
@@ -445,12 +448,15 @@ class InstanceController extends Controller {
             'priority' => 'high',
             'params' => [
                 'password' => md5($password),
-                'xtecadminPassword' => '',
+                'xtecadminPassword' => Util::getConfigParam('xtecadmin_hash'),
                 'clientName' => $instance->client->name,
                 'clientCode' => $instance->client->code,
                 'clientAddress' => $instance->client->address,
                 'clientCity' => $instance->client->city,
                 'clientDNS' => $instance->client->dns,
+                'clientPC' => $instance->client->postal_code,
+                'origin_url' => $instance->modelType->url,
+                'origin_bd' => $instance->modelType->db,
             ],
             'service_id' => $instance->service->id,
             'service_name' => $instance->service->name,
@@ -459,7 +465,52 @@ class InstanceController extends Controller {
             'instance_dns' => $instance->client->dns,
         ]);
 
-        return ['success' => __('instances.operation_programmed')];
+        return ['success' => __('instance.operation_programmed')];
     }
 
+    private function testConnectionAndCreateDb(string $serviceNameLower, string $dbName, string $userName, Instance $instance): array {
+
+        try {
+            $pdo = DB::connection($serviceNameLower)->getPdo();
+        } catch (\Exception $e) {
+            // Check is automatic creation of databases is allowed.
+            if ($serviceNameLower === 'nodes' && !Util::getConfigParam('nodes_create_db')) {
+                return [
+                    'errors' => __('instance.db_creation_failed', [
+                        'error' => $e->getMessage(),
+                        'host' => $instance->db_host,
+                        'db' => $dbName,
+                        'user' => $userName,
+                    ])];
+            }
+
+            if (str_contains($e->getMessage(), 'Unknown database')) {
+                // The database doesn't exist, so we try to create it.
+                try {
+                    $result = DB::statement("CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
+                    if ($result) {
+                        $pdo = DB::connection($serviceNameLower)->getPdo();
+                    }
+                } catch (\Exception $e) {
+                    return [
+                        'errors' => __('instance.db_connection_failed_db_not_created', [
+                            'error' => $e->getMessage(),
+                            'host' => $instance->db_host,
+                            'db' => $dbName,
+                            'user' => $userName,
+                        ])];
+                }
+            } else {
+                return [
+                    'errors' => __('instance.db_connection_failed', [
+                        'error' => $e->getMessage(),
+                        'host' => $instance->db_host,
+                        'db' => $dbName,
+                        'user' => $userName,
+                    ])];
+            }
+        }
+
+        return ['success' => true];
+    }
 }
