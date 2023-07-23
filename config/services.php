@@ -34,9 +34,9 @@ return [
     ],
 
     'google' => [
-        'client_id' => Util::getConfigParam('google_client_id'),
-        'client_secret' => Util::getConfigParam('google_client_secret'),
-        'redirect' => Util::getConfigParam('google_redirect_uri'),
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
 ];

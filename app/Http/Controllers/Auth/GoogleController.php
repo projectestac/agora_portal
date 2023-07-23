@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Helpers\Access;
+use App\Helpers\Util;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Laravel\Socialite\Facades\Socialite;
 
 class GoogleController extends Controller {
@@ -16,6 +18,13 @@ class GoogleController extends Controller {
     }
 
     public function handleGoogleCallback() {
+
+        // The Google credentials are stored in the database, so the values defined in
+        // config/services.php are overwritten.
+        Config::set('services.google.client_id', Util::getConfigParam('google_client_id'));
+        Config::set('services.google.client_secret', Util::getConfigParam('google_client_secret'));
+        Config::set('services.google.redirect', Util::getConfigParam('google_redirect_uri'));
+
         $userGoogle = Socialite::driver('google')->stateless()->user();
 
         // The username is the email without the domain.
