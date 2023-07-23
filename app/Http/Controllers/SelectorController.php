@@ -22,13 +22,13 @@ class SelectorController extends Controller {
         }
 
         // Add 'selected' element to indicate which service will be selected in the dropdown menu.
-        $services = array_map(function ($array) use ($selectedServiceName) {
+        $services = array_map(static function ($array) use ($selectedServiceName) {
             $array['selected'] = $array['name'] === $selectedServiceName;
             return $array;
         }, $services);
 
         // Extract the selected service from the full list of services to pass it to the view.
-        $selectedService = array_filter($services, function ($item) {
+        $selectedService = array_filter($services, static function ($item) {
             return $item['selected'] === true;
         });
         $selectedService = reset($selectedService);

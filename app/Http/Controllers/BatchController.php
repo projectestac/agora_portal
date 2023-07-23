@@ -19,7 +19,8 @@ class BatchController extends Controller {
 
         return view('admin.batch.query')
             ->with('viewData', $viewData)
-            ->with('query', $query);
+            ->with('query', $query)
+            ->with('queryTypes', QueryController::getTypeList());
     }
 
     /**
