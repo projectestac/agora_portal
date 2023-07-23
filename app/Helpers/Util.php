@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\Client;
+use App\Models\Config as ConfigModel;
 use App\Models\Instance;
 use App\Models\Service;
 use Illuminate\Http\Request;
@@ -205,7 +206,7 @@ class Util {
         $chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz023456789";
 
         // Sets the seed for rand function
-        srand((float) microtime() * 1000000);
+        srand((float)microtime() * 1000000);
 
         for ($i = 0, $pass = ''; $i < 8; $i++) {
             $num = rand() % strlen($chars);
@@ -213,6 +214,20 @@ class Util {
         }
 
         return $pass;
+    }
+
+    /**
+     * Retrieve the value of a configuration parameter from table "configs".
+     *
+     * @param string $name
+     * @return string
+     */
+    public static function getConfigParam(string $name): string {
+        $param = ConfigModel::select('value')
+            ->where('name', $name)
+            ->first();
+
+        return $param ?? '';
     }
 
 }
