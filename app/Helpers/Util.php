@@ -5,11 +5,14 @@ namespace App\Helpers;
 use App\Models\Client;
 use App\Models\Config as ConfigModel;
 use App\Models\Instance;
-use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 
 class Util {
+
+    public const SERVEIEDUCATIU_TYPE_ID = 5;
+    public const EOI_TYPE_ID = 6;
+    public const PROJECTES_TYPE_ID = 12;
 
     /**
      * Get the client from the URL if it is available and valid.
@@ -230,4 +233,21 @@ class Util {
         return $param->value ?? '';
     }
 
+    public static function getInstanceUrl(Instance $instance): string {
+
+        if ($instance->service_name === 'Moodle') {
+            if ($instance->client->type_id === self::EOI_TYPE_ID) {
+                return Config::get('app.agora.server.eoi') . '/' . $instance->client->dns . '/moodle/';
+            }
+            return Config::get('app.agora.server.server') . '/' . $instance->client->dns . '/moodle/';
+        }
+
+        return match ($instance->client->type_id) {
+            self::SERVEIEDUCATIU_TYPE_ID => Config::get('app.agora.server.se-url') . '/' . $instance->client->dns . '/',
+            self::EOI_TYPE_ID => Config::get('app.agora.server.eoi') . '/' . $instance->client->dns . '/',
+            self::PROJECTES_TYPE_ID => Config::get('app.agora.server.projectes') . '/' . $instance->client->dns . '/',
+            default => Config::get('app.agora.server.nodes') . '/' . $instance->client->dns . '/',
+        };
+
+    }
 }
