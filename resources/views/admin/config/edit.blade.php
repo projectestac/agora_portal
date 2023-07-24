@@ -111,30 +111,6 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="col-sm-4 control-label clear" for="google_client_id">{{ __('config.google_client_id') }}</label>
-                    <div class="col-sm-8">
-                        <input type="text" class="form-control" id="google_client_id" name="google_client_id"
-                               @if(isset($config['google_client_id'])) value="{{ $config['google_client_id'] }}" @endif>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="col-sm-4 control-label clear" for="google_client_secret">{{ __('config.google_client_secret') }}</label>
-                    <div class="col-sm-8">
-                        <input type="text" class="form-control" id="google_client_secret" name="google_client_secret"
-                               @if(isset($config['google_client_secret'])) value="{{ $config['google_client_secret'] }}" @endif>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="col-sm-4 control-label clear" for="google_redirect_uri">{{ __('config.google_redirect_uri') }}</label>
-                    <div class="col-sm-8">
-                        <input type="text" class="form-control" id="google_redirect_uri" name="google_redirect_uri"
-                               @if(isset($config['google_redirect_uri'])) value="{{ $config['google_redirect_uri'] }}" @endif>
-                    </div>
-                </div>
-
-                <div class="form-group">
                     <div class="text-center">
                         <button type="submit" class="btn btn-success">{{ __('common.save') }}</button>
                     </div>

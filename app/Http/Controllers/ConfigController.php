@@ -41,9 +41,6 @@ class ConfigController extends Controller {
             'max_file_size_for_large_upload' => $request->input('max_file_size_for_large_upload'),
             'nodes_create_db' => ($request->input('nodes_create_db') === 'on') ? 1 : 0,
             'min_db_id' => $request->input('min_db_id'),
-            'google_client_id' => $request->input('google_client_id'),
-            'google_client_secret' => $request->input('google_client_secret'),
-            'google_redirect_uri' => $request->input('google_redirect_uri'),
         ];
 
         // Encrypt password if needed.
