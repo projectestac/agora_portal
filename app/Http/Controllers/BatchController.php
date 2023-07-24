@@ -32,7 +32,8 @@ class BatchController extends Controller {
 
         $operationController = new OperationController();
         $operations = $operationController->get_operations_list($viewData['selectedService']);
-        $action = current($operations);
+
+        $action = (is_array($operations)) ? current($operations) : '';
 
         $priority = [
             'low' => __('batch.low'),
