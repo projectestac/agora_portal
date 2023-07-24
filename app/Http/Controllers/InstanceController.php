@@ -25,7 +25,6 @@ class InstanceController extends Controller {
 
     public function index(): View {
         $instances = Instance::select('instances.*', 'clients.name as client_name', 'services.name as service_name')
-            ->with('modelType')
             ->join('clients', 'instances.client_id', '=', 'clients.id')
             ->join('services', 'instances.service_id', '=', 'services.id')
             ->orderBy('instances.updated_at', 'desc')
