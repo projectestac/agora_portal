@@ -69,9 +69,13 @@ class OperationController extends Controller {
         $actions = curl_exec($curl_handle);
         curl_close($curl_handle);
 
-        $decodedActions = json_decode($actions, true, 512, JSON_THROW_ON_ERROR);
-        if ($decodedActions) {
-            return $decodedActions;
+        try {
+            $decodedActions = json_decode($actions, true, 512, JSON_THROW_ON_ERROR);
+            if ($decodedActions) {
+                return $decodedActions;
+            }
+        } catch (JsonException) {
+            return __('batch.url_has_not_returned_actions', ['url' => $operationsUrl]);
         }
 
         return __('batch.url_has_not_returned_actions', ['url' => $operationsUrl]);

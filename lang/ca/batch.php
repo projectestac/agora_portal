@@ -68,4 +68,5 @@ return [
     'queue_operation_removed' => 'S\'ha esborrat l\'operació de la cua correctament',
     'queue_operation_not_removed' => 'No s\'ha pogut esborrar l\'operació de la cua',
     'no_operation_pending' => 'No hi ha cap operació pendent',
+    'no_action' => 'No s\'ha pogut recuperar la llista d\'accions del servei',
 ];
