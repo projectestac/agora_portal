@@ -47,7 +47,7 @@
                                 <td>{{ $item['operationData']['instance_name'] }}</td>
                                 <td>{{ $item['operationData']['priority'] }}</td>
                                 <td>
-                                    <img src="{{ asset('images/' . mb_strtolower($item['operationData']['service_name'] . '.gif')) }}"
+                                    <img src="{{ secure_asset('images/' . mb_strtolower($item['operationData']['service_name'] . '.gif')) }}"
                                          alt="{{ $item['operationData']['service_name'] }}"
                                          title="{{ $item['operationData']['service_name'] }}"
                                     >

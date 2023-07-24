@@ -12,7 +12,7 @@
 
         <div class="panel panel-info">
             <div class="panel-heading">
-                <img src="{{ asset('images/' .  $image . '.gif') }}" alt="{{ $serviceName }}" title="{{ $serviceName }}"/>
+                <img src="{{ secure_asset('images/' .  $image . '.gif') }}" alt="{{ $serviceName }}" title="{{ $serviceName }}"/>
                 {{ __('batch.query_to_execute') }}
             </div>
             <div class="panel-body">

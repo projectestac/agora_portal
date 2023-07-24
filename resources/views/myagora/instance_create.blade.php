@@ -16,7 +16,7 @@
             <input type="hidden" name="client_id" value="{{ $client_id }}">
             <div class="panel panel-default">
                 <div class="panel-heading row-fluid clearfix">
-                    <img src="{{ asset('images/' . mb_strtolower($service['name'] . '.gif')) }}"
+                    <img src="{{ secure_asset('images/' . mb_strtolower($service['name'] . '.gif')) }}"
                          alt="{{ $service['name'] }}"
                          title="{{ $service['name'] }}"
                     >

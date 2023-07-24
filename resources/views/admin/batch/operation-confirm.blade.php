@@ -34,7 +34,7 @@
 
         <div class="panel panel-default">
             <div class="panel-heading">
-                <img src="{{ asset('images/' .  $image . '.gif') }}" alt="{{ $serviceName }}" title="{{ $serviceName }}"/>
+                <img src="{{ secure_asset('images/' .  $image . '.gif') }}" alt="{{ $serviceName }}" title="{{ $serviceName }}"/>
                 {{ __('batch.instances_on_execute') }}
             </div>
             <div class="panel-body">
