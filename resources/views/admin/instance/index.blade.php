@@ -25,6 +25,7 @@
                     <th>{{ __('common.status') }}</th>
                     <th>{{ __('service.service') }}</th>
                     <th>{{ __('instance.location_long') }}</th>
+                    <th>{{ __('common.dates') }}</th>
                     <th>{{ __('common.actions') }}</th>
                 </tr>
                 </thead>
@@ -36,12 +37,22 @@
                         <td>{{ $instance->modelType->description }}</td>
                         <td>{{ $instance->status }}</td>
                         <td>
-                            <img src="{{ secure_asset('images/' . mb_strtolower($instance->service_name . '.gif')) }}"
-                                 alt="{{ $instance->service_name }}"
-                                 title="{{ $instance->service_name }}"
-                            >
+                            <a href="{{ \App\Helpers\Util::getInstanceUrl($instance) }}"
+                               title="{{ $instance->service_name }} - {{ $instance->client_name }}">
+                                <img src="{{ secure_asset('images/' . mb_strtolower($instance->service_name . '.gif')) }}"
+                                     alt="{{ $instance->service_name }}"
+                                >
+                            </a>
                         </td>
-                        <td>{{ $instance->location_name }}</td>
+                        <td>
+                            {{ $instance->client->city }}<br/>
+                            {{ $instance->client->location->name }}
+                        </td>
+                        <td>
+                            E: {{ $instance->updated_at->format('d/m/Y') }}<br/>
+                            C: {{ $instance->created_at->format('d/m/Y') }}<br/>
+                            S: {{ \Carbon\Carbon::parse($instance->requested_at)->format('d/m/Y'), }}
+                        </td>
                         <td>
                             <a class="btn btn-info" href="{{ route('instances.edit', $instance->id) }}" title="{{ __('service.edit') }}">
                                 <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
