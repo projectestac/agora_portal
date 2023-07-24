@@ -24,9 +24,6 @@ class ConfigSeeder extends Seeder {
             'max_file_size_for_large_upload' => 800,
             'nodes_create_db' => 1,
             'min_db_id' => 1,
-            'google_client_id' => '',
-            'google_client_secret' => '',
-            'google_redirect_uri' => '',
         ];
 
         foreach ($params as $name => $value) {
