@@ -24,6 +24,7 @@ return [
     'cancel' => 'Cancel·la',
     'update' => 'Actualitza',
     'date' => 'Data',
+    'dates' => 'Dates',
     'town' => 'Població',
     'search' => 'Cerca',
     'close' => 'Tanca',
