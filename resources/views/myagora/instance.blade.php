@@ -55,7 +55,7 @@
                     @foreach($availableServices as $service)
                         <div style="margin: 10px 0 10px 0">
                             <a class="btn btn-default" href="{{ route('instances.create', ['service_id' => $service['id']]) }}" role="button">
-                                <img src="{{ asset('images/' . mb_strtolower($service['name']) . '.gif') }}"
+                                <img src="{{ secure_asset('images/' . mb_strtolower($service['name']) . '.gif') }}"
                                      alt="{{ $service['name'] }}"
                                      title="{{ $service['name'] }}"
                                 >

@@ -7,12 +7,12 @@
     <title>{{ __('home.title') }}</title>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/portal.css') }}">
+    <link rel="stylesheet" href="{{ secure_asset('css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ secure_asset('css/portal.css') }}">
 
     <!-- Scripts -->
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+    <script src="{{ secure_asset('js/jquery.min.js') }}"></script>
+    <script src="{{ secure_asset('js/bootstrap.min.js') }}"></script>
 </head>
 
 <body class="antialiased">
@@ -20,10 +20,10 @@
     <nav class="navbar navbar-fixed-top" id="navbar_top">
         <div class="container-fluid">
             <a href="https://educacio.gencat.cat/ca/inici/" target="_blank" class="brand departament hidden-phone">
-                <img src="{{ asset('images/departament.png') }}" alt="{{ __('home.department') }}" title="{{ __('home.department') }}"/>
+                <img src="{{ secure_asset('images/departament.png') }}" alt="{{ __('home.department') }}" title="{{ __('home.department') }}"/>
             </a>
             <a href="https://xtec.gencat.cat/ca/inici" target="_blank" class="brand xtec hidden-phone">
-                <img src="{{ asset('images/xtec.png') }}" alt="{{ __('home.xtec') }}" title="{{ __('home.xtec') }}"/>
+                <img src="{{ secure_asset('images/xtec.png') }}" alt="{{ __('home.xtec') }}" title="{{ __('home.xtec') }}"/>
             </a>
             <div class="pull-right">
                 @include('menu.usermenu')
@@ -41,7 +41,7 @@
 
 <footer>
     <a href="https://xtec.gencat.cat/ca/inici" target="_blank">
-        <img src="{{ asset('images/departament.png') }}" alt="{{ __('home.department') }}" title="{{ __('home.department') }}"/>
+        <img src="{{ secure_asset('images/departament.png') }}" alt="{{ __('home.department') }}" title="{{ __('home.department') }}"/>
     </a>
 </footer>
 </body>

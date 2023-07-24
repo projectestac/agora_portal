@@ -12,7 +12,7 @@
 
     <div class="content myagora">
         @if (isset($currentClient['name']))
-            <h3>{{ __('request.request_list', ['name' => $currentClient['name']]) }}</h3>
+            <h3>{{ __('request.request_client_list', ['name' => $currentClient['name']]) }}</h3>
         @endif
 
         @include('components.messages')

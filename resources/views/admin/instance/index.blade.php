@@ -36,7 +36,7 @@
                         <td>{{ $instance->modelType->description }}</td>
                         <td>{{ $instance->status }}</td>
                         <td>
-                            <img src="{{ asset('images/' . mb_strtolower($instance->service_name . '.gif')) }}"
+                            <img src="{{ secure_asset('images/' . mb_strtolower($instance->service_name . '.gif')) }}"
                                  alt="{{ $instance->service_name }}"
                                  title="{{ $instance->service_name }}"
                             >

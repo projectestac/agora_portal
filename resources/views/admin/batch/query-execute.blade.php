@@ -12,7 +12,7 @@
 
         <div class="panel panel-info">
             <div class="panel-heading">
-                <img src="{{ asset('images/' .  $image . '.gif') }}" alt="{{ $serviceName }}" title="{{ $serviceName }}"/>
+                <img src="{{ secure_asset('images/' .  $image . '.gif') }}" alt="{{ $serviceName }}" title="{{ $serviceName }}"/>
                 {{ __('batch.query_executed') }}
                 <div class="pull-right">
                     <a href="{{ route('batch.query') }}" class="btn btn-info">
