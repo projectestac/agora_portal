@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\Instance;
+use App\Models\Service;
 use Illuminate\Http\Request;
 
 class Quota {
@@ -21,16 +22,28 @@ class Quota {
     }
 
     public static function addToQuota(Request $request, int $size = 0) {
-        $currentInstanceId = Cache::getCurrentInstance($request)['id'];
-        $instance = Instance::where('id', $currentInstanceId)->first();
+        $currentClient = Cache::getCurrentClient($request);
+        $currentInstance = Instance::where('client_id', $currentClient['id'])
+            ->where('service_id', Service::select('id')->where('name', 'Moodle')->get()->toArray())
+            ->where('status', 'active')
+            ->first()
+            ->toArray();
+
+        $instance = Instance::where('id', $currentInstance['id'])->first();
         $instance->used_quota += $size;
 
         return $instance->save();
     }
 
     public static function subtractFromQuota(Request $request, int $size = 0) {
-        $currentInstanceId = Cache::getCurrentInstance($request)['id'];
-        $instance = Instance::where('id', $currentInstanceId)->first();
+        $currentClient = Cache::getCurrentClient($request);
+        $currentInstance = Instance::where('client_id', $currentClient['id'])
+            ->where('service_id', Service::select('id')->where('name', 'Moodle')->get()->toArray())
+            ->where('status', 'active')
+            ->first()
+            ->toArray();
+
+        $instance = Instance::where('id', $currentInstance['id'])->first();
         $instance->used_quota -= $size;
 
         return $instance->save();
