@@ -151,7 +151,7 @@ class Util {
         return round($bytes / 1024 / 1024 / 1024, $precision);
     }
 
-    public static function getAgoraVar(string $varName = '', Request $request = null): string {
+    public static function getAgoraVar(string $varName = ''): string {
         if (empty($varName)) {
             return '';
         }
@@ -161,18 +161,8 @@ class Util {
                 Config::get('app.agora.admin.datadir'),
             'nodesdata' => Config::get('app.agora.server.root') .
                 Config::get('app.agora.nodes.datadir'),
-            'nodesdata_db' => Config::get('app.agora.server.root') .
-                Config::get('app.agora.nodes.datadir') .
-                Cache::getDBName($request, 'Nodes') . '/',
             'moodledata' => Config::get('app.agora.server.root') .
                 Config::get('app.agora.moodle2.datadir'),
-            'moodledata_db' => Config::get('app.agora.server.root') .
-                Config::get('app.agora.moodle2.datadir') .
-                Cache::getDBName($request, 'Moodle') . '/',
-            'moodledata_repo' => Config::get('app.agora.server.root') .
-                Config::get('app.agora.moodle2.datadir') .
-                Cache::getDBName($request, 'Moodle') .
-                Config::get('app.agora.moodle2.repository_files'),
             'nodes_domain' => Config::get('app.agora.server.nodes'),
             'moodle_domain' => Config::get('app.agora.server.server'),
             'se_domain' => Config::get('app.agora.server.se-url'),
