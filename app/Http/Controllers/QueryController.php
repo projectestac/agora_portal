@@ -235,7 +235,7 @@ class QueryController extends Controller {
             ->orderBy('instances.id')
             ->get()->toArray();
 
-        config(["database.connections.$serviceNameLower.userpwd" => $userPassword]);
+        config(["database.connections.$serviceNameLower.password" => $userPassword]);
         $userPrefix = config("app.agora.$serviceKey.userprefix");
 
         foreach ($instances as $instance) {
