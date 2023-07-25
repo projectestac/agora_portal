@@ -12,14 +12,12 @@ use App\Models\Log;
 use App\Models\Manager;
 use App\Models\RequestType;
 use App\Models\Service;
-use Illuminate\Contracts\Foundation\Application as ApplicationContract;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
-use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -87,12 +85,20 @@ class MyAgoraController extends Controller {
         $maxFileSize = Access::isAdmin(Auth::user()) ? 0 : 800;
         $extensions = 'zip,mbz';
 
+        $currentClient = Cache::getCurrentClient($request);
+        $currentInstance = Instance::where('client_id', $currentClient['id'])
+            ->where('service_id', Service::select('id')->where('name', 'Moodle')->get()->toArray())
+            ->where('status', 'active')
+            ->first()
+            ->toArray();
+
         // The quota information in the cache can be out of date. Using getQuota() it is ensured that is updated.
-        $currentInstance = Cache::getCurrentInstance($request);
         $quota = Quota::getQuota($currentInstance['id']);
         $percent = round($quota['used_quota'] / $quota['quota'] * 100);
 
-        $files = Util::getFiles(Util::getAgoraVar('moodledata_repo', $request));
+        $files = Util::getFiles(Util::getAgoraVar('moodledata') .
+            Config::get('app.agora.moodle2.userprefix') . $currentInstance['db_id'] .
+            Config::get('app.agora.moodle2.repository_files'));
 
         return view('myagora.file')
             ->with('maxFileSize', $maxFileSize)
@@ -120,7 +126,17 @@ class MyAgoraController extends Controller {
             @set_time_limit(15 * 60);
 
             $targetDir = Util::getAgoraVar('portaldata') . 'tmp/uploads/';
-            $moodleDataDir = Util::getAgoraVar('moodledata_repo', $request); // /dades/data/moodledata/usu1/repository/files/
+
+            $currentClient = Cache::getCurrentClient($request);
+            $currentInstance = Instance::where('client_id', $currentClient['id'])
+                ->where('service_id', Service::select('id')->where('name', 'Moodle')->get()->toArray())
+                ->where('status', 'active')
+                ->first()
+                ->toArray();
+
+            $moodleDataDir = Util::getAgoraVar('moodledata') .
+                Config::get('app.agora.moodle2.userprefix') . $currentInstance['db_id'] .
+                Config::get('app.agora.moodle2.repository_files'); // /dades/data/moodledata/usu1/repository/files/
 
             $cleanupTargetDir = true; // Remove old files
             $maxFileAge = 24 * 3600; // Temp file age in seconds
@@ -136,8 +152,8 @@ class MyAgoraController extends Controller {
 
             // Chunking might be enabled. Chunk contains the number of part and chunks contains the total number of parts. They
             // must be integers to be able to strictly compare them.
-            $chunk = (int) $request->input('chunk', 0);
-            $chunks = (int) $request->input('chunks', 0);
+            $chunk = (int)$request->input('chunk', 0);
+            $chunks = (int)$request->input('chunks', 0);
 
             // Remove old temp files
             if ($cleanupTargetDir) {
@@ -175,8 +191,10 @@ class MyAgoraController extends Controller {
                 if (!$in = @fopen($_FILES['file']['tmp_name'], "rb")) {
                     die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
                 }
-            } else if (!$in = @fopen("php://input", "rb")) {
-                die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+            } else {
+                if (!$in = @fopen("php://input", "rb")) {
+                    die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "Failed to open input stream."}, "id" : "id"}');
+                }
             }
 
             while ($buff = fread($in, 4096)) {
@@ -218,7 +236,16 @@ class MyAgoraController extends Controller {
             abort(404);
         }
 
-        $dir = Util::getAgoraVar('moodledata_repo', $request);
+        $currentClient = Cache::getCurrentClient($request);
+        $currentInstance = Instance::where('client_id', $currentClient['id'])
+            ->where('service_id', Service::select('id')->where('name', 'Moodle')->get()->toArray())
+            ->where('status', 'active')
+            ->first()
+            ->toArray();
+
+        $dir = Util::getAgoraVar('moodledata') .
+            Config::get('app.agora.moodle2.userprefix') . $currentInstance['db_id'] .
+            Config::get('app.agora.moodle2.repository_files');
         $path = $dir . DIRECTORY_SEPARATOR . $fileName;
 
         if (!file_exists($path)) {
@@ -237,7 +264,16 @@ class MyAgoraController extends Controller {
             abort(404);
         }
 
-        $dir = Util::getAgoraVar('moodledata_repo', $request);
+        $currentClient = Cache::getCurrentClient($request);
+        $currentInstance = Instance::where('client_id', $currentClient['id'])
+            ->where('service_id', Service::select('id')->where('name', 'Moodle')->get()->toArray())
+            ->where('status', 'active')
+            ->first()
+            ->toArray();
+
+        $dir = Util::getAgoraVar('moodledata') .
+            Config::get('app.agora.moodle2.userprefix') . $currentInstance['db_id'] .
+            Config::get('app.agora.moodle2.repository_files');;
         $path = $dir . DIRECTORY_SEPARATOR . $fileName;
         $fileSize = filesize($path);
 
@@ -262,7 +298,7 @@ class MyAgoraController extends Controller {
 
     }
 
-    public function requests(Request $request): View|Application|Factory|ApplicationContract {
+    public function requests(Request $request): View {
         if (Access::isClient(Auth::user())) {
             return view('myagora.no_access')->with('message', __('myagora.no_client_access'));
         }
@@ -309,7 +345,7 @@ class MyAgoraController extends Controller {
             ->with('availableRequests', $availableRequests);
     }
 
-    public function managers(Request $request): View|Application|Factory|ApplicationContract {
+    public function managers(Request $request): View {
 
         if (Access::isAdmin(Auth::user())) {
             $currentClient = Util::getClientFromUrl($request);
@@ -334,7 +370,7 @@ class MyAgoraController extends Controller {
             ->with('max_managers', Manager::MAX_MANAGERS_PER_CLIENT);
     }
 
-    public function logs(Request $request): View|Application|Factory|ApplicationContract {
+    public function logs(Request $request): View {
 
         if (Access::isAdmin(Auth::user())) {
             $currentClient = Util::getClientFromUrl($request);
@@ -386,7 +422,14 @@ class MyAgoraController extends Controller {
 
         $instance = Instance::where('id', $instanceId)->first();
         $service = Service::find($instance->service_id);
-        $dataDir = Util::getAgoraVar(mb_strtolower($service->name) . 'data_db', $request);
+
+        if ($service->name === 'Moodle') {
+            $dataDir = Util::getAgoraVar(mb_strtolower($service->name) . 'data') .
+                Config::get('app.agora.moodle2.userprefix') . $instance ->db_id;
+        } else {
+            $dataDir = Util::getAgoraVar(mb_strtolower($service->name) . 'data') .
+                Config::get('app.agora.' . mb_strtolower($service->name) . '.userprefix') . $instance ->db_id;
+        }
 
         $instance->used_quota = Quota::getDiskUsage($dataDir);
         $instance->save();
