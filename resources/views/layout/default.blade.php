@@ -9,10 +9,12 @@
     <!-- Styles -->
     <link rel="stylesheet" href="{{ secure_asset('css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ secure_asset('css/portal.css') }}">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
 
     <!-- Scripts -->
     <script src="{{ secure_asset('js/jquery.min.js') }}"></script>
     <script src="{{ secure_asset('js/bootstrap.min.js') }}"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
 </head>
 
 <body class="antialiased">

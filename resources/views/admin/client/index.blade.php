@@ -6,43 +6,49 @@
     </div>
 
     <div class="content service">
-        <p class="h3">{{ __('client.client_list') }}</p>
-        @if(!empty($clients))
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th>{{ __('client.name') }}</th>
-                    <th>{{ __('client.code') }}</th>
-                    <th>{{ __('client.dns') }}</th>
-                    <th>{{ __('common.status') }}</th>
-                    <th>{{ __('common.actions') }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach ($clients as $client)
-                    <tr>
-                        <td>{{ $client->name }}</td>
-                        <td>{{ $client->code }}</td>
-                        <td>{{ $client->dns }}</td>
-                        <td>{{ $client->status }}</td>
-                        <td>
-                            <a href="{{ route('clients.show', $client->id) }}"
-                               class="btn btn-info">{{ __('common.show') }}</a>
-                            <a href="{{ route('clients.edit', $client->id) }}"
-                               class="btn btn-primary">{{ __('common.edit') }}</a>
-                            <form action="{{ route('clients.destroy', $client->id) }}" method="POST"
-                                  style="display: inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger">{{ __('common.delete') }}</button>
-                            </form>
-                        </td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-        @else
-            <div class="alert alert-warning">{{ __('client.no_clients') }}</div>
-        @endif
+        <h3>{{ __('client.client_list') }}</h3>
+
+        <table class="table table-striped" id="client-list">
+            <thead>
+            <tr>
+                <th>{{ __('common.id') }}</th>
+                <th>{{ __('client.name') }}</th>
+                <th>{{ __('client.code') }}</th>
+                <th>{{ __('service.services') }}</th>
+                <th>{{ __('client.dns') }}</th>
+                <th>{{ __('client.old_dns') }}</th>
+                <th>{{ __('common.status') }}</th>
+                <th>{{ __('common.description') }}</th>
+                <th>{{ __('common.actions') }}</th>
+            </tr>
+            </thead>
+        </table>
+
+        <script>
+            $(function () {
+                $('#client-list').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    language: {
+                        url: '{{ url('/datatable/ca.json') }}'
+                    },
+                    lengthMenu: [10, 25, 50, 100, 250],
+                    pageLength: 25,
+                    ajax: '{{ route('clients.list') }}',
+                    columns: [
+                        {data: 'id', name: 'id'},
+                        {data: 'name', name: 'name'},
+                        {data: 'code', name: 'code'},
+                        {data: 'services', name: 'services'},
+                        {data: 'dns', name: 'dns'},
+                        {data: 'old_dns', name: 'old_dns'},
+                        {data: 'status', name: 'status'},
+                        {data: 'description', name: 'description'},
+                        {data: 'actions', name: 'actions', orderable: false, searchable: false}
+                    ]
+                });
+            });
+        </script>
+
     </div>
 @endsection
