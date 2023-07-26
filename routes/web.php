@@ -39,6 +39,7 @@ Route::resource('/queries', QueryController::class);
 
 // AJAX routes for datatables. Must be before the resource route.
 Route::get('/clients/list', [ClientController::class, 'getClients'])->name('clients.list');
+Route::get('/instances/list', [InstanceController::class, 'getInstances'])->name('instances.list');
 
 // Routes for administrators only.
 Route::group(['middleware' => ['auth', 'permission:Administrate site']], static function () {
