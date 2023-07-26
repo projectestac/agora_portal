@@ -10,69 +10,47 @@
 
         @include('components.messages')
 
-        @if(!empty($instances))
+        <table class="table table-striped" id="instance-list">
+            <thead>
+            <tr>
+                <th>{{ __('common.id') }}</th>
+                <th>{{ __('client.name') }}</th>
+                <th>{{ __('instance.db_id') }}</th>
+                <th>{{ __('common.type') }}</th>
+                <th>{{ __('common.status') }}</th>
+                <th>{{ __('service.service') }}</th>
+                <th>{{ __('instance.location_long') }}</th>
+                <th>{{ __('common.dates') }}</th>
+                <th>{{ __('common.actions') }}</th>
+            </tr>
+            </thead>
+        </table>
 
-            <div class="pull-right">
-                {{ $instances->links('pagination::bootstrap-4') }}
-            </div>
+        <script>
+            $(function () {
+                $('#instance-list').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    language: {
+                        url: '{{ url('/datatable/ca.json') }}'
+                    },
+                    lengthMenu: [10, 25, 50, 100, 250],
+                    pageLength: 25,
+                    ajax: '{{ route('instances.list') }}',
+                    columns: [
+                        {data: 'id', name: 'id'},
+                        {data: 'client_name', name: 'client_name'},
+                        {data: 'db_id', name: 'db_id'},
+                        {data: 'type', name: 'type'},
+                        {data: 'status', name: 'status'},
+                        {data: 'service', name: 'service'},
+                        {data: 'location', name: 'location'},
+                        {data: 'dates', name: 'dates'},
+                        {data: 'actions', name: 'actions', orderable: false, searchable: false}
+                    ]
+                });
+            });
+        </script>
 
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th>{{ __('instance.db_id') }}</th>
-                    <th>{{ __('client.name') }}</th>
-                    <th>{{ __('common.type') }}</th>
-                    <th>{{ __('common.status') }}</th>
-                    <th>{{ __('service.service') }}</th>
-                    <th>{{ __('instance.location_long') }}</th>
-                    <th>{{ __('common.dates') }}</th>
-                    <th>{{ __('common.actions') }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach ($instances as $instance)
-                    <tr>
-                        <td>{{ $instance->db_id }}</td>
-                        <td>{{ $instance->client_name }}</td>
-                        <td>{{ $instance->modelType->description }}</td>
-                        <td>{{ $instance->status }}</td>
-                        <td>
-                            <a href="{{ \App\Helpers\Util::getInstanceUrl($instance) }}"
-                               title="{{ $instance->service_name }} - {{ $instance->client_name }}">
-                                <img src="{{ secure_asset('images/' . mb_strtolower($instance->service_name . '.gif')) }}"
-                                     alt="{{ $instance->service_name }}"
-                                >
-                            </a>
-                        </td>
-                        <td>
-                            {{ $instance->client->city }}<br/>
-                            {{ $instance->client->location->name }}
-                        </td>
-                        <td>
-                            E: {{ $instance->updated_at->format('d/m/Y') }}<br/>
-                            C: {{ $instance->created_at->format('d/m/Y') }}<br/>
-                            S: {{ \Carbon\Carbon::parse($instance->requested_at)->format('d/m/Y'), }}
-                        </td>
-                        <td>
-                            <a class="btn btn-info" href="{{ route('instances.edit', $instance->id) }}" title="{{ __('service.edit') }}">
-                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                            </a>
-                            <form action="{{ route('instances.destroy', $instance->id) }}" method="POST"
-                                  style="display: inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger" title="{{ __('service.delete') }}">
-                                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-
-        @else
-            <div class="alert alert-warning">{{ __('instances.no_instances') }}</div>
-        @endif
     </div>
 @endsection
