@@ -46,7 +46,7 @@ class OperationController extends Controller {
             ->join('clients', 'instances.client_id', '=', 'clients.id')
             ->where('instances.service_id', $service['id'])
             ->where('instances.status', 'active')
-            ->orderBy('instances.id')
+            ->orderBy('instances.db_id')
             ->first()
             ->toArray();
 
