@@ -24,7 +24,9 @@
                 <tr>
                     <th>{{ __('standardlog.action_type') }}</th>
                     <th>{{ __('standardlog.action_description') }}</th>
+                    @can('Administrate site')
                     <th>{{ __('user.user') }}</th>
+                    @endcan
                     <th>{{ __('common.date') }}</th>
                 </tr>
                 </thead>
@@ -64,9 +66,11 @@
                                 </span>
                             @endif
                         </td>
-                        <td>{{ $log_item['action_description'] }}</td>
+                        <td>{!! stripslashes($log_item['action_description']) !!}</td>
+                        @can('Administrate site')
                         <td>{{ $log_item->user->name }}</td>
-                        <td>{{ $log_item['created_at'] }}</td>
+                        @endcan
+                        <td>{{ \Carbon\Carbon::parse($log_item['created_at'])->format('d/m/Y H:i') }}</td>
                     </tr>
                 @endforeach
                 </tbody>
