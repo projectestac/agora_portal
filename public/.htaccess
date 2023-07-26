@@ -5,6 +5,10 @@
 
     RewriteBase /portal/
 
+    RewriteCond %{REQUEST_URI} file.php$ [NC]
+    RewriteCond %{QUERY_STRING} ^file=menu_nodes/menu-nodes\.js$
+    RewriteRule ^$ menu-nodes.js [L,R=301]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
