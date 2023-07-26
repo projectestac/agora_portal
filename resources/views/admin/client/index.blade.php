@@ -8,6 +8,8 @@
     <div class="content service">
         <h3>{{ __('client.client_list') }}</h3>
 
+        @include('components.messages')
+
         <table class="table table-striped" id="client-list">
             <thead>
             <tr>
