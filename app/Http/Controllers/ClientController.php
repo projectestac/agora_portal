@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Util;
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Models\Client;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\HtmlString;
 use Yajra\DataTables\DataTables;
 use Illuminate\Contracts\View\View;
 
@@ -26,7 +28,7 @@ class ClientController extends Controller {
      * Show the form for creating a new resource.
      */
     public function create() {
-       //
+        //
     }
 
     /**
@@ -67,14 +69,21 @@ class ClientController extends Controller {
     public function getClients(): JsonResponse {
         return Datatables::make(Client::all())
             ->addColumn('services', static function ($client) {
-                return $client->instances->map(static function ($instance) {
-                    return view('admin.client.service', ['instance' => $instance]);
-                })->implode('');
+                $html = '';
+                foreach ($client->instances as $instance) {
+                    $url = Util::getInstanceUrl($instance);
+                    $html .= view('admin.client.service', [
+                        'url' => $url,
+                        'serviceName' => $instance->service->name,
+                        'clientName' => $instance->client->name,
+                        ])->render();
+                }
+                return new HtmlString($html);
             })
             ->addColumn('actions', static function ($client) {
                 return view('admin.client.action', ['client' => $client]);
             })
-            ->make(true);
+            ->make();
     }
 
 }
