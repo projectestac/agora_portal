@@ -67,8 +67,11 @@ class ClientController extends Controller {
     }
 
     public function getClients(): JsonResponse {
-        return Datatables::make(Client::all())
-            ->addColumn('services', static function ($client) {
+
+        $clients = Client::orderBy('id', 'asc');
+
+        return Datatables::make($clients)
+            ->addColumn('services', function ($client) {
                 $html = '';
                 foreach ($client->instances as $instance) {
                     $url = Util::getInstanceUrl($instance);
@@ -84,6 +87,7 @@ class ClientController extends Controller {
                 return view('admin.client.action', ['client' => $client]);
             })
             ->make();
+
     }
 
 }
