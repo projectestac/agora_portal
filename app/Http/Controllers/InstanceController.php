@@ -10,11 +10,14 @@ use App\Models\Log;
 use App\Models\ModelType;
 use App\Models\Service;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\HtmlString;
 use Throwable;
+use Yajra\DataTables\Facades\DataTables;
 use ZipArchive;
 
 class InstanceController extends Controller {
@@ -177,7 +180,7 @@ class InstanceController extends Controller {
         return match ($status) {
             Instance::STATUS_PENDING => 'warning',
             Instance::STATUS_ACTIVE => 'success',
-            Instance::STATUS_INACTIVE => 'secondary',
+            Instance::STATUS_INACTIVE => 'primary',
             Instance::STATUS_DENIED => 'danger',
             Instance::STATUS_WITHDRAWN => 'dark',
             Instance::STATUS_BLOCKED => 'danger',
@@ -194,6 +197,48 @@ class InstanceController extends Controller {
             Instance::STATUS_WITHDRAWN => __('instance.status_withdrawn'),
             Instance::STATUS_BLOCKED => __('instance.status_blocked'),
         ];
+    }
+
+    public function getInstances(): JsonResponse {
+
+        $instances = Instance::orderBy('updated_at', 'desc');
+
+        return DataTables::make($instances)
+            ->rawColumns(['id'])
+            ->addColumn('client_name', function ($instance) {
+                return new HtmlString('<a href="' . route('myagora.instances', ['code' => $instance->client->code]) . '">' .
+                    $instance->client->name . '</a><br/>' . $instance->client->dns . ' - ' . $instance->client->code);
+            })
+            ->addColumn('type', function ($instance) {
+                return new HtmlString($instance->client->type->name . '<br/>' .
+                    $instance->modelType->description);
+            })
+            ->addColumn('status', function ($instance) {
+                $statusColor = $this->getStatusColor($instance->status);
+                return new HtmlString("<span class=\"btn btn-$statusColor\">$instance->status</span>");
+            })
+            ->addColumn('service', function ($instance) {
+                $url = Util::getInstanceUrl($instance);
+                return new HtmlString(view('admin.client.service', [
+                    'url' => $url,
+                    'serviceName' => $instance->service->name,
+                    'clientName' => $instance->client->name,
+                ])->render());
+            })
+            ->addColumn('location', function ($instance) {
+                return new HtmlString($instance->client->city . '<br/>(<em>' .
+                        $instance->client->location->name . '</em>)');
+            })
+            ->addColumn('dates', function ($instance) {
+                return new HtmlString('<strong>E:</strong> ' . $instance->updated_at->format('d/m/Y') . '<br/>' .
+                    '<strong>C:</strong> ' . $instance->created_at->format('d/m/Y') . '<br/>' .
+                    '<strong>S:</strong> ' . \Carbon\Carbon::parse($instance->requested_at)->format('d/m/Y'));
+            })
+            ->addColumn('actions', static function ($instance) {
+                return view('admin.instance.action', ['instance' => $instance]);
+            })
+            ->make();
+
     }
 
     /**
