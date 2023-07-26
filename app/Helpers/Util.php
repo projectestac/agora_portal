@@ -225,7 +225,7 @@ class Util {
 
     public static function getInstanceUrl(Instance $instance): string {
 
-        if ($instance->service_name === 'Moodle') {
+        if ($instance->service->name === 'Moodle') {
             if ($instance->client->type_id === self::EOI_TYPE_ID) {
                 return Config::get('app.agora.server.eoi') . '/' . $instance->client->dns . '/moodle/';
             }
