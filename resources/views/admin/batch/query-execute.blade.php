@@ -25,7 +25,8 @@
             </div>
         </div>
 
-        @if(empty($fullResults) && ($serviceName !== 'portal'))
+        {{-- Summary table --}}
+        @if (($numRows === 1) && ($serviceName !== 'portal'))
             <div class="panel panel-default">
                 <div class="panel-heading">
                     {{ __('batch.execution_summary') }}
@@ -51,12 +52,13 @@
             </div>
         @endif
 
+        {{-- Results table --}}
         <div class="panel panel-default">
             <div class="panel-heading">
                 {{ __('batch.execution_results') }}
             </div>
             <div class="panel-body">
-                @if(is_array($globalResults))
+                @if (is_array($globalResults))
                     <table class="table table-striped">
                         <thead>
                         <tr>
@@ -79,34 +81,37 @@
             </div>
         </div>
 
-        @if(!empty($fullResults))
-            @foreach($fullResults as $dbName => $results)
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <a id="{{ $dbName }}">{{ $dbName }}</a>
-                    </div>
-                    <div class="panel-body">
-                        <table class="table table-striped">
-                            <thead>
+    {{-- Build one table for each database --}}
+    @if(!empty($fullResults))
+        @foreach($fullResults as $fullResult)
+            @foreach($fullResult as $dbName => $results)
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <a id="{{ $dbName }}">{{ $dbName }}</a>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            @foreach($attributes as $attribute)
+                                <th>{{ $attribute }}</th>
+                            @endforeach
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($results as $result)
                             <tr>
                                 @foreach($attributes as $attribute)
-                                    <th>{{ $attribute }}</th>
+                                    <td>{{ $result->$attribute }}</td>
                                 @endforeach
                             </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($results as $result)
-                                <tr>
-                                    @foreach($attributes as $attribute)
-                                        <td>{{ $result->$attribute }}</td>
-                                    @endforeach
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                        @endforeach
+                        </tbody>
+                    </table>
                 </div>
+            </div>
             @endforeach
-        @endif
-    </div>
+        @endforeach
+    @endif
+</div>
 @endsection

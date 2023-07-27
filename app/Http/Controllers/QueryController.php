@@ -211,8 +211,9 @@ class QueryController extends Controller {
                 ->with('serviceName', $serviceName)
                 ->with('image', $image)
                 ->with('globalResults', $globalResults)
-                ->with('fullResults', $fullResults)
-                ->with('attributes', $attributes);
+                ->with('fullResults', [$fullResults])
+                ->with('attributes', $attributes)
+                ->with('numRows', -1);
         }
 
         $userName = '';
@@ -246,6 +247,9 @@ class QueryController extends Controller {
             config(["database.connections.$serviceNameLower.database" => $dbName]);
             config(["database.connections.$serviceNameLower.username" => $userName]);
 
+            // Force the change of the database connection. Otherwise, the query will be always be executed in the same database.
+            DB::connection($serviceNameLower)->reconnect();
+
             // Execute query
             if ($isSelect) {
                 $execResult = DB::connection($serviceNameLower)->select($sqlQuery);
@@ -253,7 +257,8 @@ class QueryController extends Controller {
                 $execResult = DB::connection($serviceNameLower)->statement($sqlQuery);
             }
 
-            [$fullResults, $attributes, $result, $numRows] = $this->processQueryResults($execResult, $dbName, $instance['client_name']);
+            [$fullResult, $attributes, $result, $numRows] = $this->processQueryResults($execResult, $dbName, $instance['client_name']);
+            $fullResults[] = $fullResult;
 
             if ($numRows === 1) {
                 $summary[$result] = isset($summary[$result]) ? ++$summary[$result] : 1;
@@ -273,7 +278,8 @@ class QueryController extends Controller {
             ->with('globalResults', $globalResults)
             ->with('fullResults', $fullResults)
             ->with('attributes', $attributes)
-            ->with('summary', $summary);
+            ->with('summary', $summary)
+            ->with('numRows', $numRows);
 
     }
 
