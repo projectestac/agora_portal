@@ -47,20 +47,29 @@
                         @foreach($data as $item)
                             <tr>
                                 <td>{{ $item['id'] }}</td>
-                                <td>{{ $item['operationData']['action'] }}</td>
+                                <td>{{ $item['operation_data']['action'] }}</td>
                                 <td>{{ $item['queue'] }}</td>
-                                <td>{{ $item['operationData']['instance_name'] }}</td>
-                                <td>{{ $item['operationData']['priority'] }}</td>
+                                <td>{{ $item['operation_data']['instance_name'] }}</td>
+                                <td>{{ $item['operation_data']['priority'] }}</td>
                                 <td>
-                                    <img src="{{ secure_asset('images/' . mb_strtolower($item['operationData']['service_name'] . '.gif')) }}"
-                                         alt="{{ $item['operationData']['service_name'] }}"
-                                         title="{{ $item['operationData']['service_name'] }}"
-                                    >
+                                    <a href="{{ \App\Helpers\Util::getInstanceUrl($item['instance_id']) }}" target="_blank">
+                                        <img src="{{ secure_asset('images/' . mb_strtolower($item['operation_data']['service_name'] . '.gif')) }}"
+                                             alt="{{ $item['operation_data']['service_name'] }}"
+                                             title="{{ $item['operation_data']['service_name'] }}"
+                                        >
+                                    </a>
                                 </td>
                                 <td>{{ $item['queued_at'] }}</td>
                                 <td>{{ $item['created_at'] }}</td>
                                 <td>{{ $item['updated_at'] }}</td>
                                 <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-info" title="{{ __('batch.params') }}"
+                                                data-toggle="modal"
+                                                data-target="#modal_params_{{ $item['id'] }}">
+                                            <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+                                        </button>
+                                    </div>
                                     <div class="btn-group" role="group">
                                         <button class="btn btn-info" title="{{ __('batch.execution_log') }}"
                                                 data-toggle="modal"
@@ -73,6 +82,44 @@
                         @endforeach
                     </table>
                     @foreach($data as $item)
+                        <div class="modal fade" id="modal_params_{{ $item['id'] }}" tabindex="-1"
+                             aria-labelledby="modal_params_title_{{ $item['id'] }}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="panel-info">
+                                        <div class="panel-heading">
+                                            {{ __('batch.params') }}
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('common.close') }}">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <ul class="list-unstyled">
+                                            @foreach ($item['operation_data'] as $name => $line)
+                                                @if (is_array($line))
+                                                    <hr>
+                                                    @if(!empty($line))
+                                                        {{ __('batch.params') }}:
+                                                        @foreach ($line as $key => $value)
+                                                            <li>{{ $key }}: {{ $value }}</li>
+                                                        @endforeach
+                                                    @else
+                                                        {{ __('batch.no_params') }}
+                                                    @endif
+                                                    <hr>
+                                                @else
+                                                    <li>{{ $name }}: {{ $line }}</li>
+                                                @endif
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                    <div class="panel-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('common.close') }}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="modal fade" id="modal_result_{{ $item['id'] }}" tabindex="-1"
                              aria-labelledby="modal_result_title_{{ $item['id'] }}" aria-hidden="true">
                             <div class="modal-dialog" role="document">

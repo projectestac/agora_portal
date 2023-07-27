@@ -62,6 +62,7 @@ return [
     'queue_fail' => 'Executades amb errors',
     'batch_creation' => 'Creació massiva',
     'execution_log' => 'Registre de l\'execució',
+    'params' => 'Paràmetres de l\'execució',
     'execution_error' => 'Error d\'execució',
     'remove_queue_operation' => 'Esborra l\'operació de la cua',
     'remove_queue_operation_confirm' => 'Confirmeu que voleu esborrar aquesta operació de la cua?',

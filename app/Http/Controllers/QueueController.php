@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ProcessOperation;
+use App\Models\Instance;
 use Carbon\Carbon;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -48,10 +48,17 @@ class QueueController extends Controller {
             $operationData = unserialize($payLoad->data->command, ['allowed_classes' => [ProcessOperation::class]]);
             $result = json_decode($job->result, false, 512, JSON_THROW_ON_ERROR);
 
+            $instanceId = Instance::join('clients', 'clients.id', '=', 'instances.client_id')
+                ->join('services', 'services.id', '=', 'instances.service_id')
+                ->where('clients.dns', $operationData->data['instance_dns'])
+                ->where('services.name', $operationData->data['service_name'])
+                ->first();
+
             $data[] = [
                 'id' => $job->id,
                 'queue' => $job->queue,
-                'operationData' => $operationData->data,
+                'operation_data' => $operationData->data,
+                'instance_id' => $instanceId,
                 'result' => $result,
                 'queued_at' => Carbon::parse($job->queued_at)->format('d/m/Y H:i'),
                 'created_at' => Carbon::parse($job->created_at)->format('d/m/Y H:i'),
