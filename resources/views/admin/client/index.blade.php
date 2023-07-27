@@ -30,7 +30,7 @@
             $(function () {
                 $('#client-list').DataTable({
                     processing: true,
-                    serverSide: true,
+                    serverSide: false,
                     language: {
                         url: '{{ url('/datatable/ca.json') }}'
                     },
