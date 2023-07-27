@@ -33,12 +33,7 @@ class InstanceController extends Controller {
     }
 
     public function index(): View {
-        $instances = Instance::select('instances.*', 'clients.name as client_name', 'services.name as service_name')
-            ->join('clients', 'instances.client_id', '=', 'clients.id')
-            ->join('services', 'instances.service_id', '=', 'services.id')
-            ->orderBy('instances.updated_at', 'desc');
-
-        return view('admin.instance.index')->with('instances', $instances);
+        return view('admin.instance.index');
     }
 
     public function create(Request $request): View {
@@ -224,9 +219,53 @@ class InstanceController extends Controller {
         ];
     }
 
-    public function getInstances(): JsonResponse {
+    public function getInstances(Request $request): JsonResponse {
 
-        $instances = Instance::orderBy('updated_at', 'desc');
+        $search = $request->validate(['search.value' => 'string|max:50|nullable']);
+        $searchValue = $search['search']['value'] ?? '';
+
+        $columns = $request->input('columns');
+        $order = $request->input('order')[0];
+        $orderColumn = 'instances.' . $columns[$order['column']]['data'] ?? 'instances.updated_at';
+        $orderDirection = $order['dir'] ?? 'desc';
+
+        if ($orderColumn === 'instances.client_name') {
+            $orderColumn = 'clients.name';
+        }
+        if ($orderColumn === 'instances.type') {
+            $orderColumn = 'client_types.name';
+        }
+        if ($orderColumn === 'instances.location') {
+            $orderColumn = 'clients.city';
+        }
+        if ($orderColumn === 'dates') {
+            $orderColumn = 'instances.updated_at';
+        }
+
+        $instances = Instance::select(['instances.*', 'clients.name as client_name', 'client_types.name as type'])
+            ->orderBy($orderColumn, $orderDirection)
+            ->join('clients', 'instances.client_id', '=', 'clients.id')
+            ->join('locations', 'clients.location_id', '=', 'locations.id')
+            ->join('client_types', 'clients.type_id', '=', 'client_types.id')
+            ->join('services', 'instances.service_id', '=', 'services.id');
+
+        if (!empty($searchValue)) {
+            $instances = $instances->where('clients.name', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('clients.code', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('clients.dns', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('clients.old_dns', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('clients.city', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('locations.name', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('client_types.name', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('services.name', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('instances.status', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('instances.db_id', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('instances.observations', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('instances.annotations', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('instances.updated_at', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('instances.created_at', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('instances.requested_at', 'LIKE', '%' . $searchValue . '%');
+        }
 
         return DataTables::make($instances)
             ->rawColumns(['id'])
@@ -242,7 +281,7 @@ class InstanceController extends Controller {
                 $statusColor = $this->getStatusColor($instance->status);
                 return new HtmlString("<span class=\"btn btn-$statusColor\">$instance->status</span>");
             })
-            ->addColumn('service', function ($instance) {
+            ->addColumn('service_id', function ($instance) {
                 $url = Util::getInstanceUrl($instance);
                 return new HtmlString(view('admin.client.service', [
                     'url' => $url,
@@ -253,7 +292,7 @@ class InstanceController extends Controller {
             ->addColumn('location', function ($instance) {
                 return new HtmlString($instance->client->city . '<br/>(<em>' . $instance->client->location->name . '</em>)');
             })
-            ->addColumn('dates', function ($instance) {
+            ->addColumn('updated_at', function ($instance) {
                 return new HtmlString('<strong>E:</strong> ' . $instance->updated_at->format('d/m/Y') . '<br/>' .
                     '<strong>C:</strong> ' . $instance->created_at->format('d/m/Y') . '<br/>' .
                     '<strong>S:</strong> ' . \Carbon\Carbon::parse($instance->requested_at)->format('d/m/Y'));

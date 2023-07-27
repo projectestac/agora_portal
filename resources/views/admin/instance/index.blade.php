@@ -30,7 +30,7 @@
             $(function () {
                 $('#instance-list').DataTable({
                     processing: true,
-                    serverSide: false,
+                    serverSide: true,
                     language: {
                         url: '{{ url('/datatable/ca.json') }}'
                     },
@@ -43,9 +43,9 @@
                         {data: 'db_id', name: 'db_id'},
                         {data: 'type', name: 'type'},
                         {data: 'status', name: 'status'},
-                        {data: 'service', name: 'service'},
+                        {data: 'service_id', name: 'service_id'},
                         {data: 'location', name: 'location'},
-                        {data: 'dates', name: 'dates'},
+                        {data: 'updated_at', name: 'updated_at'},
                         {data: 'actions', name: 'actions', orderable: false, searchable: false}
                     ]
                 });
