@@ -131,7 +131,7 @@ class OperationController extends Controller {
         $serviceName = Service::find($serviceId)->name;
 
         if ($serviceSelector === 'all') {
-            $instances = Instance::select('instances.id', 'clients.name', 'clients.dns')
+            $instances = Instance::select('clients.id', 'clients.name', 'clients.dns')
                 ->join('clients', 'instances.client_id', '=', 'clients.id')
                 ->where('instances.service_id', $serviceId)
                 ->where('instances.status', 'active')
@@ -189,6 +189,7 @@ class OperationController extends Controller {
                 'priority' => $data['priority'],
                 'params' => $data['params'],
                 'service_name' => $data['service_name'],
+                'instance_id' => $instance['id'],
                 'instance_name' => $instance['name'],
                 'instance_dns' => $instance['dns'],
             ]);
