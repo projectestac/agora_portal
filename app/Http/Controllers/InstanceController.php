@@ -378,6 +378,9 @@ class InstanceController extends Controller {
             "database.connections.$serviceNameLower.userpwd" => $userPassword,
         ]);
 
+        // Force the change of the database connection.
+        DB::connection($serviceNameLower)->reconnect();
+
         // Test the database connection. If the database is missing and the parameter 'nodes_create_db' is checked,
         // the database will be created.
         $test = $this->testConnectionAndCreateDb($serviceNameLower, $dbName, $userName, $instance);
