@@ -44,7 +44,7 @@
         </fieldset>
 
         <div class="text-center">
-            <x-primary-button>
+            <x-primary-button id="login">
                 {{ __('common.login') }}
             </x-primary-button>
         </div>
