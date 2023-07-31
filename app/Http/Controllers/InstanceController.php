@@ -136,7 +136,7 @@ class InstanceController extends Controller {
             if (!empty($programOperation['errors'])) {
                 return redirect()
                     ->route('instances.index')
-                    ->with('error', $unzipFiles['errors']);
+                    ->with('error', $programOperation['errors']);
             }
 
             if (isset($programOperation['success'])) {
@@ -384,8 +384,8 @@ class InstanceController extends Controller {
         // Test the database connection. If the database is missing and the parameter 'nodes_create_db' is checked,
         // the database will be created.
         $test = $this->testConnectionAndCreateDb($serviceNameLower, $dbName, $userName, $instance);
-        if (!empty($errors['errors'])) {
-            return ['errors' => $errors];
+        if (!empty($test['errors'])) {
+            return ['errors' => $test['errors']];
         }
 
         // Temporary variable, used to store current query.
