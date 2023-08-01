@@ -24,7 +24,7 @@ class UpdateRequest extends Mailable {
      */
     public function envelope(): Envelope {
         return new Envelope(
-            subject: __('mail.update_request_subject'),
+            subject: __('email.update_request_subject'),
         );
     }
 
@@ -33,9 +33,9 @@ class UpdateRequest extends Mailable {
      */
     public function content(): Content {
         return new Content(
-            view: 'mail.update-request',
+            view: 'email.update-request',
             with: [
-                'status' => $this->status,
+                'status' => __( 'request.status_' . $this->status),
                 'adminComments' => $this->adminComments,
             ],
         );

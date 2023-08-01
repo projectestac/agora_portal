@@ -22,9 +22,9 @@ class StoreRequestRequest extends FormRequest {
      */
     public function rules(): array {
         return [
-            'user_comment' => 'string',
-            'admin_comment' => 'string',
-            'private_note' => 'string',
+            'user_comment' => 'nullable|string',
+            'admin_comment' => 'nullable|string',
+            'private_note' => 'nullable|string',
             'request_select_request' => 'regex:/^\d+:\d+$/',
         ];
     }
