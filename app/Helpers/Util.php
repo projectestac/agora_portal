@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App\Models\Client;
 use App\Models\Config as ConfigModel;
 use App\Models\Instance;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 
@@ -240,4 +241,18 @@ class Util {
         };
 
     }
+
+    public static function getManagersEmail(Client $client): array {
+
+        $emails = [$client->code . '@xtec.cat'];
+        $managers = $client->managers()->get()->toArray();
+
+        foreach ($managers as $manager) {
+            $user = User::where('id', $manager['user_id'])->get()->toArray()[0];
+            array_push($emails, $user['email']);
+        }
+
+        return $emails;
+    }
+
 }

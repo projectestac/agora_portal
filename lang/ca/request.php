@@ -21,5 +21,11 @@ return [
     'observations' => 'Observacions (Opcional)',
     'request_created' => 'S\'ha registrat la vostra sol·licitud',
     'request_created_detail' => 'S\'ha fet la sol·licitud de :request_name del servei :service_name.',
-    'request_types' => 'Tipus de sol·licitud',
+    'request_type' => 'Tipus de sol·licitud',
+    'request_types' => 'Tipus de sol·licituds',
+    'request_edit' => 'Edició de sol·licitud',
+    'request_status_changed' => 'Ha canviat l\'estat de la sol·licitud de :request_name del servei :service_name, de :old_status a :new_status.',
+    'send_email_on_change' => 'Notifica el centre i els gestors en cas de canvi d\'estat',
+    'request_updated' => 'S\'ha actualitzat la sol·licitud',
+    'request_updated_and_notified' => 'S\'ha actualitzat la sol·licitud i s\'ha notificat per correu al centre i als gestors',
 ];
