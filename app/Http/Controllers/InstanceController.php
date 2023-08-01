@@ -226,8 +226,7 @@ class InstanceController extends Controller {
                 ])->render());
             })
             ->addColumn('location', function ($instance) {
-                return new HtmlString($instance->client->city . '<br/>(<em>' .
-                        $instance->client->location->name . '</em>)');
+                return new HtmlString($instance->client->city . '<br/>(<em>' . $instance->client->location->name . '</em>)');
             })
             ->addColumn('dates', function ($instance) {
                 return new HtmlString('<strong>E:</strong> ' . $instance->updated_at->format('d/m/Y') . '<br/>' .
@@ -375,7 +374,7 @@ class InstanceController extends Controller {
             "database.connections.$serviceNameLower.host" => $instance->db_host,
             "database.connections.$serviceNameLower.database" => $dbName,
             "database.connections.$serviceNameLower.username" => $userName,
-            "database.connections.$serviceNameLower.userpwd" => $userPassword,
+            "database.connections.$serviceNameLower.password" => $userPassword,
         ]);
 
         // Force the change of the database connection.
@@ -534,7 +533,20 @@ class InstanceController extends Controller {
             if (str_contains($e->getMessage(), 'Unknown database')) {
                 // The database doesn't exist, so we try to create it.
                 try {
-                    $result = DB::statement("CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;");
+                    /*
+                     * To execute a query, the database configured must exist. As we are creating a database, it doesn't exist
+                     * yet, so it can't be configured in the connection. For that reason, we configure the connection with no
+                     * selected database, execute the CREATE DATABASE query and, finally, select the created database.
+                     */
+                    config(["database.connections.$serviceNameLower.database" => '']);
+                    DB::connection($serviceNameLower)->reconnect();
+
+                    $result = DB::connection($serviceNameLower)
+                        ->statement("CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+
+                    config(["database.connections.$serviceNameLower.database" => $dbName]);
+                    DB::connection($serviceNameLower)->reconnect();
+
                     if ($result) {
                         $pdo = DB::connection($serviceNameLower)->getPdo();
                     }
