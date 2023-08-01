@@ -233,6 +233,7 @@ class QueryController extends Controller {
             ->join('clients', 'instances.client_id', '=', 'clients.id')
             ->where('instances.service_id', $serviceSel)
             ->whereIn('instances.client_id', $clientsSel)
+            ->where('instances.status', 'active')
             ->orderBy('instances.id')
             ->get()->toArray();
 
