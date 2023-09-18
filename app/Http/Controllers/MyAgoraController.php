@@ -83,7 +83,7 @@ class MyAgoraController extends Controller {
 
         // Admin users have no limit on the file size.
         $maxFileSize = Access::isAdmin(Auth::user()) ? 0 : 800;
-        $extensions = 'zip,mbz';
+        $extensions = 'zip,mbz,xml';
 
         $currentClient = Cache::getCurrentClient($request);
         $currentInstance = Instance::where('client_id', $currentClient['id'])
