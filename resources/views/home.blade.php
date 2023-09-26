@@ -10,10 +10,6 @@
 
     <h3>{{ __('home.active_instances') }}</h3>
 
-    <div class="alert alert-warning">
-        {{ __('home.temporarily_unavailable') }}
-    </div>
-
     <div class="content myagora">
         @if (isset($currentClient['name']))
             <h3>{{ __('myagora.instance_list', ['name' => $currentClient['name']]) }}</h3>
