@@ -255,4 +255,47 @@ class Util {
         return $emails;
     }
 
+    /**
+     * Get the string with School Information from Web Service.
+     * Demo string: a8000001$$nompropi$$Nom del Centre$$c. Carrer, 18-24$$Valldevent$$00000
+     *
+     * @param string $uname Codi de centre
+     * @global array $agora
+     * @return array
+     * @author Toni Ginard
+     */
+    public function getSchoolFromWS(string $uname): array {
+        global $agora;
+
+        // Build the URL.
+        $unamenum = (new self)->transformClientCode($uname, 'letter2num');
+        $url = $agora['server']['school_information'] . $unamenum;
+
+        $handle = curl_init();
+        curl_setopt($handle, CURLOPT_URL, $url);
+        curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 8);
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+        $buffer = curl_exec($handle);
+        curl_close($handle);
+
+        // Get school Data
+        if (empty($buffer)) {
+            $results['error'] = 1;
+            $results['message'] = 'No s\'ha pogut obtenir automàticament la informació del centre.
+            Aquest error no és greu, però si persisteix durant dies, poseu-vos en contacte amb el SAU.';
+        } else {
+            $schooldata = utf8_encode($buffer);
+
+            // Additional check. This error should never happen.
+            if (str_contains($schooldata, 'ERROR')) {
+                $results['error'] = 1;
+                $results['message'] = "El codi de centre $unamenum no figura a la base de dades de centres de la XTEC. Poseu-vos en contacte amb el SAU.";
+            } else {
+                $results['error'] = 0;
+                $results['message'] = $schooldata;
+            }
+        }
+
+        return $results;
+    }
 }

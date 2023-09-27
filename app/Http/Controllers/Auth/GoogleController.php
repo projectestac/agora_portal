@@ -4,12 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Helpers\Access;
 use App\Helpers\Util;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
 use Laravel\Socialite\Facades\Socialite;
 
 class GoogleController extends Controller {
@@ -36,6 +34,28 @@ class GoogleController extends Controller {
         $user->last_login_at = now();
         $user->save();
 
+        $util = new Util();
+        $clientController = new ClientController();
+        $clientExists = $clientController->existsClient($username);
+        $error = '';
+
+        // If the user corresponds to a client, try to create the client if it doesn't exist.
+        if ($util->isValidCode($username)) {
+            // Get school data from WS.
+            $data = $util->getSchoolFromWS($username);
+
+            // Test data:
+            // $data['error'] = 0;
+            // $data['message'] = 'a8000001$$esc-tramuntana$$Escola Tramuntana$$c. Rosa dels Vents, 8$$Valldevent$$09999';
+
+            if ($data['error'] === 0 && !$clientExists) {
+                $clientController->createClientFromWS($data['message']);
+                $clientController->setClientPermissions($username);
+            } else {
+                $error = $data['message'];
+            }
+        }
+
         Auth::login($user, true);
 
         if (Access::isAdmin($user)) {
@@ -43,9 +63,13 @@ class GoogleController extends Controller {
         }
 
         if (Access::isClient($user) || Access::isManager($user)) {
-            return redirect()->route('myagora');
+            if ($clientExists) {
+                return redirect()->route('myagora.instances')->with('error', $error);
+            }
         }
 
-        return redirect()->route('home');
+        return redirect()->route('home')->with('error', $error);
+
     }
+
 }
