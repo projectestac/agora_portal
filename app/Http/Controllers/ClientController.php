@@ -6,8 +6,10 @@ use App\Helpers\Util;
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Models\Client;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\HtmlString;
+use Spatie\Permission\Models\Role;
 use Yajra\DataTables\DataTables;
 use Illuminate\Contracts\View\View;
 
@@ -79,7 +81,7 @@ class ClientController extends Controller {
                         'url' => $url,
                         'serviceName' => $instance->service->name,
                         'clientName' => $instance->client->name,
-                        ])->render();
+                    ])->render();
                 }
                 return new HtmlString($html);
             })
@@ -88,6 +90,38 @@ class ClientController extends Controller {
             })
             ->make();
 
+    }
+
+    public function createClientFromWS(mixed $data) {
+        // a8000001$$esc-tramuntana$$Escola Tramuntana$$c. Rosa dels Vents, 8$$Valldevent$$09999
+        $data = explode('$$', $data);
+
+        $client = new Client();
+        $client->code = $data[0];
+        $client->dns = $data[1];
+        $client->name = $data[2];
+        $client->address = $data[3];
+        $client->city = $data[4];
+        $client->postal_code = $data[5];
+        $client->status = Client::STATUS_ACTIVE;
+        $client->visible = 'yes';
+
+        $client->save();
+    }
+
+    public function existsClient(string $code): bool {
+        $client = Client::where('code', $code)->first();
+
+        if ($client) {
+            return true;
+        }
+        return false;
+    }
+
+    public function setClientPermissions(string $username): void {
+        $user = User::where('name', $username)->first();
+        $clientRole = Role::findByName('client');
+        $user->assignRole($clientRole);
     }
 
 }
