@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Spatie\Permission\Models\Role;
 
 class ManagerController extends Controller {
     /**
@@ -63,11 +64,15 @@ class ManagerController extends Controller {
             return redirect()->back()->withErrors(__('manager.manager_already_exists'));
         }
 
+        // Add the register to table "managers".
         $manager = new Manager([
             'user_id' => $user->id,
             'client_id' => $currentClient['id'],
         ]);
         $manager->save();
+
+        // Add the register to table "model_has_roles".
+        $this->setManagerPermissions($username);
 
         Log::insert([
             'client_id' => $currentClient['id'],
@@ -107,7 +112,11 @@ class ManagerController extends Controller {
      */
     public function destroy(Manager $manager): RedirectResponse {
 
+        // Remove register from table "managers".
         $manager->delete();
+
+        // Remove register from table "model_has_roles".
+        $this->removeManagerPermissions($manager->user->name);
 
         Log::insert([
             'client_id' => $manager->client_id,
@@ -121,4 +130,17 @@ class ManagerController extends Controller {
         return redirect()->back()->with('success', __('manager.manager_removed'));
 
     }
+
+    public function setManagerPermissions(string $username): void {
+        $user = User::where('name', $username)->first();
+        $managerRole = Role::findByName('manager');
+        $user->assignRole($managerRole);
+    }
+
+    public function removeManagerPermissions(string $username): void {
+        $user = User::where('name', $username)->first();
+        $managerRole = Role::findByName('manager');
+        $user->removeRole($managerRole);
+    }
+
 }
