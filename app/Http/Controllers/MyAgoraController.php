@@ -72,6 +72,18 @@ class MyAgoraController extends Controller {
             return view('myagora.no_access')->with('message', __('myagora.no_client_access'));
         }
 
+        $currentClient = Cache::getCurrentClient($request);
+        $currentInstance = Instance::where('client_id', $currentClient['id'])
+            ->where('service_id', Service::select('id')->where('name', 'Moodle')->get()->toArray())
+            ->where('status', 'active')
+            ->first();
+
+        if (is_null($currentInstance)) {
+            return view('myagora.file')->with('instanceId', null);
+        }
+
+        $currentInstance = $currentInstance->toArray();
+
         if ($request->has('file')) {
             $file = $request->input('file');
             Session::flash('message', __('file.uploaded_to_moodle', ['filename' => $file]));
@@ -84,13 +96,6 @@ class MyAgoraController extends Controller {
         // Admin users have no limit on the file size.
         $maxFileSize = Access::isAdmin(Auth::user()) ? 0 : 800;
         $extensions = 'zip,mbz,xml';
-
-        $currentClient = Cache::getCurrentClient($request);
-        $currentInstance = Instance::where('client_id', $currentClient['id'])
-            ->where('service_id', Service::select('id')->where('name', 'Moodle')->get()->toArray())
-            ->where('status', 'active')
-            ->first()
-            ->toArray();
 
         // The quota information in the cache can be out of date. Using getQuota() it is ensured that is updated.
         $quota = Quota::getQuota($currentInstance['id']);
