@@ -28,4 +28,5 @@ return [
     'confirm_deletion' => 'Confirmeu que voleu esborrar el fitxer :filename del servidor?',
     'no_files' => 'No hi ha cap fitxer al repositori',
     'quota_updated' => 'S\'ha actualitzat la quota',
+    'no_instance' => 'No teniu activat el servei de Moodle',
 ];
