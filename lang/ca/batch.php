@@ -70,4 +70,12 @@ return [
     'queue_operation_not_removed' => 'No s\'ha pogut esborrar l\'operació de la cua',
     'no_operation_pending' => 'No hi ha cap operació pendent',
     'no_action' => 'No s\'ha pogut recuperar la llista d\'accions del servei',
+    'batch_creation_instances' => 'Creació massiva d\'instàncies',
+    'code_and_server' => 'Codis i servidors',
+    'code_and_server_info' => 'Indiqueu el codi i el servidor de les instàncies que voleu crear. El format ha de ser del tipus següent: <codi1>:<servidor1>,<codi2>:<servidor2>,...<codiN>:<servidorN>',
+    'automatic_signup' => 'Alta automàtica',
+    'instance_created' => 'S\'ha creat la instància per al client <strong>:code</strong>. La contrasenya d\'admin és: <strong>:password</strong>',
+    'invalid_code' => 'El codi <strong>:code</strong> no és vàlid',
+    'client_not_found' => 'No s\'ha trobat cap client amb codi <strong>:code</strong>',
+    'instance_already_exists' => 'Ja existeix una instància per al client amb codi <strong>:code</strong>',
 ];
