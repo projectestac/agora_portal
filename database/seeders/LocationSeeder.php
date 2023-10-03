@@ -24,6 +24,7 @@ class LocationSeeder extends Seeder
             8 => 'Tarragona',
             9 => 'Terres de l\'Ebre',
             10 => 'Vallès Occidental',
+            11 => 'No definit',
         ];
 
         foreach ($locations as $id => $name) {
