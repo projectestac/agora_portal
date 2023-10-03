@@ -59,7 +59,8 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::get('/batch/queue/success', [QueueController::class, 'getSuccess'])->name('queue.success');
     Route::get('/batch/queue/fail', [QueueController::class, 'getFail'])->name('queue.fail');
     Route::delete('/batch/queue/{id}', [QueueController::class, 'destroy'])->name('queue.destroy');
-    Route::get('/batch/create', [BatchController::class, 'create'])->name('create');
+    Route::get('/batch/instance/create', [BatchController::class, 'instanceCreate'])->name('batch.instance.create');
+    Route::post('/batch/instance', [BatchController::class, 'instanceStore'])->name('batch.instance.store');
 
     Route::get('/config', [ConfigController::class, 'edit'])->name('config.edit');
     Route::put('/config', [ConfigController::class, 'update'])->name('config.update');
