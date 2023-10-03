@@ -17,7 +17,7 @@ class ClientTypeSeeder extends Seeder
             1 => 'Escola',
             2 => 'Institut',
             3 => 'Institut-Escola',
-            4 => 'Formació d\'adults',
+            4 => 'Adults',
             5 => 'Servei educatiu',
             6 => 'Escola Oficial d\'Idiomes',
             7 => 'Altres',
@@ -26,6 +26,9 @@ class ClientTypeSeeder extends Seeder
             10 => 'ECA',
             11 => 'ZER',
             12 => 'Projecte',
+            13 => 'Formació',
+            14 => 'Llar d\infants',
+            15 => 'No definit',
         ];
 
         foreach ($client_types as $id => $name) {
