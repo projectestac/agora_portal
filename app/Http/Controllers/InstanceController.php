@@ -78,8 +78,16 @@ class InstanceController extends Controller {
             ->with('statusList', $this->getStatusList());
     }
 
+    /**
+     * The instance update may mean a simple change in some of the record fields of that instance or may imply a status change.
+     * In case of an activation, the database must be created and populated and, also, the data dir must be created and populated.
+     * If the instance has a database id, it means that there is a database and a data dir in the system for that instance.
+     *
+     * @param Request $request
+     * @param Instance $instance
+     * @return RedirectResponse
+     */
     public function update(Request $request, Instance $instance): RedirectResponse {
-
         $statusFinal = $request->input('status');
 
         $instance->db_host = $request->input('db_host');
@@ -91,75 +99,20 @@ class InstanceController extends Controller {
         $newDbId = -1;
         $messages = [];
 
-        // If the status has changed, is possible that the db_id needs to be updated.
+        // If the status has changed, is possible that the db_id needs to be updated. This call gets what database id should be
+        // used according to the status change.
         if ($statusFinal !== $instance->status) {
             $newDbId = $this->getNewOrUpdatedDbId($instance, $statusFinal);
         }
 
-        // When the db_id goes from 0 to a new value, it means that the database needs to be populated and the files created.
+        // When the db_id goes from 0 to a new value, it is an activation, which means that the database and the data dir need
+        // to be created and populated.
         if ($instance->db_id === 0 && $newDbId > 0) {
-            // First of all, ensure that the required files are available.
-            $checkFiles = $this->checkFiles($instance);
-            if (!empty($checkFiles['errors'])) {
-                return redirect()
-                    ->route('instances.index')
-                    ->with('error', $checkFiles['errors']);
+            $log = $this->activateInstance($instance, $newDbId, $statusFinal);
+            if (isset($log['errors'])) {
+                return redirect()->route('instances.index')->with('error', $log['errors']);
             }
-            if (isset($checkFiles['success'])) {
-                $messages[] = __('instance.dump_files_found');
-            }
-
-            $dumpDatabase = $this->dumpDatabase($instance, $newDbId, $checkFiles['success']['dbFile']);
-            if (!empty($dumpDatabase['errors'])) {
-                return redirect()
-                    ->route('instances.index')
-                    ->with('error', $dumpDatabase['errors']);
-            }
-
-            if (isset($dumpDatabase['success'])) {
-                $messages[] = __('instance.dump_success');
-            }
-
-            $unzipFiles = $this->unzipFiles($instance, $newDbId, $checkFiles['success']['dataFile']);
-            if (!empty($unzipFiles['errors'])) {
-                return redirect()
-                    ->route('instances.index')
-                    ->with('error', $unzipFiles['errors']);
-            }
-
-            if (isset($unzipFiles['success'])) {
-                $messages[] = __('instance.unzip_success_short');
-            }
-
-            $password = Util::createRandomPass();
-            $programOperation = $this->programOperationEnable($instance, $newDbId, $password);
-            if (!empty($programOperation['errors'])) {
-                return redirect()
-                    ->route('instances.index')
-                    ->with('error', $programOperation['errors']);
-            }
-
-            if (isset($programOperation['success'])) {
-                $messages[] = $programOperation['success'];
-            }
-
-            $instance->status = $statusFinal;
-            $instance->db_id = $newDbId;
-            $instance->save();
-
-            Log::insert([
-                'client_id' => $instance->client->id,
-                'user_id' => Auth::user()->id,
-                'action_type' => Log::ACTION_TYPE_ADD,
-                'action_description' => __('instance.actived_instance', [
-                    'service' => $instance->service->name,
-                    'client' => $instance->client->name,
-                    'password' => $password,
-                ]),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-
+            $messages = $log['messages'];
         } else {
             if ($newDbId === 0) {
                 $instance->db_id = 0;
@@ -171,9 +124,7 @@ class InstanceController extends Controller {
         $messages[] = __('instance.instance_updated');
         $messagesString = implode("\n", $messages);
 
-        return redirect()
-            ->route('instances.index')
-            ->with('success', $messagesString);
+        return redirect()->route('instances.index')->with('success', $messagesString);
     }
 
     public function getStatusColor(string $status): string {
@@ -240,6 +191,72 @@ class InstanceController extends Controller {
 
     }
 
+    public function activateInstance(Instance $instance, int $newDbId, mixed $statusFinal): array|RedirectResponse {
+        // First of all, ensure that the required files are available.
+        $checkFiles = $this->checkFiles($instance);
+        if (!empty($checkFiles['errors'])) {
+            return ['error' => $checkFiles['errors']];
+        }
+
+        $messages = [];
+        if (isset($checkFiles['success'])) {
+            $messages[] = __('instance.dump_files_found');
+        }
+
+        $dumpDatabase = $this->dumpDatabase($instance, $newDbId, $checkFiles['success']['dbFile']);
+
+        if (!empty($dumpDatabase['errors'])) {
+            return ['errors' => $dumpDatabase['errors']];
+        }
+
+        if (isset($dumpDatabase['success'])) {
+            $messages[] = __('instance.dump_success');
+        }
+
+        $unzipFiles = $this->unzipFiles($instance, $newDbId, $checkFiles['success']['dataFile']);
+
+        if (!empty($unzipFiles['errors'])) {
+            return ['errors' => $unzipFiles['errors']];
+        }
+
+        if (isset($unzipFiles['success'])) {
+            $messages[] = __('instance.unzip_success_short');
+        }
+
+        $password = Util::createRandomPass();
+        $programOperation = $this->programOperationEnable($instance, $newDbId, $password);
+
+        if (!empty($programOperation['errors'])) {
+            return ['errors' => $programOperation['errors']];
+        }
+
+        if (isset($programOperation['success'])) {
+            $messages[] = $programOperation['success'];
+        }
+
+        $instance->status = $statusFinal;
+        $instance->db_id = $newDbId;
+        $instance->save();
+
+        Log::insert([
+            'client_id' => $instance->client->id,
+            'user_id' => Auth::user()->id,
+            'action_type' => Log::ACTION_TYPE_ADD,
+            'action_description' => __('instance.actived_instance', [
+                'service' => $instance->service->name,
+                'client' => $instance->client->name,
+                'password' => $password,
+            ]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return [
+            'messages' => $messages,
+            'password' => $password,
+        ];
+    }
+
     /**
      * The change of status may imply the creation or deletion of the database. These operations are not developed yet, but the
      * db_id field must be updated in the instances table when needed. The changes of status that imply a db_id update are:
@@ -250,7 +267,7 @@ class InstanceController extends Controller {
      * @param string $statusFinal
      * @return int
      */
-    private function getNewOrUpdatedDbId(Instance $instance, string $statusFinal): int {
+    public function getNewOrUpdatedDbId(Instance $instance, string $statusFinal): int {
 
         if (($instance->status === Instance::STATUS_PENDING || $instance->status === Instance::STATUS_WITHDRAWN)
             && $statusFinal === Instance::STATUS_ACTIVE && $instance->db_id === 0) {
@@ -272,8 +289,8 @@ class InstanceController extends Controller {
             ->get()
             ->toArray();
 
-        // TODO: Get this value from site config.
-        $firstID = 1;
+        $firstID = Util::getConfigParam('first_db_id');
+        $firstID = (empty($firstID)) ? 1 : (int)$firstID;
 
         $i = $firstID;
         $free = 0;
@@ -519,7 +536,7 @@ class InstanceController extends Controller {
         try {
             $pdo = DB::connection($serviceNameLower)->getPdo();
         } catch (\Exception $e) {
-            // Check is automatic creation of databases is allowed.
+            // Check if automatic creation of databases is allowed.
             if ($serviceNameLower === 'nodes' && !Util::getConfigParam('nodes_create_db')) {
                 return [
                     'errors' => __('instance.db_creation_failed', [
@@ -572,4 +589,5 @@ class InstanceController extends Controller {
 
         return ['success' => true];
     }
+
 }

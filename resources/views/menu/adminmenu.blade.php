@@ -66,7 +66,7 @@
                 </a>
             </li>
             <li>
-                <a href="{{ route('create') }}" @if (str_contains(request()->url(), 'create')) class="selected" @endif>
+                <a href="{{ route('batch.instance.create') }}" @if (str_contains(request()->url(), 'instance')) class="selected" @endif>
                     {{ __('batch.batch_creation') }}
                 </a>
             </li>
