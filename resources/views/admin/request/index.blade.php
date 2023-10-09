@@ -16,17 +16,25 @@
                     <th>{{ __('user.name') }}</th>
                     <th>{{ __('common.status') }}</th>
                     <th>{{ __('common.type') }}</th>
+                    <th>{{ __('common.created_at') }}</th>
+                    <th>{{ __('common.updated_at') }}</th>
                     <th>{{ __('common.actions') }}</th>
                 </tr>
                 </thead>
                 <tbody>
-                @foreach ($requests  as $request)
+                @foreach ($requests as $request)
                     <tr>
                         <td>{{ $request->client->name }}</td>
                         <td>{{ $request->service->name }}</td>
                         <td>{{ $request->user->name }}</td>
-                        <td>{{ $request->status }}</td>
+                        <td>
+                            <span class="btn btn-{{ (new \App\Http\Controllers\RequestController)->getStatusColor($request->status) }}">
+                                {{ $request->status }}
+                            </span>
+                        </td>
                         <td>{{ $request->requestType->name }}</td>
+                        <td>{{ \Carbon\Carbon::parse($request->created_at)->format('d/m/Y H:i') }}</td>
+                        <td>{{ \Carbon\Carbon::parse($request->updated_at)->format('d/m/Y H:i') }}</td>
                         <td>
                             <a href="{{ route('requests.show', $request->id) }}"
                                class="btn btn-info">{{ __('common.show') }}</a>
