@@ -29,6 +29,10 @@ class RequestController extends Controller {
      */
     public function index(): View {
         $requests = Request::with('requestType', 'service', 'client', 'user')
+            ->orderByRaw("FIELD(status, \"" . Request::STATUS_PENDING . "\",
+             \"" . Request::STATUS_UNDER_STUDY . "\",
+             \"" . Request::STATUS_DENIED . "\",
+             \"" . Request::STATUS_SOLVED . "\")")
             ->orderBy('updated_at', 'desc')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -104,9 +108,17 @@ class RequestController extends Controller {
 
         $requestOriginal = Request::find($requestId);
 
-        $notified = false;
+        $messages = [];
+        $error = '';
+
         if ($sendEmail && ($status !== $requestOriginal->status)) {
-            $notified = $this->notifyByEmail($status, $adminComment, $requestOriginal->client_id);
+            $emailResult = $this->notifyByEmail($status, $adminComment, $requestOriginal->client_id);
+            if (isset($emailResult['success'])) {
+                $messages[] = $emailResult['success'];
+            }
+            if (isset($emailResult['error'])) {
+                $error = $emailResult['error'];
+            }
         }
 
         $requestOriginal->status = $status;
@@ -128,9 +140,12 @@ class RequestController extends Controller {
             'updated_at' => now(),
         ]);
 
-        $message = $notified ? __('request.request_updated_and_notified') : __('request.request_updated');
+        $messages[] = __('request.request_updated');
+        $messagesString = implode('<br>', $messages);
 
-        return redirect()->route('requests.index')->with('success', $message);
+        return redirect()->route('requests.index')
+            ->with('success', $messagesString)
+            ->with('error', $error);
 
     }
 
@@ -150,16 +165,31 @@ class RequestController extends Controller {
         ];
     }
 
-    private function notifyByEmail(string $status, string $adminComment, int $clientId): bool {
+    public function getStatusColor(string $status): string {
+        return match ($status) {
+            Request::STATUS_PENDING => 'warning',
+            Request::STATUS_UNDER_STUDY => 'info',
+            Request::STATUS_SOLVED => 'success',
+            Request::STATUS_DENIED => 'danger',
+        };
+    }
+
+    private function notifyByEmail(string $status, string $adminComment, int $clientId): array {
 
         $adminEmail = Util::getConfigParam('notify_address_request');
         $to = Util::getManagersEmail(Client::find($clientId));
 
-        Mail::to($to)
-            ->bcc($adminEmail)
-            ->send(new UpdateRequest($status, $adminComment));
+        try {
+            Mail::to($to)
+                ->bcc($adminEmail)
+                ->send(new UpdateRequest($status, $adminComment));
 
-        return true;
+            $message = __('email.email_sent', ['to' => implode(', ', $to), 'bcc' => $adminEmail]);
+            return ['success' => $message];
+
+        } catch (\Exception $e) {
+            return ['error' => $e->getMessage()];
+        }
 
     }
 
