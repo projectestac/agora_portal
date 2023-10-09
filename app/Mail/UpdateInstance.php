@@ -15,7 +15,7 @@ class UpdateInstance extends Mailable {
     /**
      * Create a new message instance.
      */
-    public function __construct() {
+    public function __construct(private $instance, private $password) {
         //
     }
 
@@ -24,7 +24,7 @@ class UpdateInstance extends Mailable {
      */
     public function envelope(): Envelope {
         return new Envelope(
-            subject: __('mail.update_instance_subject')
+            subject: __('email.update_instance_subject')
         );
     }
 
@@ -33,7 +33,11 @@ class UpdateInstance extends Mailable {
      */
     public function content(): Content {
         return new Content(
-            view: 'mail.update-instance',
+            view: 'email.update-instance',
+            with: [
+                'instance' => $this->instance,
+                'password' => $this->password,
+            ]
         );
     }
 
