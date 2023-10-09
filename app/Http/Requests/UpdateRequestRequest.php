@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Helpers\Access;
+use App\Models\Request;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequestRequest extends FormRequest {
@@ -21,7 +22,8 @@ class UpdateRequestRequest extends FormRequest {
     public function rules(): array {
         return [
             'request_id' => 'required|integer',
-            'status' => 'required|in:pending,under_study,solved,denied',
+            'status' => 'required|in:' . Request::STATUS_PENDING . ',' . Request::STATUS_UNDER_STUDY . ','
+                . Request::STATUS_SOLVED . ',' . Request::STATUS_DENIED,
             'send_email' => 'nullable|in:on',
             'admin_comment' => 'nullable|string',
             'private_note' => 'nullable|string',
