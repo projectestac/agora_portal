@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Cache;
 use App\Helpers\Util;
+use App\Http\Requests\UpdateInstanceRequest;
 use App\Jobs\ProcessOperation;
+use App\Mail\UpdateInstance;
+use App\Models\Client;
 use App\Models\Instance;
 use App\Models\Log;
 use App\Models\ModelType;
@@ -15,6 +18,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\HtmlString;
 use Throwable;
 use Yajra\DataTables\Facades\DataTables;
@@ -69,6 +73,19 @@ class InstanceController extends Controller {
         ]);
         $instance->save();
 
+        Log::insert([
+            'client_id' => $instance->client_id,
+            'user_id' => Auth::user()->id,
+            'action_type' => Log::ACTION_TYPE_ADD,
+            'action_description' => __('instance.requested_instance', [
+                'user' => Auth::user()->name,
+                'service' => Service::find($instance->service_id)->name,
+                'client' => Client::find($instance->client_id)->name,
+            ]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         return redirect()->route('myagora.instances');
     }
 
@@ -87,22 +104,31 @@ class InstanceController extends Controller {
      * @param Instance $instance
      * @return RedirectResponse
      */
-    public function update(Request $request, Instance $instance): RedirectResponse {
-        $statusFinal = $request->input('status');
+    public function update(UpdateInstanceRequest $request, Instance $instance): RedirectResponse {
+        $statusFinal = $request->validated('status');
+        $sendEmail = (bool)$request->validated('send_email');
 
-        $instance->db_host = $request->input('db_host');
-        $instance->quota = $request->input('quota') * 1024 * 1024 * 1024; // GB to Bytes
-        $instance->observations = $request->input('observations');
-        $instance->annotations = $request->input('annotations');
-        $instance->save();
+        $instance->db_host = $request->validated('db_host');
+        $instance->quota = $request->validated('quota') * 1024 * 1024 * 1024; // GB to Bytes
+        $instance->observations = $request->validated('observations');
+        $instance->annotations = $request->validated('annotations');
 
-        $newDbId = -1;
+        try {
+            $instance->save();
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+
         $messages = [];
+        $error = '';
 
         // If the status has changed, is possible that the db_id needs to be updated. This call gets what database id should be
         // used according to the status change.
         if ($statusFinal !== $instance->status) {
             $newDbId = $this->getNewOrUpdatedDbId($instance, $statusFinal);
+        } else {
+            // When the status is the same, there is nothing else to do.
+            return redirect()->back()->with('success', __('instance.instance_updated'));
         }
 
         // When the db_id goes from 0 to a new value, it is an activation, which means that the database and the data dir need
@@ -113,18 +139,57 @@ class InstanceController extends Controller {
                 return redirect()->route('instances.index')->with('error', $log['errors']);
             }
             $messages = $log['messages'];
+
+            Log::insert([
+                'client_id' => $instance->client->id,
+                'user_id' => Auth::user()->id,
+                'action_type' => Log::ACTION_TYPE_EDIT,
+                'action_description' => __('instance.actived_instance', [
+                    'service' => $instance->service->name,
+                    'client' => $instance->client->name,
+                    'password' => $log['password'],
+                ]),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         } else {
             if ($newDbId === 0) {
                 $instance->db_id = 0;
             }
+            $oldStatus = $instance->status;
             $instance->status = $statusFinal;
             $instance->save();
+
+            Log::insert([
+                'client_id' => $instance->client_id,
+                'user_id' => Auth::user()->id,
+                'action_type' => Log::ACTION_TYPE_EDIT,
+                'action_description' => __('instance.status_changed', [
+                    'old_status' => $oldStatus,
+                    'new_status' => $instance->status,
+                ]),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        // Email the client. If it is an activation, send the password and welcome information.
+        if ($sendEmail) {
+            $emailResult = $this->notifyByEmail($instance, $log['password'] ?? '');
+            if (isset($emailResult['success'])) {
+                $messages[] = $emailResult['success'];
+            }
+            if (isset($emailResult['error'])) {
+                $error = $emailResult['error'];
+            }
         }
 
         $messages[] = __('instance.instance_updated');
-        $messagesString = implode("\n", $messages);
+        $messagesString = implode('<br>', $messages);
 
-        return redirect()->route('instances.index')->with('success', $messagesString);
+        return redirect()->route('instances.index')
+            ->with('success', $messagesString)
+            ->with('error', $error);
     }
 
     public function getStatusColor(string $status): string {
@@ -238,19 +303,6 @@ class InstanceController extends Controller {
         $instance->db_id = $newDbId;
         $instance->save();
 
-        Log::insert([
-            'client_id' => $instance->client->id,
-            'user_id' => Auth::user()->id,
-            'action_type' => Log::ACTION_TYPE_ADD,
-            'action_description' => __('instance.actived_instance', [
-                'service' => $instance->service->name,
-                'client' => $instance->client->name,
-                'password' => $password,
-            ]),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
         return [
             'messages' => $messages,
             'password' => $password,
@@ -326,36 +378,19 @@ class InstanceController extends Controller {
         $portalData = Util::getAgoraVar('portaldata') . 'data/';
         $serviceName = mb_strtolower($instance->service->name);
         $shortCode = $instance->modelType->short_code;
-        $dbFile = '';
-        $dataFile = '';
 
-        if ($serviceName === 'nodes') {
-            $dbFile = $portalData . 'nodes/master' . $shortCode . '.sql';
-            $dataFile = $portalData . 'nodes/master' . $shortCode . '.zip';
-
-            if (!file_exists($dbFile)) {
-                $errors[] = __('instance.file_not_found', ['name' => $dbFile]);
-            }
-
-            if (!file_exists($dataFile)) {
-                $errors[] = __('instance.file_not_found', ['name' => $dataFile]);
-            }
-        }
-
-        if ($serviceName === 'moodle') {
-            $dbFile = $portalData . 'moodle/master' . $serviceName . $shortCode . '.sql';
-            $dataFile = $portalData . 'moodle/master' . $serviceName . $shortCode . '.zip';
-
-            if (!file_exists($dbFile)) {
-                $errors[] = __('instance.file_not_found', ['name' => $dbFile]);
-            }
-
-            if (!file_exists($dataFile)) {
-                $errors[] = __('instance.file_not_found', ['name' => $dataFile]);
-            }
-        }
+        $dbFile = $portalData . $serviceName . '/master' . $serviceName . $shortCode . '.sql';
+        $dataFile = $portalData . $serviceName . '/master' . $serviceName . $shortCode . '.zip';
 
         $errors = [];
+
+        if (!file_exists($dbFile)) {
+            $errors[] = __('instance.file_not_found', ['name' => $dbFile]);
+        }
+
+        if (!file_exists($dataFile)) {
+            $errors[] = __('instance.file_not_found', ['name' => $dataFile]);
+        }
 
         if (!empty($errors)) {
             return ['errors' => $errors];
@@ -588,6 +623,25 @@ class InstanceController extends Controller {
         }
 
         return ['success' => true];
+    }
+
+    private function notifyByEmail(Instance $instance, string $password = ''): array {
+
+        $adminEmail = Util::getConfigParam('notify_address_user_cco');
+        $to = Util::getManagersEmail(Client::find($instance->client_id));
+
+        try {
+            Mail::to($to)
+                ->bcc($adminEmail)
+                ->send(new UpdateInstance($instance, $password));
+
+            $message = __('email.email_sent', ['to' => implode(', ', $to), 'bcc' => $adminEmail]);
+            return ['success' => $message];
+
+        } catch (\Exception $e) {
+            return ['error' => $e->getMessage()];
+        }
+
     }
 
 }

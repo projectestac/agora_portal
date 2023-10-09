@@ -32,5 +32,7 @@ return [
     'unzip_success' => 'S\'ha descomprimit correctament el fitxer :file al directori :dir.',
     'unzip_success_short' => 'S\'ha descomprimit correctament el fitxer al sistema de fitxers.',
     'operation_programmed' => 'S\'ha programat l\'operació correctament.',
+    'requested_instance' => 'L\'usuari :user ha sol·licitat l\'alta del servei :service per al centre :client',
     'actived_instance' => 'S\'ha activat el servei :service del centre :client. La contrasenya de l\'usuari admin és :password',
+    'status_changed' => 'S\'ha canviat l\'estat de la instància de :old_status a :new_status',
 ];
