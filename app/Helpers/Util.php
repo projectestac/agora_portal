@@ -244,15 +244,26 @@ class Util {
 
     public static function getManagersEmail(Client $client): array {
 
-        $emails = [$client->code . '@xtec.cat'];
+        $clientEmail = User::where('name', $client->code)->first()->email;
+        $emails = (!empty($clientEmail)) ? [$clientEmail] : [$client->code . '@xtec.cat'];
         $managers = $client->managers()->get()->toArray();
 
         foreach ($managers as $manager) {
             $user = User::where('id', $manager['user_id'])->get()->toArray()[0];
-            array_push($emails, $user['email']);
+            $emails[] = $user['email'];
         }
 
         return $emails;
+    }
+
+    public static function isMoodleInstanceActive(Client $client): bool {
+        $client->instances()
+            ->join('services', 'instances.service_id', '=', 'services.id')
+            ->where('services.name', 'Moodle')
+            ->where('instances.status', 'active')
+            ->first();
+
+        return !empty($client->instances);
     }
 
     /**
@@ -298,4 +309,5 @@ class Util {
 
         return $results;
     }
+
 }
