@@ -5,7 +5,7 @@ return [
     'status' => 'Estat',
     'requested_at' => 'Data de sol·licitud',
     'created_at' => 'Data de creació',
-    'updated_at' => 'Data de modificació',
+    'updated_at' => 'Darrera modificació',
     'actions' => 'Accions',
     'show' => 'Mostra',
     'edit' => 'Edita',
