@@ -50,7 +50,7 @@ class ProcessOperation implements ShouldQueue {
             }
         }
 
-        $command = 'php ' . $file . $paramsCommand . ' > /dev/stdout 2>&1';
+        $command = 'nohup php ' . $file . $paramsCommand . ' > /dev/stdout 2>&1';
 
         $last = exec($command, $result);
         $this->job->result = $result;
