@@ -23,7 +23,6 @@ class StoreBatchInstanceRequest extends FormRequest {
             'codeAndServer' => [
                 'required',
                 'string',
-                'regex:/^(?:\w+:[\w.-]+(?:,\w+:[\w.-]+)*),$/',
             ],
             'serviceId' => [
                 'required',
