@@ -11,6 +11,7 @@ use App\Models\Service;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use JsonException;
 
 class BatchController extends Controller {
@@ -146,9 +147,17 @@ class BatchController extends Controller {
                 'code' => $client->code,
                 'password' => $log['password'],
             ]);
+
+            // Save the password in batch_log table.
+            DB::table('batch_logs')->insert([
+                'instance_id' => $instance->id,
+                'password' => $log['password'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
 
-        $messagesString = implode("\n", $messages);
+        $messagesString = implode('<br />', $messages);
 
         return redirect()->route('batch.instance.create')
             ->with('success', $messagesString)
