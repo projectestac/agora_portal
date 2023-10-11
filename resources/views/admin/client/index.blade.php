@@ -20,7 +20,8 @@
                 <th>{{ __('client.dns') }}</th>
                 <th>{{ __('client.old_dns') }}</th>
                 <th>{{ __('common.status') }}</th>
-                <th>{{ __('common.description') }}</th>
+                <th>{{ __('client.visible') }}</th>
+                <th>{{ __('common.dates') }}</th>
                 <th>{{ __('common.actions') }}</th>
             </tr>
             </thead>
@@ -45,7 +46,8 @@
                         {data: 'dns', name: 'dns'},
                         {data: 'old_dns', name: 'old_dns'},
                         {data: 'status', name: 'status'},
-                        {data: 'description', name: 'description'},
+                        {data: 'visible', name: 'visible'},
+                        {data: 'dates', name: 'dates'},
                         {data: 'actions', name: 'actions', orderable: false, searchable: false}
                     ]
                 });

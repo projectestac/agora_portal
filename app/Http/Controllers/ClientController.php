@@ -73,6 +73,10 @@ class ClientController extends Controller {
         $clients = Client::orderBy('id', 'asc');
 
         return Datatables::make($clients)
+            ->addColumn('name', function ($client) {
+                return new HtmlString('<a href="' . route('myagora.instances', ['code' => $client->code]) . '">' .
+                    $client->name . '</a>');
+            })
             ->addColumn('services', function ($client) {
                 $html = '';
                 foreach ($client->instances as $instance) {
@@ -84,6 +88,10 @@ class ClientController extends Controller {
                     ])->render();
                 }
                 return new HtmlString($html);
+            })
+            ->addColumn('dates', function ($client) {
+                return new HtmlString('<strong>C:</strong> ' . $client->created_at->format('d/m/Y') . '<br/>' .
+                    '<strong>E:</strong> ' . $client->updated_at->format('d/m/Y'));
             })
             ->addColumn('actions', static function ($client) {
                 return view('admin.client.action', ['client' => $client]);
