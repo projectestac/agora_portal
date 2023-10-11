@@ -11,21 +11,31 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
 
 class QueueController extends Controller {
+
+    const PER_PAGE = 25;
+
     /**
      * @throws \JsonException
      */
     public function getPending(): View {
-        $jobs = DB::table('jobs')->paginate(10);
+        $jobs = DB::table('jobs')->paginate(self::PER_PAGE);
         $data = [];
 
         foreach ($jobs as $job) {
             $payLoad = json_decode($job->payload, false, 512, JSON_THROW_ON_ERROR);
             $operationData = unserialize($payLoad->data->command, ['allowed_classes' => [ProcessOperation::class]]);
 
+            $instanceId = Instance::join('clients', 'clients.id', '=', 'instances.client_id')
+                ->join('services', 'services.id', '=', 'instances.service_id')
+                ->where('clients.dns', $operationData->data['instance_dns'])
+                ->where('services.name', $operationData->data['service_name'])
+                ->first();
+
             $data[] = [
                 'id' => $job->id,
                 'queue' => $job->queue,
-                'operationData' => $operationData->data,
+                'operation_data' => $operationData->data,
+                'instance_id' => $instanceId,
                 'attempts' => $job->attempts,
                 'created_at' => Carbon::parse($job->created_at)->format('d/m/Y H:i'),
             ];
@@ -40,7 +50,7 @@ class QueueController extends Controller {
      * @throws \JsonException
      */
     public function getSuccess(): View {
-        $jobs = DB::table('success_jobs')->orderByDesc('id')->paginate(10);
+        $jobs = DB::table('success_jobs')->orderByDesc('id')->paginate(self::PER_PAGE);
         $data = [];
 
         foreach ($jobs as $job) {
@@ -72,7 +82,7 @@ class QueueController extends Controller {
     }
 
     public function getFail(): View {
-        $jobs = DB::table('failed_jobs')->orderByDesc('id')->paginate(10);
+        $jobs = DB::table('failed_jobs')->orderByDesc('id')->paginate(self::PER_PAGE);
         $data = [];
 
         foreach ($jobs as $job) {
@@ -80,10 +90,17 @@ class QueueController extends Controller {
             $operationData = unserialize($payLoad->data->command, ['allowed_classes' => [ProcessOperation::class]]);
             $exception = $job->exception;
 
+            $instanceId = Instance::join('clients', 'clients.id', '=', 'instances.client_id')
+                ->join('services', 'services.id', '=', 'instances.service_id')
+                ->where('clients.dns', $operationData->data['instance_dns'])
+                ->where('services.name', $operationData->data['service_name'])
+                ->first();
+
             $data[] = [
                 'id' => $job->id,
                 'queue' => $job->queue,
-                'operationData' => $operationData->data,
+                'operation_data' => $operationData->data,
+                'instance_id' => $instanceId,
                 'exception' => $exception,
                 'failed_at' => Carbon::parse($job->failed_at)->format('d/m/Y H:i'),
             ];
