@@ -5,10 +5,18 @@
         @include('menu.adminmenu')
     </div>
 
-    <div class="content service">
+    <div class="content client">
         <h3>{{ __('client.client_list') }}</h3>
 
         @include('components.messages')
+
+        <div class="row">
+            <div class="col-md-6">
+                <a href="{{ route('clients.create') }}" class="btn btn-primary">{{ __('client.new_client') }}</a>
+            </div>
+        </div>
+
+        <br />
 
         <table class="table table-striped" id="client-list">
             <thead>

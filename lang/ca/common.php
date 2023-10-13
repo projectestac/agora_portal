@@ -36,4 +36,6 @@ return [
     'files' => 'Fitxers',
     'id' => 'ID',
     'error_occurred' => 'S\'ha produït un error',
+    'yes' => 'Sí',
+    'no' => 'No',
 ];
