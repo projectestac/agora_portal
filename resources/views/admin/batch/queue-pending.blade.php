@@ -47,12 +47,20 @@
                                 <td>{{ $item['operation_data']['instance_name'] }}</td>
                                 <td>{{ $item['operation_data']['priority'] }}</td>
                                 <td>
-                                    <a href="{{ \App\Helpers\Util::getInstanceUrl($item['instance_id']) }}" target="_blank">
+                                    @if($item['instance'] instanceof \App\Models\Instance)
+
+                                        <a href="{{ \App\Helpers\Util::getInstanceUrl($item['instance']) }}" target="_blank">
+                                            <img src="{{ secure_asset('images/' . mb_strtolower($item['operation_data']['service_name'] . '.gif')) }}"
+                                                 alt="{{ $item['operation_data']['service_name'] }}"
+                                                 title="{{ $item['operation_data']['service_name'] }}"
+                                            >
+                                        </a>
+                                    @else
                                         <img src="{{ secure_asset('images/' . mb_strtolower($item['operation_data']['service_name'] . '.gif')) }}"
                                              alt="{{ $item['operation_data']['service_name'] }}"
                                              title="{{ $item['operation_data']['service_name'] }}"
                                         >
-                                    </a>
+                                    @endif
                                 </td>
                                 <td>{{ $item['created_at'] }}</td>
                                 <td>
