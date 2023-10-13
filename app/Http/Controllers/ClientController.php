@@ -6,8 +6,14 @@ use App\Helpers\Util;
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Models\Client;
+use App\Models\ClientType;
+use App\Models\Location;
+use App\Models\Log;
+use App\Models\Service;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 use Spatie\Permission\Models\Role;
 use Yajra\DataTables\DataTables;
@@ -29,15 +35,68 @@ class ClientController extends Controller {
     /**
      * Show the form for creating a new resource.
      */
-    public function create() {
-        //
+    public function create(): View {
+        $locations = Location::all()->sortBy('name');
+        $clientTypes = ClientType::all()->sortBy('name');
+
+        return view('admin.client.create')
+            ->with('locations', $locations)
+            ->with('client_types', $clientTypes);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreClientRequest $request) {
-        //
+    public function store(StoreClientRequest $request): RedirectResponse {
+        $name = $request->input('name');
+        $code = $request->input('code');
+        $dns = $request->input('dns');
+        $oldDns = $request->input('old_dns');
+        $status = $request->input('status');
+        $locationId = $request->input('location');
+        $clientTypeId = $request->input('client_type');
+        $visible = $request->input('visible');
+
+        $client = new Client([
+            'name' => $name,
+            'code' => $code,
+            'dns' => $dns,
+            'old_dns' => $oldDns,
+            'status' => $status,
+            'location_id' => $locationId,
+            'type_id' => $clientTypeId,
+            'visible' => $visible,
+        ]);
+
+        try {
+            $client->save();
+        } catch (\Exception $e) {
+            $locations = Location::all()->sortBy('name');
+            $clientTypes = ClientType::all()->sortBy('name');
+
+            return redirect()->route('clients.create')
+                ->with('locations', $locations)
+                ->with('client_types', $clientTypes)
+                ->withInput()
+                ->withErrors(['error' => $e->getMessage()]);
+        }
+
+        Log::insert([
+            'client_id' => $client->id,
+            'user_id' => Auth::user()->id,
+            'action_type' => Log::ACTION_TYPE_ADD,
+            'action_description' => __('client.created_client', [
+                'user' => Auth::user()->name,
+                'name' => $client->name,
+                'code' => $client->code,
+                'dns' => $client->dns,
+            ]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('clients.index')
+            ->with('success', __('client.created_client_short'));
     }
 
     /**
@@ -50,15 +109,60 @@ class ClientController extends Controller {
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Client $client) {
-        //
+    public function edit(Client $client): View {
+        $locations = Location::all()->sortBy('name');
+        $clientTypes = ClientType::all()->sortBy('name');
+
+        return view('admin.client.edit')
+            ->with('client', $client)
+            ->with('locations', $locations)
+            ->with('types', $clientTypes);
     }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(UpdateClientRequest $request, Client $client) {
-        //
+
+        $client->name = $request->input('name');
+        $client->code = $request->input('code');
+        $client->dns = $request->input('dns');
+        $client->old_dns = $request->input('old_dns');
+        $client->status = $request->input('status');
+        $client->location_id = $request->input('location');
+        $client->type_id = $request->input('client_type');
+        $client->visible = $request->input('visible');
+
+        try {
+            $client->save();
+        } catch (\Exception $e) {
+            $locations = Location::all()->sortBy('name');
+            $clientTypes = ClientType::all()->sortBy('name');
+
+            return redirect()->route('clients.update')
+                ->with('client', $client)
+                ->with('locations', $locations)
+                ->with('client_types', $clientTypes)
+                ->withInput()
+                ->withErrors(['error' => $e->getMessage()]);
+        }
+
+        Log::insert([
+            'client_id' => $client->id,
+            'user_id' => Auth::user()->id,
+            'action_type' => Log::ACTION_TYPE_EDIT,
+            'action_description' => __('client.updated_client', [
+                'user' => Auth::user()->name,
+                'name' => $client->name,
+                'code' => $client->code,
+                'dns' => $client->dns,
+            ]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('clients.index')
+            ->with('success', __('client.updated_client_short'));
     }
 
     /**
@@ -100,7 +204,7 @@ class ClientController extends Controller {
 
     }
 
-    public function createClientFromWS(mixed $data) {
+    public function createClientFromWS(mixed $data): void {
         // a8000001$$esc-tramuntana$$Escola Tramuntana$$c. Rosa dels Vents, 8$$Valldevent$$09999
         $data = explode('$$', $data);
 
