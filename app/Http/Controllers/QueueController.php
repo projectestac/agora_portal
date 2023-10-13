@@ -25,7 +25,7 @@ class QueueController extends Controller {
             $payLoad = json_decode($job->payload, false, 512, JSON_THROW_ON_ERROR);
             $operationData = unserialize($payLoad->data->command, ['allowed_classes' => [ProcessOperation::class]]);
 
-            $instanceId = Instance::join('clients', 'clients.id', '=', 'instances.client_id')
+            $instance = Instance::join('clients', 'clients.id', '=', 'instances.client_id')
                 ->join('services', 'services.id', '=', 'instances.service_id')
                 ->where('clients.dns', $operationData->data['instance_dns'])
                 ->where('services.name', $operationData->data['service_name'])
@@ -35,7 +35,7 @@ class QueueController extends Controller {
                 'id' => $job->id,
                 'queue' => $job->queue,
                 'operation_data' => $operationData->data,
-                'instance_id' => $instanceId,
+                'instance' => $instance,
                 'attempts' => $job->attempts,
                 'created_at' => Carbon::parse($job->created_at)->format('d/m/Y H:i'),
             ];
@@ -58,7 +58,7 @@ class QueueController extends Controller {
             $operationData = unserialize($payLoad->data->command, ['allowed_classes' => [ProcessOperation::class]]);
             $result = json_decode($job->result, false, 512, JSON_THROW_ON_ERROR);
 
-            $instanceId = Instance::join('clients', 'clients.id', '=', 'instances.client_id')
+            $instance = Instance::join('clients', 'clients.id', '=', 'instances.client_id')
                 ->join('services', 'services.id', '=', 'instances.service_id')
                 ->where('clients.dns', $operationData->data['instance_dns'])
                 ->where('services.name', $operationData->data['service_name'])
@@ -68,7 +68,7 @@ class QueueController extends Controller {
                 'id' => $job->id,
                 'queue' => $job->queue,
                 'operation_data' => $operationData->data,
-                'instance_id' => $instanceId,
+                'instance' => $instance,
                 'result' => $result,
                 'queued_at' => Carbon::parse($job->queued_at)->format('d/m/Y H:i'),
                 'created_at' => Carbon::parse($job->created_at)->format('d/m/Y H:i'),
@@ -90,7 +90,7 @@ class QueueController extends Controller {
             $operationData = unserialize($payLoad->data->command, ['allowed_classes' => [ProcessOperation::class]]);
             $exception = $job->exception;
 
-            $instanceId = Instance::join('clients', 'clients.id', '=', 'instances.client_id')
+            $instance = Instance::join('clients', 'clients.id', '=', 'instances.client_id')
                 ->join('services', 'services.id', '=', 'instances.service_id')
                 ->where('clients.dns', $operationData->data['instance_dns'])
                 ->where('services.name', $operationData->data['service_name'])
@@ -100,7 +100,7 @@ class QueueController extends Controller {
                 'id' => $job->id,
                 'queue' => $job->queue,
                 'operation_data' => $operationData->data,
-                'instance_id' => $instanceId,
+                'instance' => $instance,
                 'exception' => $exception,
                 'failed_at' => Carbon::parse($job->failed_at)->format('d/m/Y H:i'),
             ];
