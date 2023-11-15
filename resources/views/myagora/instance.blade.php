@@ -25,6 +25,7 @@
                     $usedQuota = Util::formatBytes($instance->used_quota);
                     $percent = round($instance->used_quota / $instance->quota * 100);
                     $instanceId = $instance->id;
+                    $url = \App\Helpers\Util::getInstanceUrl($instance);
                 @endphp
 
                 <div class="panel panel-default">
@@ -32,6 +33,7 @@
                         {{ $instance->service->name }}: {{ $instance->service->description }}
                     </div>
                     <div class="panel-body">
+                        <div><strong>{{ __('service.url') }}:</strong> <a href="{{ $url }}" target="_blank">{{ $url }}</a></div>
                         <div><strong>{{ __('myagora.requested_by') }}:</strong> {{ $instance->contact_name }}</div>
                         <div><strong>{{ __('myagora.active_date') }}:</strong> {{ $date->format('d/m/Y') }}</div>
                         <div><strong>{{ __('common.status') }}:</strong> {{ $instance->status }}</div>
