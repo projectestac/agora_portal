@@ -37,7 +37,7 @@ class UpdateClientRequest extends FormRequest {
                 'regex:/^[a-z0-9-_]+$/',
             ],
             'old_dns' => [
-                'required',
+                'nullable',
                 'string',
                 'max:30',
                 'regex:/^[a-z0-9-_]+$/',
