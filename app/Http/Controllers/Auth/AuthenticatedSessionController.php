@@ -46,24 +46,9 @@ class AuthenticatedSessionController extends Controller {
             $user->save();
         }
 
-        if (Access::isAdmin($user)) {
-            return redirect()->intended(RouteServiceProvider::ADMIN);
-        }
+        $result = Access::completeLogin($user);
 
-        if (Access::isClient($user) || Access::isManager($user)) {
-            return redirect()->intended(RouteServiceProvider::MY_AGORA);
-        }
-
-        // If user has logged in and is not an admin, a client or a manager, it must have the role User.
-        if (Access::isUser($user)) {
-            // Check if user has role User.
-            $userRole = Role::findByName('user');
-            if (!$user->hasRole($userRole)) {
-                $user->assignRole($userRole);
-            }
-        }
-
-        return redirect()->intended(RouteServiceProvider::HOME);
+        return redirect()->intended($result['route'])->with('error', $result['error']);
 
     }
 
