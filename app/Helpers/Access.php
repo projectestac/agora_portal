@@ -3,6 +3,9 @@
 namespace App\Helpers;
 
 use App\Http\Controllers\ClientController;
+use App\Models\Client;
+use App\Models\ClientType;
+use App\Models\Location;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -18,7 +21,7 @@ class Access {
         $clientExists = $clientController->existsClient($user['name']);
         $error = '';
 
-        // If the user corresponds to a client, try to create the client if it doesn't exist.
+        // If the username has the format of a client code, create the client if it doesn't exist.
         if ($util->isValidCode($user['name'])) {
             // Get school data from WS.
             $data = $util->getSchoolFromWS($user['name']);
@@ -27,11 +30,30 @@ class Access {
             // $data['error'] = 0;
             // $data['message'] = 'a8000001$$esc-tramuntana$$Escola Tramuntana$$c. Rosa dels Vents, 8$$Valldevent$$09999';
 
-            if ($data['error'] === 0 && !$clientExists) {
-                $clientController->createClientFromWS($data['message']);
-                $clientController->setClientPermissions($user['name']);
-            } else {
+            if ($data['error'] === 1) {
                 $error = $data['message'];
+            }
+
+            // If client doesn't exist, create it in any case and give it the permissions.
+            if (!$clientExists) {
+                if ($data['error'] === 1) {
+                    // If there is an error, create the client with minimal data.
+                    $client = new Client([
+                        'code' => $user['name'],
+                        'name' => $user['name'],
+                        'dns' => $user['name'],
+                        'location_id' => Location::UNDEFINED,
+                        'type_id' => ClientType::UNDEFINED,
+                        'status' => Client::STATUS_ACTIVE,
+                        'visible' => 'yes',
+                    ]);
+                    $client->save();
+                } else {
+                    // Create the client using the data from WS.
+                    $clientController->createClientFromWS($data['message']);
+                }
+
+                $clientController->setClientPermissions($user['name']);
             }
         }
 

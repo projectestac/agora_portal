@@ -9,7 +9,6 @@ use App\Models\Client;
 use App\Models\ClientType;
 use App\Models\Location;
 use App\Models\Log;
-use App\Models\Service;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -208,15 +207,18 @@ class ClientController extends Controller {
         // a8000001$$esc-tramuntana$$Escola Tramuntana$$c. Rosa dels Vents, 8$$Valldevent$$09999
         $data = explode('$$', $data);
 
-        $client = new Client();
-        $client->code = $data[0];
-        $client->dns = $data[1];
-        $client->name = $data[2];
-        $client->address = $data[3];
-        $client->city = $data[4];
-        $client->postal_code = $data[5];
-        $client->status = Client::STATUS_ACTIVE;
-        $client->visible = 'yes';
+        $client = new Client([
+            'code' => $data[0],
+            'name' => $data[2],
+            'dns' => $data[1],
+            'address' => $data[3],
+            'city' => $data[4],
+            'postal_code' => $data[5],
+            'location_id' => Location::UNDEFINED,
+            'type_id' => ClientType::UNDEFINED,
+            'status' => Client::STATUS_ACTIVE,
+            'visible' => 'yes',
+        ]);
 
         $client->save();
     }

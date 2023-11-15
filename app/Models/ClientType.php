@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ClientType extends Model {
     use HasFactory;
 
+    public const UNDEFINED = 15; // 15 is the id of the undefined client type in the database.
+
     protected $fillable = [
         'name',
     ];
