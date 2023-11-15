@@ -18,4 +18,5 @@ return [
     'username_string' => 'El text introduït ha de ser una cadena de caràcters.',
     'username_max' => 'El text introduït no pot tenir més de 17 caràcters.',
     'username_regex' => 'El text introduït no es correspon amb un nom d\'usuari XTEC ni amb una adreça de correu XTEC.',
+    'clients_cannot_be_managers' => 'Els codis de centre no poden ser gestors.',
 ];
