@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Location extends Model {
     use HasFactory;
 
+    public const UNDEFINED = 11; // 11 is the id of the undefined location in the database.
+
     protected $fillable = [
         'name',
     ];
