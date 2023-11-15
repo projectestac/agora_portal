@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Access;
 use App\Helpers\Cache;
 use App\Http\Requests\StoreManagerRequest;
 use App\Http\Requests\UpdateManagerRequest;
@@ -46,7 +47,7 @@ class ManagerController extends Controller {
         }
 
         // Look for the user in the database.
-        $user = User::where('email', $email)->first();
+        $user = User::where('name', $username)->first();
 
         // If the user does not exist, create it.
         if (is_null($user)) {
@@ -56,6 +57,10 @@ class ManagerController extends Controller {
                 'password' => '',
             ]);
             $user->save();
+        }
+
+        if (Access::isClient($user)) {
+            return redirect()->back()->withErrors(__('manager.clients_cannot_be_managers'));
         }
 
         $currentClient = Cache::getCurrentClient($request);
