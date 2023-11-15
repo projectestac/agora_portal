@@ -7,9 +7,14 @@ use App\Helpers\Util;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use Spatie\Permission\Models\Role;
 
+/**
+ * Controller used when the user logs in with Google. For local login, see AuthenticatedSessionController.
+ */
 class GoogleController extends Controller {
     public function redirectToGoogle() {
         return Socialite::driver('google')->redirect();
@@ -59,16 +64,25 @@ class GoogleController extends Controller {
         Auth::login($user, true);
 
         if (Access::isAdmin($user)) {
-            return redirect('/instances');
+            return redirect()->intended(RouteServiceProvider::ADMIN);
         }
 
         if (Access::isClient($user) || Access::isManager($user)) {
             if ($clientExists) {
-                return redirect()->route('myagora.instances')->with('error', $error);
+                return redirect()->route(RouteServiceProvider::MY_AGORA)->with('error', $error);
             }
         }
 
-        return redirect()->route('home')->with('error', $error);
+        // If user has logged in and is not an admin, a client or a manager, it must have the role User.
+        if (Access::isUser($user)) {
+            // Check if user has role User.
+            $userRole = Role::findByName('user');
+            if (!$user->hasRole($userRole)) {
+                $user->assignRole($userRole);
+            }
+        }
+
+        return redirect()->intended(RouteServiceProvider::HOME)->with('error', $error);
 
     }
 
