@@ -95,14 +95,18 @@ class ManagerController extends Controller {
      * Display the specified resource.
      */
     public function show(Manager $manager) {
-        //
+        echo "SHOW";
+        $manager = Manager::find($manager->id);
+        dd($manager);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(Manager $manager) {
-        //
+        echo "FORM TO EDIT";
+        $manager = Manager::find($manager->id);
+        dd($manager);
     }
 
     /**
