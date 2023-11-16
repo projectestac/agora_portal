@@ -42,7 +42,7 @@
             </a>
         </li>
         <li>
-            <a href="{{ route('home') }}" @if (str_contains(request()->url(), 'usuaris')) class="selected" @endif>
+            <a href="{{ route('usersList') }}" @if (str_contains(request()->url(), 'users') || str_contains(request()->url(), 'role') || str_contains(request()->url(), 'manager')) class="selected" @endif>
                 {{ __('user.users') }}
             </a>
         </li>
@@ -103,6 +103,26 @@
             <li>
                 <a href="{{ route('client-types.index') }}" @if (str_contains(request()->url(), 'client-types')) class="selected" @endif>
                     {{ __('client.client_types') }}
+                </a>
+            </li>
+        </ul>
+    @endif
+
+    @if (str_contains(request()->url(), 'users') || str_contains(request()->url(), 'role') || str_contains(request()->url(), 'manager'))
+        <ul class="nav navbar-nav secondary">
+            <li>
+                <a href="{{ route('usersList') }}" @if (str_ends_with(request()->url(), 'users')) class="selected" @endif>
+                    {{ __('user.users') }}
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('roleList') }}" @if (str_ends_with(request()->url(), 'role')) class="selected" @endif>
+                    Rols
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('managersList') }}" @if (str_ends_with(request()->url(), 'manager')) class="selected" @endif>
+                    Gestor
                 </a>
             </li>
         </ul>
