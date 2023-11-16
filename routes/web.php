@@ -16,6 +16,9 @@ use App\Http\Controllers\RequestController;
 use App\Http\Controllers\RequestTypeController;
 use App\Http\Controllers\SelectorController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\RoleController;
 use App\Mail\UpdateRequest;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -40,11 +43,15 @@ Route::resource('/queries', QueryController::class);
 // AJAX routes for datatables. Must be before the resource route.
 Route::get('/clients/list', [ClientController::class, 'getClients'])->name('clients.list');
 Route::get('/instances/list', [InstanceController::class, 'getInstances'])->name('instances.list');
+Route::get('/users/list', [UserManagementController::class, 'getUsers'])->name('users.list');
+Route::get('/managers/list', [UserManagementController::class, 'getManagers'])->name('managers.list');
 
 // Routes for administrators only.
 Route::group(['middleware' => ['auth', 'permission:Administrate site']], static function () {
     Route::resource('/services', ServiceController::class);
     Route::resource('/clients', ClientController::class);
+    Route::resource('/user', UserController::class);
+    Route::resource('/role', RoleController::class);
 
     Route::get('/batch', [BatchController::class, 'batch'])->name('batch');
     Route::get('/batch/query', [BatchController::class, 'query'])->name('batch.query');
@@ -68,6 +75,10 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::resource('/config/request-types', RequestTypeController::class);
     Route::resource('/config/locations', LocationController::class);
     Route::resource('/config/client-types', ClientTypeController::class);
+
+    Route::get('/users', [UserManagementController::class, 'users'])->name('usersList');
+    Route::get('/manager', [UserManagementController::class, 'managers'])->name('managersList');
+    Route::get('/role', [UserManagementController::class, 'roles'])->name('roleList');
 });
 
 Route::group(['middleware' => ['auth', 'permission:Administrate site|Manage own managers|Manage clients']], static function () {
