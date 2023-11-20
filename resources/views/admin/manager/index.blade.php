@@ -11,11 +11,9 @@
                 <thead>
                     <tr>
                         <th>{{ __('common.id') }}</th>
-                        <th>Client ID</th>
-                        <th>Client Name</th>
-                        <th>Client Code</th>
-                        <th>Client DNS</th>
-                        <th>User name</th>
+                        <th>{{ __('client.client') }}</th>
+                        <th>{{ __('user.user') }}</th>
+                        <th>{{ __('manager.manager_added_date') }}</th>
                         <th>{{ __('common.actions') }}</th>
 
                     </tr>
@@ -36,11 +34,9 @@
                 ajax: '{{ route('managers.list') }}',
                 columns: [
                     {data: 'id', name: 'id'},
-                    {data: 'client_id', name: 'client_id'},
                     {data: 'client_name', name: 'client_name'},
-                    {data: 'client_code', name: 'client_code'},
-                    {data: 'client_dns', name: 'client_dns'},
                     {data: 'user_name', name: 'user_name'},
+                    {data: 'assigned', name: 'assigned'},
                     {data: 'actions', name: 'actions', orderable: false, searchable: false}
                 ]
             });

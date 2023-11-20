@@ -10,6 +10,7 @@ return [
     'notify_user' => 'Aviseu a la persona designada que a partir d\'ara podrà gestionar els serveis del centre des d\'aquest portal.',
     'manager_added' => 'S\'ha afegit el gestor.',
     'manager_added_detail' => 'S\'ha afegit el gestor amb nom d\'usuari :username.',
+    'manager_added_date' => 'Data d\'assignació',
     'manager_removed' => 'S\'ha esborrat el gestor.',
     'manager_removed_detail' => 'S\'ha esborrat el gestor amb nom d\'usuari :username.',
     'manager_already_exists' => 'Aquest gestor ja estava assignat.',
@@ -19,4 +20,5 @@ return [
     'username_max' => 'El text introduït no pot tenir més de 17 caràcters.',
     'username_regex' => 'El text introduït no es correspon amb un nom d\'usuari XTEC ni amb una adreça de correu XTEC.',
     'clients_cannot_be_managers' => 'Els codis de centre no poden ser gestors.',
+    'remove_manager_confirm' => 'Confirmeu que voleu que l\'usuari deixi de ser gestor/a?',
 ];

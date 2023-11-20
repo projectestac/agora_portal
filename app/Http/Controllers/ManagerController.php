@@ -9,24 +9,26 @@ use App\Http\Requests\UpdateManagerRequest;
 use App\Models\Log;
 use App\Models\Manager;
 use App\Models\User;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\HtmlString;
 use Spatie\Permission\Models\Role;
+use Yajra\DataTables\Facades\DataTables;
 
 class ManagerController extends Controller {
     /**
      * Display a listing of the resource.
      */
-    public function index() {
-        //
+    public function index(): View {
+        return view('admin.manager.index');
     }
 
     /**
      * Show the form for creating a new resource.
      */
     public function create() {
-        //
     }
 
     /**
@@ -89,31 +91,25 @@ class ManagerController extends Controller {
         ]);
 
         return redirect()->back()->with('success', __('manager.manager_added'));
+
     }
 
     /**
      * Display the specified resource.
      */
     public function show(Manager $manager) {
-        echo "SHOW";
-        $manager = Manager::find($manager->id);
-        dd($manager);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(Manager $manager) {
-        echo "FORM TO EDIT";
-        $manager = Manager::find($manager->id);
-        dd($manager);
     }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(UpdateManagerRequest $request, Manager $manager) {
-        //
     }
 
     /**
@@ -150,6 +146,29 @@ class ManagerController extends Controller {
         $user = User::where('name', $username)->first();
         $managerRole = Role::findByName('manager');
         $user->removeRole($managerRole);
+    }
+
+    public function getManagers(): JsonResponse {
+
+        $manager = Manager::orderBy('id', 'desc');
+
+        return DataTables::make($manager)
+            ->rawColumns(['id'])
+            ->addColumn('client_name', function ($manager) {
+                return new HtmlString('<a href="' . route('myagora.instances', ['code' => $manager->client->code]) . '">' .
+                    $manager->client->name . '</a><br/>' . $manager->client->dns . ' - ' . $manager->client->code);
+            })
+             ->addColumn('user_name', function ($manager) {
+                return new HtmlString('<span>' . $manager->user->name . '</span>');
+            })
+            ->addColumn('assigned', function ($manager) {
+                return new HtmlString('<span>' . $manager->created_at->format('d/m/Y H:i') . '</span>');
+            })
+            ->addColumn('actions', static function ($manager) {
+                return view('admin.manager.action', ['manager' => $manager]);
+            })
+            ->make();
+
     }
 
 }
