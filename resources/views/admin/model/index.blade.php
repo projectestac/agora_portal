@@ -19,6 +19,8 @@
                 <tr>
                     <th>{{ __('common.description') }}</th>
                     <th>URL</th>
+                    <th>{{ __('common.created_at') }}</th>
+                    <th>{{ __('common.updated_at') }}</th>
                     <th>{{ __('common.actions') }}</th>
                 </tr>
                 </thead>
@@ -29,6 +31,8 @@
                         <tr>
                             <td>{{ $modelType->description }}</td>
                             <td>{{ $modelType->url }}</td>
+                            <td>{{ \Carbon\Carbon::parse($modelType->created_at)->format('d/m/Y H:i') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($modelType->updated_at)->format('d/m/Y H:i') }}</td>
                             <td>
                                 <a href="{{ route('models.edit', $modelType->id) }}" class="btn btn-primary">{{ __('common.edit') }}</a>
                             </td>
