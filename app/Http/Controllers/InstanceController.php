@@ -34,8 +34,7 @@ class InstanceController extends Controller {
         $instances = Instance::select('instances.*', 'clients.name as client_name', 'services.name as service_name')
             ->join('clients', 'instances.client_id', '=', 'clients.id')
             ->join('services', 'instances.service_id', '=', 'services.id')
-            ->orderBy('instances.updated_at', 'desc')
-            ->paginate(10);
+            ->orderBy('instances.updated_at', 'desc');
 
         return view('admin.instance.index')->with('instances', $instances);
     }
