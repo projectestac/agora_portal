@@ -1,10 +1,10 @@
-<a href="{{ route('user.show', $user->id) }}" class="btn btn-info" title="{{ __('common.show') }}">
+<a href="{{ route('users.show', $user->id) }}" class="btn btn-info" title="{{ __('common.show') }}">
     <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
 </a>
-<a href="{{ route('user.edit', $user->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
+<a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
     <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
 </a>
-<form action="{{ route('user.destroy', $user->id) }}" method="POST" style="display: inline">
+<form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display: inline">
     @csrf
     @method('DELETE')
     <button type="submit" class="btn btn-danger" title="{{ __('common.delete') }}">

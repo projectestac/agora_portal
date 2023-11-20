@@ -6,13 +6,14 @@
     </div>
 
     <div class="content users">
-        <h3>Llista d'usuaris</h3>
+        <h3>{{ __('user.users_list') }}</h3>
             <table class="table table-striped" id="user-list">
                 <thead>
                     <tr>
                         <th>{{ __('common.id') }}</th>
                         <th>{{ __('user.name') }}</th>
                         <th>{{ __('user.email') }}</th>
+                        <th>{{ __('user.roles') }}</th>
                         <th>{{ __('common.actions') }}</th>
                     </tr>
                 </thead>
@@ -34,6 +35,7 @@
                     {data: 'id', name: 'id'},
                     {data: 'name', name: 'name'},
                     {data: 'email', name: 'email'},
+                    {data: 'roles', name: 'roles'},
                     {data: 'actions', name: 'actions', orderable: false, searchable: false}
                 ]
             });
