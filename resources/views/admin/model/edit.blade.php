@@ -9,7 +9,7 @@
     </div>
 
     <div class="content service">
-        <h3>{{ __('request.request_edit') }}</h3>
+        <h3>{{ __('model.model_edit') }}</h3>
 
         <div class="panel panel-default">
             <div class="panel-body">
@@ -22,14 +22,14 @@
                     <div class="form-group">
                         <label class="col-sm-4 control-label clear">{{ __('common.description') }}</label>
                         <div class="col-sm-8">
-                            <input type="text" id="description" name="description" value="{{ $modelType->description }}">
+                            <input type="text" class="form-control" id="description" name="description" value="{{ $modelType->description }}">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-sm-4 control-label clear">URL</label>
                         <div class="col-sm-8">
-                            <input type="text" id="url" name="url" value="{{ $modelType->url }}">
+                            <input type="text" class="form-control" id="url" name="url" value="{{ $modelType->url }}">
                         </div>
                     </div>
 
