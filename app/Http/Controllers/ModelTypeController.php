@@ -9,6 +9,7 @@ use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 
 class ModelTypeController extends Controller {
     /**
@@ -49,15 +50,28 @@ class ModelTypeController extends Controller {
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ModelType $modelType) {
-        //
+    public function edit($id): View {
+        $modelType = ModelType::findOrFail($id);
+        return view('admin.model.edit')->with('modelType', $modelType); // we send the model type to the view
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateModelTypeRequest $request, ModelType $modelType) {
-        //
+    public function update(Request $request, $id) {
+        $validatedData = $request->validate([
+            'description' => 'required|string',
+            'url' => 'required|url'
+        ]);
+
+        $modelType = ModelType::findOrFail($id);
+
+        $modelType->update([
+            'description' => $validatedData['description'],
+            'url' => $validatedData['url']
+        ]);
+
+        return redirect()->route('models.index')->with('success', __('request.request_created'));
     }
 
     /**

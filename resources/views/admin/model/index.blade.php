@@ -6,7 +6,11 @@
     </div>
 
     <div class="content batch">
+        {{-- Translations are defined in lang/ca folder --}}
+
         <p class="h3">{{ __('model.models') }}</p>
+
+        {{-- $modelTypes is defined when returning the view in ModelTypeController.php --}}
 
         @if (!empty($modelTypes))
 
@@ -15,6 +19,7 @@
                 <tr>
                     <th>{{ __('common.description') }}</th>
                     <th>URL</th>
+                    <th>{{ __('common.actions') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -24,6 +29,9 @@
                         <tr>
                             <td>{{ $modelType->description }}</td>
                             <td>{{ $modelType->url }}</td>
+                            <td>
+                                <a href="{{ route('models.edit', $modelType->id) }}" class="btn btn-primary">{{ __('common.edit') }}</a>
+                            </td>
                         </tr>
 
                     @endforeach

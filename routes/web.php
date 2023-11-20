@@ -78,7 +78,12 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
 
     Route::get('/config', [ConfigController::class, 'edit'])->name('config.edit');
     Route::put('/config', [ConfigController::class, 'update'])->name('config.update');
+
+    // maybe some confusion to fixed later here: the 'model' route targets actually the 'model type' controller, then model_types in the database
     Route::resource('/config/models', ModelTypeController::class);
+    Route::put('/config/models/{id}', [ModelTypeController::class, 'update'])->name('models.update');
+    Route::get('/config/models/{id}/edit', [ModelTypeController::class, 'edit']);
+
     Route::resource('/config/request-types', RequestTypeController::class);
     Route::resource('/config/locations', LocationController::class);
     Route::resource('/config/client-types', ClientTypeController::class);
