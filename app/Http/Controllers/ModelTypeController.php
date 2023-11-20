@@ -14,9 +14,16 @@ class ModelTypeController extends Controller {
     /**
      * Display a listing of the resource.
      */
-    public function index(): View|Application|Factory|ApplicationContract  {
-        return view('admin.model.index');
+    public function index(): View {
+        $modelTypes = ModelType::get();
+
+        return view('admin.model.index')
+            ->with('modelTypes', $modelTypes);
     }
+
+    // public function index(): View|Application|Factory|ApplicationContract  {
+    //     return view('admin.model.index');
+    // }
 
     /**
      * Show the form for creating a new resource.
