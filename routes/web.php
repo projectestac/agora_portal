@@ -78,7 +78,9 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
 
     Route::get('/config', [ConfigController::class, 'edit'])->name('config.edit');
     Route::put('/config', [ConfigController::class, 'update'])->name('config.update');
-    Route::resource('/config/models', ModelTypeController::class);
+
+    Route::resource('/config/model-types', ModelTypeController::class);
+
     Route::resource('/config/request-types', RequestTypeController::class);
     Route::resource('/config/locations', LocationController::class);
     Route::resource('/config/client-types', ClientTypeController::class);

@@ -12,6 +12,7 @@ class ModelType extends Model {
 
     protected $fillable = [
         'short_code',
+        'service_id',
         'description',
         'url',
         'db',

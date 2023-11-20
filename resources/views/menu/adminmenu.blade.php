@@ -86,8 +86,8 @@
                 </a>
             </li>
             <li>
-                <a href="{{ route('models.index') }}" @if (str_contains(request()->url(), 'models')) class="selected" @endif>
-                    {{ __('model.models') }}
+                <a href="{{ route('model-types.index') }}" @if (str_contains(request()->url(), 'model-types')) class="selected" @endif>
+                    {{ __('modeltype.models') }}
                 </a>
             </li>
             <li>
