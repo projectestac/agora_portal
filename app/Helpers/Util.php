@@ -267,20 +267,29 @@ class Util {
     }
 
     /**
-     * Get the string with School Information from Web Service.
-     * Demo string: a8000001$$nompropi$$Nom del Centre$$c. Carrer, 18-24$$Valldevent$$00000
+     * Get the string with School Information from Web Service. In case of error, return information about the error.
+     * Possible errors:
+     *  1. No data received.
+     *  2. Client is not registered in master clients table.
+     *  3. Client has no "nom propi".
+     *
+     * Test strings (values received from the Web Service):
+     *  - Success: 'a8000001$$nompropi$$Nom del Centre$$c. Carrer, 18-24$$Valldevent$$00000'
+     *  - Error #1: ''
+     *  - Error #2: 'ERROR'
+     *  - Error #3: 'a8000001$$0$$Nom del Centre$$c. Carrer, 18-24$$Valldevent$$00000'
      *
      * @param string $uname Codi de centre
      * @global array $agora
-     * @return array
+     * @return array ['error' => 0|1, 'message' => string]
      * @author Toni Ginard
      */
     public function getSchoolFromWS(string $uname): array {
         global $agora;
 
         // Build the URL.
-        $unamenum = (new self)->transformClientCode($uname, 'letter2num');
-        $url = $agora['server']['school_information'] . $unamenum;
+        $codeNumber = (new self)->transformClientCode($uname, 'letter2num');
+        $url = $agora['server']['school_information'] . $codeNumber;
 
         $handle = curl_init();
         curl_setopt($handle, CURLOPT_URL, $url);
@@ -289,22 +298,36 @@ class Util {
         $buffer = curl_exec($handle);
         curl_close($handle);
 
-        // Get school Data
-        if (empty($buffer)) {
-            $results['error'] = 1;
-            $results['message'] = 'No s\'ha pogut obtenir automàticament la informació del centre.
-            Aquest error no és greu, però si persisteix durant dies, poseu-vos en contacte amb el SAU.';
-        } else {
-            $schooldata = utf8_encode($buffer);
+        // $buffer = 'a8000001$$nompropi$$Nom del Centre$$c. Carrer, 18-24$$Valldevent$$00000';
 
-            // Additional check. This error should never happen.
-            if (str_contains($schooldata, 'ERROR')) {
-                $results['error'] = 1;
-                $results['message'] = "El codi de centre $unamenum no figura a la base de dades de centres de la XTEC. Poseu-vos en contacte amb el SAU.";
-            } else {
-                $results['error'] = 0;
-                $results['message'] = $schooldata;
-            }
+        // Get school Data. Error #1: No data received.
+        if (empty($buffer)) {
+            return [
+                'error' => 1,
+                'message' => __('client.no_ws'),
+            ];
+        }
+
+        $clientData = utf8_encode(trim($buffer));
+
+        // Error #2: Client is not registered in master clients table.
+        if (str_contains($clientData, 'ERROR')) {
+            return [
+                'error' => 1,
+                'message' => __('client.no_client_in_ws', ['code' => $codeNumber]),
+            ];
+        }
+
+        $clientDataArray = explode('$$', $clientData);
+
+        // Error #3: Client has no "nom propi".
+        if ($clientDataArray[1] === '0') {
+            $results['error'] = 1;
+            $results['message'] = __('client.client_has_no_nompropi');
+        } else {
+            // Success.
+            $results['error'] = 0;
+            $results['message'] = $clientData;
         }
 
         return $results;
