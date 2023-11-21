@@ -30,7 +30,7 @@
 
                         <tr>
                             <td>{{ $modelType->description }}</td>
-                            <td>{{ $modelType->url }}</td>
+                            <td><a href="{{ $modelType->url }}" target="_blank">{{ $modelType->url }}</a></td>
                             <td>{{ \Carbon\Carbon::parse($modelType->created_at)->format('d/m/Y H:i') }}</td>
                             <td>{{ \Carbon\Carbon::parse($modelType->updated_at)->format('d/m/Y H:i') }}</td>
                             <td>
