@@ -10,6 +10,8 @@ return [
     'show' => 'Mostra',
     'edit' => 'Edita',
     'delete' => 'Esborra',
+    'confirm_deletion' => 'Esteu segur que voleu suprimir aquest element?',
+    'deletion_success' => 'L\'element ha estat eliminat amb èxit.',
     'type' => 'Tipus',
     'login' => 'Entra',
     'logout' => 'Surt',

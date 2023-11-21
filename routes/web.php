@@ -83,6 +83,7 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::resource('/config/models', ModelTypeController::class);
     Route::put('/config/models/{id}', [ModelTypeController::class, 'update'])->name('models.update');
     Route::get('/config/models/{id}/edit', [ModelTypeController::class, 'edit']);
+    Route::delete('/config/models/{id}', [ModelTypeController::class, 'destroy'])->name('models.destroy');
 
     Route::resource('/config/request-types', RequestTypeController::class);
     Route::resource('/config/locations', LocationController::class);

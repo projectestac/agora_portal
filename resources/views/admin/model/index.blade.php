@@ -35,6 +35,12 @@
                             <td>{{ \Carbon\Carbon::parse($modelType->updated_at)->format('d/m/Y H:i') }}</td>
                             <td>
                                 <a href="{{ route('models.edit', $modelType->id) }}" class="btn btn-primary">{{ __('common.edit') }}</a>
+
+                                {{-- <form action="{{ route('models.destroy', $modelType->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" onclick="return confirm('{{ __('common.confirm_deletion') }}')">{{ __('common.delete') }}</button>
+                                </form> --}}
                             </td>
                         </tr>
 

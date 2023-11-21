@@ -77,7 +77,11 @@ class ModelTypeController extends Controller {
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ModelType $modelType) {
-        //
+    public function destroy($id)
+    {
+        $modelType = ModelType::findOrFail($id);
+        $modelType->delete();
+
+        return redirect()->route('models.index')->with('success', __('common.deletion_success'));
     }
 }
