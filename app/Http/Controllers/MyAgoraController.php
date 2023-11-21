@@ -6,6 +6,7 @@ use App\Helpers\Access;
 use App\Helpers\Cache;
 use App\Helpers\Quota;
 use App\Helpers\Util;
+use App\Jobs\ProcessOperation;
 use App\Models\Client;
 use App\Models\Instance;
 use App\Models\Log;
@@ -30,15 +31,7 @@ class MyAgoraController extends Controller {
 
     public function instances(Request $request): View {
 
-        // If the current user is admin, try to get a client code from the URL. Otherwise, get the
-        // current client from the session.
-        if (Access::isAdmin(Auth::user())) {
-            $currentClient = Util::getClientFromUrl($request);
-        }
-
-        if (empty($currentClient)) {
-            $currentClient = Cache::getCurrentClient($request);
-        }
+        $currentClient = $this->getCurrentClient($request);
 
         if (empty($currentClient)) {
             return view('myagora.instance')->with('instances', []);
@@ -59,10 +52,24 @@ class MyAgoraController extends Controller {
             ->get()
             ->toArray();
 
+        $currentDNS = $currentClient['dns'];
+        $newDNS = '';
+
+        $data = (new Util())->getSchoolFromWS($currentClient['code']);
+
+        if ($data['error'] !== 0) {
+            $error = $data['message'];
+        } else {
+            $newDNS = explode('$$', $data['message'])[1];
+        }
+
         return view('myagora.instance')
             ->with('instances', $instances)
             ->with('currentClient', $currentClient)
-            ->with('availableServices', $availableServices);
+            ->with('availableServices', $availableServices)
+            ->with('error', $error ?? '')
+            ->with('currentDNS', $currentDNS)
+            ->with('newDNS', $newDNS ?? '');
 
     }
 
@@ -352,12 +359,12 @@ class MyAgoraController extends Controller {
 
     public function managers(Request $request): View {
 
-        if (Access::isAdmin(Auth::user())) {
-            $currentClient = Util::getClientFromUrl($request);
-        }
+        $currentClient = $this->getCurrentClient($request);
 
         if (empty($currentClient)) {
-            $currentClient = Cache::getCurrentClient($request);
+            return view('myagora.manager')
+                ->with('managers', [])
+                ->with('max_managers', Manager::MAX_MANAGERS_PER_CLIENT);
         }
 
         // Get an array of objects of type Manager.
@@ -377,13 +384,7 @@ class MyAgoraController extends Controller {
 
     public function logs(Request $request): View {
 
-        if (Access::isAdmin(Auth::user())) {
-            $currentClient = Util::getClientFromUrl($request);
-        }
-
-        if (empty($currentClient)) {
-            $currentClient = Cache::getCurrentClient($request);
-        }
+        $currentClient = $this->getCurrentClient($request);
 
         if (empty($currentClient)) {
             return view('myagora.log')->with('log', []);
@@ -430,16 +431,142 @@ class MyAgoraController extends Controller {
 
         if ($service->name === 'Moodle') {
             $dataDir = Util::getAgoraVar(mb_strtolower($service->name) . 'data') .
-                Config::get('app.agora.moodle2.userprefix') . $instance ->db_id;
+                Config::get('app.agora.moodle2.userprefix') . $instance->db_id;
         } else {
             $dataDir = Util::getAgoraVar(mb_strtolower($service->name) . 'data') .
-                Config::get('app.agora.' . mb_strtolower($service->name) . '.userprefix') . $instance ->db_id;
+                Config::get('app.agora.' . mb_strtolower($service->name) . '.userprefix') . $instance->db_id;
         }
 
         $instance->used_quota = Quota::getDiskUsage($dataDir);
         $instance->save();
 
         return redirect()->route('myagora.instances')->with('success', __('file.quota_updated'));
+    }
+
+    private function getCurrentClient(Request $request) {
+        // If the current user is admin, try to get a client code from the URL. Otherwise, get the
+        // current client from the session.
+        if (Access::isAdmin(Auth::user())) {
+            $currentClient = Util::getClientFromUrl($request);
+        }
+
+        if (empty($currentClient)) {
+            $currentClient = Cache::getCurrentClient($request);
+        }
+
+        if (empty($currentClient)) {
+            $data = (new Util())->getSchoolFromWS(Auth::user()['name']);
+
+            if ($data['error'] === 1) {
+                $request->session()->flash('error', $data['message']);
+            }
+
+            return [];
+        }
+
+        return $currentClient;
+    }
+
+    public function changeDNS(Request $request): RedirectResponse {
+
+        $user = Auth::user();
+        if (!(Access::isAdmin($user) || Access::isClient($user) || Access::isManager($user))) {
+            return redirect()->route('myagora.instances')
+                ->with('error', __('myagora.not_enough_permissions'));
+        }
+
+        // Check the client ID
+        $values = $request->validate([
+            'clientId' => 'required|integer',
+        ]);
+        $clientId = $values['clientId'];
+
+        // Check the DNS, current and new.
+        $currentDNS = $request->input('currentDNS');
+        $newDNS = $request->input('newDNS');
+
+        $util = new Util();
+
+        if (!$util->isValidDNS($currentDNS)) {
+            return redirect()->route('myagora.instances')
+                ->with('error', __('myagora.invalid_dns'));
+        }
+
+        if (!$util->isValidDNS($newDNS)) {
+            return redirect()->route('myagora.instances')
+                ->with('error', __('myagora.invalid_dns'));
+        }
+
+        // Get the active instances of the client.
+        $instances = Instance::where('client_id', $clientId)
+            ->where('status', 'active')
+            ->get();
+
+        if ($instances->isEmpty()) {
+            return redirect()->route('myagora.instances')
+                ->with('error', __('client.nompropi_no_active_instances'));
+        }
+
+        // Program the change of DNS by calling the proper function.
+        foreach ($instances as $instance) {
+            if ($instance->service->name === 'Moodle') {
+                $this->changeMoodleDNS($instance, $currentDNS, $newDNS);
+            }
+            if ($instance->service->name === 'Nodes') {
+                $this->changeNodesDNS($instance);
+            }
+        }
+
+        // Remove the client information from the cache to get the dns updated.
+        $request->session()->forget(['currentClient', 'clients']);
+
+        return redirect()->route('myagora.instances')
+            ->with('success', __('client.change_of_nompropi_programmed'));
+
+    }
+
+    private function changeMoodleDNS(Instance $instance, string $currentDNS, string $newDNS): void {
+
+        $currentURL = Util::getInstanceUrl($instance);
+        $currentURL = str_replace(['http://', 'https://'], '://', $currentURL);
+        $newURL = str_replace($currentDNS, $newDNS, $currentURL);
+
+        $params = [
+            'origintext' => $currentURL,
+            'targettext' => $newURL,
+        ];
+
+        ProcessOperation::dispatch([
+            'action' => 'script_replace_database_text',
+            'priority' => 'high',
+            'params' => $params,
+            'service_name' => $instance->service->name,
+            'instance_id' => $instance['id'],
+            'instance_name' => $instance->client->name,
+            'instance_dns' => $instance->client->dns,
+        ]);
+
+    }
+
+    private function changeNodesDNS(Instance $instance): void {
+
+        $currentURL = Util::getInstanceUrl($instance);
+        $currentURL = str_replace(['http://', 'https://'], '://', $currentURL);
+
+        $params = [
+            'origin_url' => $currentURL,
+        ];
+
+        ProcessOperation::dispatch([
+            'action' => 'script_replace_url',
+            'priority' => 'high',
+            'params' => $params,
+            'service_name' => $instance->service->name,
+            'instance_id' => $instance['id'],
+            'instance_name' => $instance->client->name,
+            'instance_dns' => $instance->client->dns,
+        ]);
+
     }
 
 }

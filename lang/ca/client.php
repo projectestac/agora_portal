@@ -27,4 +27,15 @@ return [
     'edit_client' => 'Edició del client',
     'status_active' => 'Actiu',
     'status_inactive' => 'Inactiu',
+    'no_ws' => 'No s\'ha pogut obtenir automàticament la informació del centre. Aquest error no és greu, però si persisteix durant dies, poseu-vos en contacte amb el SAU.',
+    'no_client_in_ws' => 'El codi de centre :code no figura a la base de dades de centres de la XTEC. Poseu-vos en contacte amb el SAU.',
+    'client_has_no_nompropi' => 'El vostre centre no té nom propi. Sense nom propi no es pot demanar l\'alta al servei Agora. Poseu-vos en contacte amb el SAU.',
+    'nompropi_has_changed_1' => 'El nom propi del vostre centre ha canviat, però els serveis d\'Àgora encara utilitzen el nom propi antic. L\'actual és <strong>:currentDNS</strong> i el nom nou és <strong>:newDNS</strong>.',
+    'nompropi_has_changed_2' => 'No cal que feu el canvi de nom propi ara, però si el voleu fer, heu de tenir en compte que pot afectar a alguns enllaços interns, tant en el cas del Moodle com en el del Nodes, i no es pot
+                                 desfer. Un cop fet el canvi, si passats 30 minuts trobeu alguna anomalia, us recomanem que contacteu amb l\'equip d\'Àgora, <a target="_blank" href="https://educaciodigital.cat/">via
+                                 fòrum</a>, per tal que corregeixin els enllaços.',
+    'nompropi_change_confirm_question' => 'Voleu fer aquest canvi ara?',
+    'nompropi_change_confirm_yes' => 'Sí, vull fer el canvi ara',
+    'nompropi_no_active_instances' => 'No hi ha cap servei actiu al qual es pugui fer el canvi de nom propi.',
+    'change_of_nompropi_programmed' => 'El canvi de nom propi s\'ha programat correctament. El canvi es farà efectiu en els serveis actius en pocs minuts.',
 ];
