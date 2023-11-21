@@ -11,4 +11,6 @@ return [
     'request_service' => 'Sol·licita el servei',
     'request_by' => 'Sol·licitud enviada per',
     'contact_profile' => 'Càrrec en el centre',
+    'not_enough_permissions' => 'No teniu permisos per accedir a aquesta pàgina.',
+    'invalid_dns' => 'El nom propi no és vàlid.',
 ];

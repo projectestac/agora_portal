@@ -14,18 +14,18 @@
 
         @include('components.messages')
 
-        <div class="pull-right">
-            {{ $log->links('pagination::bootstrap-4') }}
-        </div>
-
         @if (!empty($log))
+            <div class="pull-right">
+                {{ $log->links('pagination::bootstrap-4') }}
+            </div>
+
             <table class="table table-responsive">
                 <thead>
                 <tr>
                     <th>{{ __('standardlog.action_type') }}</th>
                     <th>{{ __('standardlog.action_description') }}</th>
                     @can('Administrate site')
-                    <th>{{ __('user.user') }}</th>
+                        <th>{{ __('user.user') }}</th>
                     @endcan
                     <th>{{ __('common.date') }}</th>
                 </tr>
@@ -68,7 +68,7 @@
                         </td>
                         <td>{!! stripslashes($log_item['action_description']) !!}</td>
                         @can('Administrate site')
-                        <td>{{ $log_item->user->name }}</td>
+                            <td>{{ $log_item->user->name }}</td>
                         @endcan
                         <td>{{ \Carbon\Carbon::parse($log_item['created_at'])->format('d/m/Y H:i') }}</td>
                     </tr>
