@@ -26,33 +26,14 @@ class Access {
             // Get school data from WS.
             $data = $util->getSchoolFromWS($user['name']);
 
-            // Test data:
-            // $data['error'] = 0;
-            // $data['message'] = 'a8000001$$esc-tramuntana$$Escola Tramuntana$$c. Rosa dels Vents, 8$$Valldevent$$09999';
-
             if ($data['error'] === 1) {
                 $error = $data['message'];
             }
 
             // If client doesn't exist, create it in any case and give it the permissions.
-            if (!$clientExists) {
-                if ($data['error'] === 1) {
-                    // If there is an error, create the client with minimal data.
-                    $client = new Client([
-                        'code' => $user['name'],
-                        'name' => $user['name'],
-                        'dns' => $user['name'],
-                        'location_id' => Location::UNDEFINED,
-                        'type_id' => ClientType::UNDEFINED,
-                        'status' => Client::STATUS_ACTIVE,
-                        'visible' => 'yes',
-                    ]);
-                    $client->save();
-                } else {
-                    // Create the client using the data from WS.
-                    $clientController->createClientFromWS($data['message']);
-                }
-
+            if (!$clientExists && $data['error'] === 0) {
+                // Create the client using the data from WS.
+                $clientController->createClientFromWS($data['message']);
                 $clientController->setClientPermissions($user['name']);
             }
         }
