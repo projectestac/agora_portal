@@ -18,6 +18,7 @@
     <script src="{{ secure_asset('js/bootstrap.min.js') }}"></script>
     @auth()
     <script src="{{ secure_asset('js/jquery.dataTables.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @endauth
 </head>
 
