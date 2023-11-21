@@ -36,6 +36,7 @@ class Cache {
                     'id' => $client->id,
                     'name' => $client->name,
                     'code' => $client->code,
+                    'dns' => $client->dns,
                 ];
             }
 
@@ -44,10 +45,14 @@ class Cache {
 
         if (is_null($clients) && Access::isClient($user)) {
             $client = Client::where('code', $user->name)->first();
+            if (is_null($client)) {
+                return [];
+            }
             $clients[] = [
                 'id' => $client->id,
                 'name' => $client->name,
                 'code' => $client->code,
+                'dns' => $client->dns,
             ];
 
             $request->session()->put('clients', $clients);
