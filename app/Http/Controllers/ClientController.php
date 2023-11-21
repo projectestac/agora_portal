@@ -138,7 +138,7 @@ class ClientController extends Controller {
             $locations = Location::all()->sortBy('name');
             $clientTypes = ClientType::all()->sortBy('name');
 
-            return redirect()->route('clients.update')
+            return redirect()->route('clients.index')
                 ->with('client', $client)
                 ->with('locations', $locations)
                 ->with('client_types', $clientTypes)
