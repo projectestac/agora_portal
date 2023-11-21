@@ -86,6 +86,7 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site|Manage own 
     Route::get('/myagora/requests', [MyAgoraController::class, 'requests'])->name('myagora.requests');
     Route::get('/myagora/managers', [MyAgoraController::class, 'managers'])->name('myagora.managers');
     Route::get('/myagora/logs', [MyAgoraController::class, 'logs'])->name('myagora.logs');
+    Route::post('/myagora/changedns', [MyAgoraController::class, 'changeDNS'])->name('myagora.changedns');
 });
 
 // AJAX routes
