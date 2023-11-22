@@ -3,11 +3,8 @@
 namespace App\Helpers;
 
 use App\Models\Client;
-use App\Models\Instance;
-use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
 
 /**
  * The Laravel session will be used as a cache to store several data.
