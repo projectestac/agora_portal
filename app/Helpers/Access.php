@@ -3,9 +3,6 @@
 namespace App\Helpers;
 
 use App\Http\Controllers\ClientController;
-use App\Models\Client;
-use App\Models\ClientType;
-use App\Models\Location;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -30,7 +27,7 @@ class Access {
                 $error = $data['message'];
             }
 
-            // If client doesn't exist, create it in any case and give it the permissions.
+            // If client is present in WS but doesn't exist in clients table, create it and give it the permissions.
             if (!$clientExists && $data['error'] === 0) {
                 // Create the client using the data from WS.
                 $clientController->createClientFromWS($data['message']);
