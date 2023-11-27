@@ -35,4 +35,9 @@ return [
     'requested_instance' => 'L\'usuari :user ha sol·licitat l\'alta del servei :service per al centre :client',
     'actived_instance' => 'S\'ha activat el servei :service del centre :client. La contrasenya de l\'usuari admin és :password',
     'status_changed' => 'S\'ha canviat l\'estat de la instància de :old_status a :new_status',
+    'client_id_required' => 'El camp d\'ID del client és obligatori.',
+    'service_id_required' => 'El camp d\'ID del servei és obligatori.',
+    'model_type_id_required' => 'Seleccioneu una maqueta.',
+    'contact_profile_required' => 'Indiqueu el vostre càrrec al centre.',
+    'only_managers_can_create_instances' => 'Només poden sol·licitar l\'alta els gestors.',
 ];

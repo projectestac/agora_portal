@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Access;
 use App\Helpers\Cache;
 use App\Helpers\Util;
+use App\Http\Requests\StoreInstanceRequest;
 use App\Http\Requests\UpdateInstanceRequest;
 use App\Jobs\ProcessOperation;
 use App\Mail\UpdateInstance;
@@ -40,9 +42,16 @@ class InstanceController extends Controller {
     }
 
     public function create(Request $request): View {
-        $service_id = $request->input('service_id');
 
+        $service_id = $request->input('service_id');
         $service = Service::find($service_id)->toArray();
+
+        if (!(Access::isAdmin(Auth::user()) || Access::isManager(Auth::user()))) {
+            return view('myagora.instance_create')
+                ->with('service', $service)
+                ->with('error', __('instance.only_managers_can_create_instances'));
+        }
+
         $models = ModelType::where('service_id', $service_id)->get()->toArray();
         $username = Auth::user()->name;
         $currentClient = Cache::getCurrentClient($request);
@@ -52,9 +61,10 @@ class InstanceController extends Controller {
             ->with('models', $models)
             ->with('username', $username)
             ->with('client_id', $currentClient['id']);
+
     }
 
-    public function store(Request $request): RedirectResponse {
+    public function store(StoreInstanceRequest $request): RedirectResponse {
         $clientId = $request->input('client_id');
         $serviceId = $request->input('service_id');
         $quota = Service::find($serviceId)->quota;
