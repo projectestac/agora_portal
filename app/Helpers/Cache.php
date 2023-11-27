@@ -12,13 +12,11 @@ use Illuminate\Support\Facades\Auth;
 class Cache {
 
     public static function getClients(Request $request): mixed {
-        $clients = $request->session()->get('clients');
 
         $user = Auth::user();
 
         // If the clients are not in the session, get them from the database.
-        if (is_null($clients) && Access::isManager($user)) {
-
+        if (Access::isManager($user)) {
             // Get a record for each client where the user is a manager.
             $managers = $user->manager->all();
 
@@ -36,26 +34,24 @@ class Cache {
                     'dns' => $client->dns,
                 ];
             }
-
-            $request->session()->put('clients', $clients);
         }
 
-        if (is_null($clients) && Access::isClient($user)) {
+        if (!isset($clients) && Access::isClient($user)) {
             $client = Client::where('code', $user->name)->first();
+
             if (is_null($client)) {
                 return [];
             }
+
             $clients[] = [
                 'id' => $client->id,
                 'name' => $client->name,
                 'code' => $client->code,
                 'dns' => $client->dns,
             ];
-
-            $request->session()->put('clients', $clients);
         }
 
-        return is_null($clients) ? [] : $clients;
+        return $clients ?? [];
     }
 
     public static function getCurrentClient(Request $request) {
