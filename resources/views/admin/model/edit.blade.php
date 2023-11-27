@@ -20,14 +20,14 @@
                     <input type="hidden" id="model_id" name="model_id" value="{{ $modelType->id }}"/>
 
                     <div class="form-group">
-                        <label class="col-sm-4 control-label clear">{{ __('common.description') }}</label>
+                        <label class="col-sm-4 control-label clear" for="description">{{ __('common.description') }}</label>
                         <div class="col-sm-8">
                             <input type="text" class="form-control" id="description" name="description" value="{{ $modelType->description }}">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-4 control-label clear">URL</label>
+                        <label class="col-sm-4 control-label clear" for="url">{{ __('service.url') }}</label>
                         <div class="col-sm-8">
                             <input type="text" class="form-control" id="url" name="url" value="{{ $modelType->url }}">
                         </div>

@@ -3,12 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreModelTypeRequest;
-use App\Http\Requests\UpdateModelTypeRequest;
 use App\Models\ModelType;
-use Illuminate\Contracts\Foundation\Application as ApplicationContract;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
-use Illuminate\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class ModelTypeController extends Controller {
@@ -21,10 +18,6 @@ class ModelTypeController extends Controller {
         return view('admin.model.index')
             ->with('modelTypes', $modelTypes);
     }
-
-    // public function index(): View|Application|Factory|ApplicationContract  {
-    //     return view('admin.model.index');
-    // }
 
     /**
      * Show the form for creating a new resource.
@@ -58,17 +51,17 @@ class ModelTypeController extends Controller {
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id): RedirectResponse {
         $validatedData = $request->validate([
             'description' => 'required|string',
-            'url' => 'required|url'
+            'url' => 'required|url',
         ]);
 
         $modelType = ModelType::findOrFail($id);
 
         $modelType->update([
             'description' => $validatedData['description'],
-            'url' => $validatedData['url']
+            'url' => $validatedData['url'],
         ]);
 
         return redirect()->route('models.index')->with('success', __('request.request_created'));
@@ -77,8 +70,7 @@ class ModelTypeController extends Controller {
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
-    {
+    public function destroy($id): RedirectResponse {
         $modelType = ModelType::findOrFail($id);
         $modelType->delete();
 

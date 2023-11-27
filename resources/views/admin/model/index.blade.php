@@ -18,7 +18,7 @@
                 <thead>
                 <tr>
                     <th>{{ __('common.description') }}</th>
-                    <th>URL</th>
+                    <th>{{ __('service.url') }}</th>
                     <th>{{ __('common.created_at') }}</th>
                     <th>{{ __('common.updated_at') }}</th>
                     <th>{{ __('common.actions') }}</th>
@@ -34,7 +34,9 @@
                             <td>{{ \Carbon\Carbon::parse($modelType->created_at)->format('d/m/Y H:i') }}</td>
                             <td>{{ \Carbon\Carbon::parse($modelType->updated_at)->format('d/m/Y H:i') }}</td>
                             <td>
-                                <a href="{{ route('models.edit', $modelType->id) }}" class="btn btn-primary">{{ __('common.edit') }}</a>
+                                <a href="{{ route('models.edit', $modelType->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
+                                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                                </a>
 
                                 {{-- <form action="{{ route('models.destroy', $modelType->id) }}" method="POST" style="display:inline;">
                                     @csrf
