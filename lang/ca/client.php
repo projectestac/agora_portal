@@ -38,4 +38,5 @@ return [
     'nompropi_change_confirm_yes' => 'Sí, vull fer el canvi ara',
     'nompropi_no_active_instances' => 'No hi ha cap servei actiu al qual es pugui fer el canvi de nom propi.',
     'change_of_nompropi_programmed' => 'El canvi de nom propi s\'ha programat correctament. El canvi es farà efectiu en els serveis actius en pocs minuts.',
+    'nompropi_not_updated' => 'No s\'ha pogut actualitzar el nom propi del centre.',
 ];

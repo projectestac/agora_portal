@@ -54,7 +54,7 @@
                 <div class="alert alert-warning">{{ __('myagora.no_instances') }}</div>
             @endif
 
-            @if (!empty($availableServices) && empty($error))
+            @if (!empty($availableServices))
                 <div class="panel panel-default">
                     <div class="panel-heading row-fluid clearfix">
                         {{ __('myagora.other_services_available') }}
@@ -76,7 +76,7 @@
                 </div>
             @endif
 
-            @if(!$instances->isEmpty() && !empty($newDNS) && ($newDNS !== $currentDNS))
+            @if(!empty($newDNS) && ($newDNS !== $currentDNS) && !$instances->isEmpty())
                 <div class="alert alert-info">
                     <form action="{{ route('myagora.changedns') }}" method="post">
                         @csrf

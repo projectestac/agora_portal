@@ -497,6 +497,15 @@ class MyAgoraController extends Controller {
                 ->with('error', __('myagora.invalid_dns'));
         }
 
+        $clientUpdated = Client::where('id', $clientId)
+            ->update(['dns' => $newDNS, 'old_dns' => $currentDNS]);
+
+        // Edit the client in the database. Move dns to old_dns and set the new dns.
+        if ($clientUpdated === 0) {
+            return redirect()->route('myagora.instances')
+                ->with('error', __('client.nompropi_not_updated'));
+        }
+
         // Get the active instances of the client.
         $instances = Instance::where('client_id', $clientId)
             ->where('status', 'active')
@@ -507,39 +516,38 @@ class MyAgoraController extends Controller {
                 ->with('error', __('client.nompropi_no_active_instances'));
         }
 
-        // Program the change of DNS by calling the proper function.
+        // Program the change of DNS by calling the proper function. Because the 'nom propi' is already changed in
+        // the client's table, the program functions need only the current 'nom propi', which is, in fact, the old one.
         foreach ($instances as $instance) {
             if ($instance->service->name === 'Moodle') {
-                $this->changeMoodleDNS($instance, $currentDNS, $newDNS);
+                $this->programChangeMoodleDNS($instance, $currentDNS);
             }
             if ($instance->service->name === 'Nodes') {
-                $this->changeNodesDNS($instance);
+                $this->programChangeNodesDNS($instance, $currentDNS);
             }
         }
 
         // Remove the client information from the cache to get the dns updated.
-        $request->session()->forget(['currentClient', 'clients']);
+        $request->session()->forget('currentClient');
 
         return redirect()->route('myagora.instances')
             ->with('success', __('client.change_of_nompropi_programmed'));
 
     }
 
-    private function changeMoodleDNS(Instance $instance, string $currentDNS, string $newDNS): void {
+    private function programChangeMoodleDNS(Instance $instance, string $currentDNS): void {
 
-        $currentURL = Util::getInstanceUrl($instance);
-        $currentURL = str_replace(['http://', 'https://'], '://', $currentURL);
-        $newURL = str_replace($currentDNS, $newDNS, $currentURL);
-
-        $params = [
-            'origintext' => $currentURL,
-            'targettext' => $newURL,
-        ];
+        $newURL = Util::getInstanceUrl($instance);
+        $newURL = str_replace(['http://', 'https://'], '://', $newURL);
+        $currentURL = str_replace($instance->client->dns, $currentDNS, $newURL);
 
         ProcessOperation::dispatch([
             'action' => 'script_replace_database_text',
             'priority' => 'high',
-            'params' => $params,
+            'params' => [
+                'origintext' => $currentURL,
+                'targettext' => $newURL,
+            ],
             'service_name' => $instance->service->name,
             'instance_id' => $instance['id'],
             'instance_name' => $instance->client->name,
@@ -548,19 +556,18 @@ class MyAgoraController extends Controller {
 
     }
 
-    private function changeNodesDNS(Instance $instance): void {
+    private function programChangeNodesDNS(Instance $instance, string $currentDNS): void {
 
-        $currentURL = Util::getInstanceUrl($instance);
-        $currentURL = str_replace(['http://', 'https://'], '://', $currentURL);
-
-        $params = [
-            'origin_url' => $currentURL,
-        ];
+        $newURL = Util::getInstanceUrl($instance);
+        $newURL = str_replace(['http://', 'https://'], '://', $newURL);
+        $currentURL = str_replace($instance->client->dns, $currentDNS, $newURL);
 
         ProcessOperation::dispatch([
             'action' => 'script_replace_url',
             'priority' => 'high',
-            'params' => $params,
+            'params' => [
+                'origin_url' => $currentURL,
+            ],
             'service_name' => $instance->service->name,
             'instance_id' => $instance['id'],
             'instance_name' => $instance->client->name,
