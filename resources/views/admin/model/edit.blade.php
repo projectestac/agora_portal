@@ -23,6 +23,10 @@
                         <label class="col-sm-4 control-label clear" for="description">{{ __('common.description') }}</label>
                         <div class="col-sm-8">
                             <input type="text" class="form-control" id="description" name="description" value="{{ $modelType->description }}">
+
+                            @error('description')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
 
@@ -30,6 +34,10 @@
                         <label class="col-sm-4 control-label clear" for="url">{{ __('service.url') }}</label>
                         <div class="col-sm-8">
                             <input type="text" class="form-control" id="url" name="url" value="{{ $modelType->url }}">
+
+                            @error('url')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
 
@@ -43,7 +51,5 @@
         </div>
 
     </div>
-
-    @include('error-popup')
 
 @endsection
