@@ -34,11 +34,11 @@
                             <td>{{ \Carbon\Carbon::parse($modelType->created_at)->format('d/m/Y H:i') }}</td>
                             <td>{{ \Carbon\Carbon::parse($modelType->updated_at)->format('d/m/Y H:i') }}</td>
                             <td>
-                                <a href="{{ route('models.edit', $modelType->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
+                                <a href="{{ route('model-types.edit', $modelType->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
                                     <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                                 </a>
 
-                                {{-- <form action="{{ route('models.destroy', $modelType->id) }}" method="POST" style="display:inline;">
+                                {{-- <form action="{{ route('model-types.destroy', $modelType->id) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" onclick="return confirm('{{ __('common.confirm_deletion') }}')">{{ __('common.delete') }}</button>

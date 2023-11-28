@@ -13,7 +13,7 @@
 
         <div class="panel panel-default">
             <div class="panel-body">
-                <form class="form-horizontal" action="{{ route('models.update', $modelType->id) }}" method="POST">
+                <form class="form-horizontal" action="{{ route('model-types.update', $modelType->id) }}" method="POST">
                     @csrf
                     @method('PUT')
 

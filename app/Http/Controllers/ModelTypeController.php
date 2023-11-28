@@ -15,7 +15,7 @@ class ModelTypeController extends Controller {
     public function index(): View {
         $modelTypes = ModelType::get();
 
-        return view('admin.model.index')
+        return view('admin.model-type.index')
             ->with('modelTypes', $modelTypes);
     }
 
@@ -45,7 +45,7 @@ class ModelTypeController extends Controller {
      */
     public function edit($id): View {
         $modelType = ModelType::findOrFail($id);
-        return view('admin.model.edit')->with('modelType', $modelType); // we send the model type to the view
+        return view('admin.model-type.edit')->with('modelType', $modelType); // we send the model type to the view
     }
 
     /**
@@ -64,7 +64,7 @@ class ModelTypeController extends Controller {
             'url' => $validatedData['url'],
         ]);
 
-        return redirect()->route('models.index')->with('success', __('request.request_created'));
+        return redirect()->route('model-types.index')->with('success', __('request.request_created'));
     }
 
     /**
@@ -74,6 +74,6 @@ class ModelTypeController extends Controller {
         $modelType = ModelType::findOrFail($id);
         $modelType->delete();
 
-        return redirect()->route('models.index')->with('success', __('common.deletion_success'));
+        return redirect()->route('model-types.index')->with('success', __('common.deletion_success'));
     }
 }
