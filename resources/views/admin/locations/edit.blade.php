@@ -20,6 +20,10 @@
                         <label class="col-sm-4 control-label clear">{{ __('common.name') }}</label>
                         <div class="col-sm-8">
                             <input type="text" class="form-control" id="name" name="name" value="{{ $location->name }}">
+
+                            @error('name')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
 
@@ -33,7 +37,5 @@
         </div>
 
     </div>
-
-    @include('error-popup')
 
 @endsection

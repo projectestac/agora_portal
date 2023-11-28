@@ -32,13 +32,13 @@
                         <td>{{ \Carbon\Carbon::parse($location->updated_at)->format('d/m/Y H:i') }}</td>
                         <td>
                             <a href="{{ route('locations.edit', $location->id) }}"
-                               class="btn btn-primary">{{ __('common.edit') }}</a>
+                               class="btn btn-primary"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>
 
                                <form action="{{ route('locations.destroy', $location->id) }}" method="POST"
                                 style="display: inline">
                               @csrf
                               @method('DELETE')
-                              <button type="submit" class="btn btn-danger">{{ __('common.delete') }}</button>
+                              <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
                           </form>
                         </td>
                     </tr>
