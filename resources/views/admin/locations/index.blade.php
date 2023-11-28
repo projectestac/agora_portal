@@ -34,12 +34,11 @@
                             <a href="{{ route('locations.edit', $location->id) }}"
                                class="btn btn-primary"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></a>
 
-                               <form action="{{ route('locations.destroy', $location->id) }}" method="POST"
-                                style="display: inline">
-                              @csrf
-                              @method('DELETE')
-                              <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
-                          </form>
+                               <form action="{{ route('locations.destroy', $location->id) }}"  onsubmit="return confirm('{{ __('common.confirm_deletion') }}')" method="POST" style="display: inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+                               </form>
                         </td>
                     </tr>
                 @endforeach
