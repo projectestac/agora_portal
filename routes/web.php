@@ -60,6 +60,11 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::resource('/users', UserController::class);
     Route::resource('/roles', RoleController::class);
 
+    // Maquetes
+    Route::resource('/config/models', ModelTypeController::class);
+    // Serveis territorials
+    Route::resource('/config/locations', LocationController::class);
+
     Route::get('/batch', [BatchController::class, 'batch'])->name('batch');
     Route::get('/batch/query', [BatchController::class, 'query'])->name('batch.query');
     Route::post('/batch/query/confirm', [QueryController::class, 'confirmQuery'])->name('batch.query.confirm');

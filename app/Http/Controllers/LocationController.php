@@ -6,9 +6,14 @@ use App\Http\Requests\StoreLocationRequest;
 use App\Http\Requests\UpdateLocationRequest;
 use App\Models\Location;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 
 class LocationController extends Controller
 {
+    public function __construct() {
+        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -25,15 +30,30 @@ class LocationController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.locations.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreLocationRequest $request)
+    public function store(StoreLocationRequest $request): RedirectResponse
     {
-        //
+        $name = $request->input('name');
+
+        $location = new Location([
+            'name' => $name
+        ]);
+
+        try {
+            $location->save();
+        } catch (\Exception $e) {
+
+            return redirect()->route('locations.create')
+                ->withErrors(['error' => $e->getMessage()]);
+        }
+
+        return redirect()->route('locations.index')
+            ->with('success', __('location.created_location_short'));
     }
 
     /**

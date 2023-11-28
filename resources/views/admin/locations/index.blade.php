@@ -8,6 +8,12 @@
     <div class="content service">
         <p class="h3">{{ __('locations.locations') }}</p>
 
+        <div class="row">
+            <div class="col-md-6">
+                <a href="{{ route('locations.create') }}" class="btn btn-primary">{{ __('locations.new_location') }}</a>
+            </div>
+        </div>
+
         @if (!empty($locations))
             <table class="table table-striped">
                 <thead>
