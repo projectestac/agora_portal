@@ -19,6 +19,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\DirectoryController;
 use App\Mail\UpdateRequest;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
@@ -83,6 +84,7 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::delete('/batch/queue/{id}', [QueueController::class, 'destroy'])->name('queue.destroy');
     Route::get('/batch/instance/create', [BatchController::class, 'instanceCreate'])->name('batch.instance.create');
     Route::post('/batch/instance', [BatchController::class, 'instanceStore'])->name('batch.instance.store');
+    Route::get('/files/{path?}', [DirectoryController::class, 'index'])->name('files.index');
 
     Route::get('/config', [ConfigController::class, 'edit'])->name('config.edit');
     Route::put('/config', [ConfigController::class, 'update'])->name('config.update');
