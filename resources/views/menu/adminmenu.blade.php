@@ -27,7 +27,7 @@
             </a>
         </li>
         <li>
-            <a href="{{ route('home') }}" @if (str_contains(request()->url(), 'files')) class="selected" @endif>
+            <a href="{{ route('files.index') }}" @if (str_contains(request()->url(), 'files')) class="selected" @endif>
                 {{ __('common.files') }}
             </a>
         </li>
