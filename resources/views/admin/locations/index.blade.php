@@ -18,6 +18,7 @@
             <table class="table table-striped">
                 <thead>
                 <tr>
+                    <th>{{ __('common.id') }}</th>
                     <th>{{ __('service.name') }}</th>
                     <th>{{ __('common.created_at') }}</th>
                     <th>{{ __('common.updated_at') }}</th>
@@ -27,6 +28,7 @@
                 <tbody>
                 @foreach ($locations as $location)
                     <tr>
+                        <td>{{ $location->id }}</td>
                         <td>{{ $location->name }}</td>
                         <td>{{ \Carbon\Carbon::parse($location->created_at)->format('d/m/Y H:i') }}</td>
                         <td>{{ \Carbon\Carbon::parse($location->updated_at)->format('d/m/Y H:i') }}</td>
