@@ -25,7 +25,9 @@
                 <tr>
                     <th>{{ __('model.service') }}</th>
                     <th>{{ __('common.description') }}</th>
+                    <th>{{ __('common.short_code') }}</th>
                     <th>{{ __('service.url') }}</th>
+                    <th>{{ __('common.database') }}</th>
                     <th>{{ __('common.created_at') }}</th>
                     <th>{{ __('common.updated_at') }}</th>
                     <th>{{ __('common.actions') }}</th>
@@ -36,9 +38,11 @@
                     @foreach ($modelTypes as $modelType)
 
                         <tr>
-                            <td>{{ $modelType->service_id }}</td>
+                            <td><img src="https://agora-aws.xtec.cat/portal/images/{{ $modelType->service_id == 4 ? "moodle" : "nodes" }}.gif"></td>
                             <td>{{ $modelType->description }}</td>
+                            <td>{{ $modelType->short_code }}</td>
                             <td><a href="{{ $modelType->url }}" target="_blank">{{ $modelType->url }}</a></td>
+                            <td>{{ $modelType->db }}</td>
                             <td>{{ \Carbon\Carbon::parse($modelType->created_at)->format('d/m/Y H:i') }}</td>
                             <td>{{ \Carbon\Carbon::parse($modelType->updated_at)->format('d/m/Y H:i') }}</td>
                             <td>

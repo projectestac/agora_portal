@@ -48,11 +48,33 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="col-sm-4 control-label clear" for="short_code">{{ __('common.short_code') }}</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="short_code" name="short_code" value="{{ $modelType->short_code }}">
+
+                            @error('short_code')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label class="col-sm-4 control-label clear" for="url">{{ __('service.url') }}</label>
                         <div class="col-sm-8">
                             <input type="text" class="form-control" id="url" name="url" value="{{ $modelType->url }}">
 
                             @error('url')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label clear" for="db">{{ __('common.database') }}</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="db" name="db" value="{{ $modelType->db }}">
+
+                            @error('db')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>

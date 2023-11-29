@@ -37,14 +37,16 @@ class ModelTypeController extends Controller {
     {
         $service_id = $request->input('service_id');
         $description = $request->input('description');
+        $short_code = $request->input('short_code');
         $url = $request->input('url');
+        $db = $request->input('db');
 
         $modelType = new ModelType([
-            'short_code' => 'xxx', // TO BE CHANGED
             'service_id' => $service_id,
             'description' => $description,
+            'short_code' => $short_code,
             'url' => $url,
-            'db' => 'usu1000' // TO BE CHANGED
+            'db' => $db
         ]);
 
         try {
@@ -85,7 +87,9 @@ class ModelTypeController extends Controller {
         $validatedData = $request->validate([
             'service_id' => 'required|int',
             'description' => 'required|string',
+            'short_code' => 'required|string',
             'url' => 'required|url',
+            'db' => 'required|string',
         ]);
 
         $modelType = ModelType::findOrFail($id);
@@ -93,7 +97,9 @@ class ModelTypeController extends Controller {
         $modelType->update([
             'service_id' => $validatedData['service_id'],
             'description' => $validatedData['description'],
+            'short_code' => $validatedData['short_code'],
             'url' => $validatedData['url'],
+            'db' => $validatedData['db'],
         ]);
 
         return redirect()->route('model-types.index')->with('success', __('request.request_created'));

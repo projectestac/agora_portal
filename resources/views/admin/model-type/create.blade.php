@@ -34,9 +34,23 @@
             </div>
 
             <div class="form-group">
+                <label class="col-sm-4 control-label clear" for="short_code">{{ __('common.short_code') }}</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="short_code" name="short_code" value="{{ old('short_code') }}">
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label class="col-sm-4 control-label clear" for="url">{{ __('common.url') }}</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" id="url" name="url" value="{{ old('url') }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-4 control-label clear" for="db">{{ __('common.database') }}</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="db" name="db" value="{{ old('db') }}">
                 </div>
             </div>
 
