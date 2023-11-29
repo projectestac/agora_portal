@@ -41,6 +41,7 @@ class ConfigController extends Controller {
             'max_file_size_for_large_upload' => $request->input('max_file_size_for_large_upload'),
             'nodes_create_db' => ($request->input('nodes_create_db') === 'on') ? 1 : 0,
             'min_db_id' => $request->input('min_db_id'),
+            'file_extensions_allowed' => $request->input('file_extensions'),
         ];
 
         // Encrypt password if needed.
