@@ -23,14 +23,35 @@ class ModelTypeController extends Controller {
      * Show the form for creating a new resource.
      */
     public function create() {
-        //
+        return view('admin.model-type.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreModelTypeRequest $request) {
-        //
+    public function store(StoreModelTypeRequest $request): RedirectResponse
+    {
+        $description = $request->input('description');
+        $url = $request->input('url');
+
+        $modelType = new ModelType([
+            'short_code' => 'xxx', // TO BE CHANGED
+            'service_id' => 4, // TO BE CHANGED
+            'description' => $description,
+            'url' => $url,
+            'db' => 'usu1000' // TO BE CHANGED
+        ]);
+
+        try {
+            $modelType->save();
+        } catch (\Exception $e) {
+
+            return redirect()->route('model-types.create')
+                ->withErrors(['error' => $e->getMessage()]);
+        }
+
+        return redirect()->route('model-types.index')
+            ->with('success', __('model.created_model_short'));
     }
 
     /**

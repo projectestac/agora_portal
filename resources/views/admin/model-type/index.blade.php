@@ -10,6 +10,12 @@
 
         <p class="h3">{{ __('model.models') }}</p>
 
+        <div class="row">
+            <div class="col-md-6">
+                <a href="{{ route('model-types.create') }}" class="btn btn-primary">{{ __('model.new_model') }}</a>
+            </div>
+        </div>
+
         {{-- $modelTypes is defined when returning the view in ModelTypeController.php --}}
 
         @if (!empty($modelTypes))

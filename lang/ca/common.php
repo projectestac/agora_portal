@@ -33,6 +33,7 @@ return [
     'database' => 'Base de dades',
     'choose_an_option' => 'Tria una opció',
     'description' => 'Descripció',
+    'url' => 'URL',
     'params' => 'Paràmetres',
     'continue' => 'Continua',
     'files' => 'Fitxers',
