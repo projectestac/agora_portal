@@ -14,6 +14,19 @@
             @csrf
 
             <div class="form-group">
+                <label class="col-sm-4 control-label clear" for="service_id">{{ __('model.service') }}</label>
+                <div class="col-sm-8">
+                    <select class="form-control" id="service_id" name="service_id">
+                        @foreach($services as $service)
+                            <option value="{{ $service->id }}" {{ (int)old('service') === $service->id ? 'selected' : '' }}>
+                                {{ $service->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label class="col-sm-4 control-label clear" for="description">{{ __('common.description') }}</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" id="description" name="description" value="{{ old('description') }}">

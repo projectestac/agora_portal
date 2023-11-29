@@ -23,6 +23,7 @@
             <table class="table table-striped">
                 <thead>
                 <tr>
+                    <th>{{ __('model.service') }}</th>
                     <th>{{ __('common.description') }}</th>
                     <th>{{ __('service.url') }}</th>
                     <th>{{ __('common.created_at') }}</th>
@@ -35,6 +36,7 @@
                     @foreach ($modelTypes as $modelType)
 
                         <tr>
+                            <td>{{ $modelType->service_id }}</td>
                             <td>{{ $modelType->description }}</td>
                             <td><a href="{{ $modelType->url }}" target="_blank">{{ $modelType->url }}</a></td>
                             <td>{{ \Carbon\Carbon::parse($modelType->created_at)->format('d/m/Y H:i') }}</td>
