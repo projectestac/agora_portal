@@ -111,6 +111,13 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="col-sm-4 control-label clear" for="file_extensions">{{ __('config.file_extensions_allowed') }}</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="file_extensions" name="file_extensions" value="{{ $config['file_extensions_allowed'] }}">
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <div class="text-center">
                         <button type="submit" class="btn btn-success">{{ __('common.save') }}</button>
                     </div>

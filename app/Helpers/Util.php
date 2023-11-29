@@ -123,6 +123,30 @@ class Util {
     }
 
     /**
+     * Convert a file size string to bytes.
+     *
+     * @param string $sizeString String representing the file size, e.g., "2M" or "512K".
+     * @return int Size of the file in bytes.
+     */
+    public static function convertToBytes(string $sizeString): int {
+        // Convert the string to uppercase to handle file size units in either case.
+        $sizeString = strtoupper($sizeString);
+
+        // Define units and their corresponding exponents.
+        $units = ['B' => 0, 'K' => 1, 'M' => 2, 'G' => 3, 'T' => 4, 'P' => 5, 'E' => 6];
+
+        // Use a regular expression to separate the numeric part and the unit.
+        preg_match('/^(\d+)([BKMGTEP]?)$/', $sizeString, $matches);
+
+        // Get the size and unit.
+        $size = (int)$matches[1];
+        $unit = $matches[2] ?? 'B';
+
+        // Calculate and return the size in bytes.
+        return $size * (1024 ** $units[$unit]);
+    }
+
+    /**
      * Function to convert a number representing a disk size in bytes to a human-readable format.
      *
      * @param int $bytes
