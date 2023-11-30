@@ -8,7 +8,8 @@ use App\Models\ClientType;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 
-class ClientTypeController extends Controller {
+class ClientTypeController extends Controller
+{
     /**
      * Display a listing of the resource.
      */
@@ -50,7 +51,8 @@ class ClientTypeController extends Controller {
     /**
      * Display the specified resource.
      */
-    public function show(ClientType $clientType) {
+    public function show(ClientType $clientType)
+    {
         //
     }
 
@@ -65,14 +67,19 @@ class ClientTypeController extends Controller {
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateClientTypeRequest $request, ClientType $clientType): RedirectResponse {
-        $clientType->update([
-            'name' => $request->input(['name']),
+    public function update(Request $request, $id)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string'
         ]);
 
-        return redirect()
-            ->route('client-types.index')
-            ->with('success', __('client-type.client_type_updated'));
+        $clientType = ClientType::findOrFail($id);
+
+        $clientType->update([
+            'name' => $validatedData['name']
+        ]);
+
+        return redirect()->route('client-types.index')->with('success', __('request.request_created'));
     }
 
     /**
