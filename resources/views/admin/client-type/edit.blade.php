@@ -22,6 +22,10 @@
                         <label class="col-sm-4 control-label clear" for="name">{{ __('client-type.name') }}</label>
                         <div class="col-sm-8">
                             <input type="text" class="form-control" id="name" name="name" value="{{ $clientType->name }}">
+
+                            @error('name')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
 
