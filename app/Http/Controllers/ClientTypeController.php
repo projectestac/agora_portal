@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreClientTypeRequest;
 use App\Http\Requests\UpdateClientTypeRequest;
 use App\Models\ClientType;
+use Illuminate\Http\Request;
 
 class ClientTypeController extends Controller
 {
@@ -13,7 +14,10 @@ class ClientTypeController extends Controller
      */
     public function index()
     {
-        //
+        $clientTypes = ClientType::get();
+
+        return view('admin.client-type.index')
+            ->with('clientTypes', $clientTypes);
     }
 
     /**
@@ -43,17 +47,30 @@ class ClientTypeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ClientType $clientType)
+    public function edit($id)
     {
-        //
+        $clientType = ClientType::findOrFail($id);
+
+        return view('admin.client-type.edit')
+                ->with('clientType', $clientType);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateClientTypeRequest $request, ClientType $clientType)
+    public function update(Request $request, $id)
     {
-        //
+        $validatedData = $request->validate([
+            'name' => 'required|string'
+        ]);
+
+        $clientType = ClientType::findOrFail($id);
+
+        $clientType->update([
+            'name' => $validatedData['name']
+        ]);
+
+        return redirect()->route('client-types.index')->with('success', __('request.request_created'));
     }
 
     /**
