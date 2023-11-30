@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateClientTypeRequest;
 use App\Models\ClientType;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class ClientTypeController extends Controller
 {
@@ -24,23 +25,25 @@ class ClientTypeController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): View {
+    public function create()
+    {
         return view('admin.client-type.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreClientTypeRequest $request): RedirectResponse {
+    public function store(StoreClientTypeRequest $request): RedirectResponse
+    {
         $name = $request->input('name');
-
         $clientType = new ClientType([
-            'name' => $name,
+            'name' => $name
         ]);
 
         try {
             $clientType->save();
         } catch (\Exception $e) {
+
             return redirect()->route('client-types.create')
                 ->withErrors(['error' => $e->getMessage()]);
         }
