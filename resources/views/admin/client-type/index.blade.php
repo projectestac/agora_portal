@@ -8,6 +8,12 @@
     <div class="content client-type">
         <p class="h3">{{ __('client-type.client_types') }}</p>
 
+        <div class="row">
+            <div class="col-md-6">
+                <a href="{{ route('client-types.create') }}" class="btn btn-primary">{{ __('client-type.client_type_new') }}</a>
+            </div>
+        </div>
+
         @if (!empty($clientTypes))
 
             <table class="table table-striped">

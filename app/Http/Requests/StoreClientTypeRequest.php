@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\Access;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreClientTypeRequest extends FormRequest
@@ -11,7 +12,7 @@ class StoreClientTypeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return Access::isAdmin($this->user());
     }
 
     /**
@@ -22,7 +23,11 @@ class StoreClientTypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => [
+                'required',
+                'string',
+                ':max:255',
+            ]
         ];
     }
 }

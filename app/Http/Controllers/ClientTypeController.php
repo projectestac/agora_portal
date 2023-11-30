@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreClientTypeRequest;
 use App\Http\Requests\UpdateClientTypeRequest;
 use App\Models\ClientType;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class ClientTypeController extends Controller
@@ -25,15 +26,29 @@ class ClientTypeController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.client-type.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreClientTypeRequest $request)
+    public function store(StoreClientTypeRequest $request): RedirectResponse
     {
-        //
+        $name = $request->input('name');
+        $clientType = new ClientType([
+            'name' => $name
+        ]);
+
+        try {
+            $clientType->save();
+        } catch (\Exception $e) {
+
+            return redirect()->route('client-types.create')
+                ->withErrors(['error' => $e->getMessage()]);
+        }
+
+        return redirect()->route('client-types.index')
+            ->with('success', __('client-type.created_client_type_short'));
     }
 
     /**
