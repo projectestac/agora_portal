@@ -91,8 +91,11 @@ class ClientTypeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ClientType $clientType)
+    public function destroy($id)
     {
-        //
+        $clientType = ClientType::findOrFail($id);
+        $clientType->delete();
+
+        return redirect()->route('client-types.index')->with('success', __('common.deletion_success'));
     }
 }

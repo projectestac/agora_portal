@@ -39,6 +39,12 @@
                                 <a href="{{ route('client-types.edit', $clientType->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
                                     <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                                 </a>
+
+                                <form action="{{ route('client-types.destroy', $clientType->id) }}" onsubmit="return confirm('{{ __('common.confirm_deletion') }}')" method="POST" style="display: inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+                              </form>
                             </td>
                         </tr>
 
