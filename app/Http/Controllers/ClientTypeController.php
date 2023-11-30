@@ -12,7 +12,8 @@ class ClientTypeController extends Controller {
     /**
      * Display a listing of the resource.
      */
-    public function index(): View {
+    public function index() {
+
         $clientTypes = ClientType::get();
 
         return view('admin.client-type.index')
@@ -22,7 +23,7 @@ class ClientTypeController extends Controller {
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): View {
+    public function create() {
         return view('admin.client-type.create');
     }
 
@@ -30,10 +31,9 @@ class ClientTypeController extends Controller {
      * Store a newly created resource in storage.
      */
     public function store(StoreClientTypeRequest $request): RedirectResponse {
-        $name = $request->input('name');
 
         $clientType = new ClientType([
-            'name' => $name,
+            'name' => $request->input('name'),
         ]);
 
         try {
@@ -66,8 +66,9 @@ class ClientTypeController extends Controller {
      * Update the specified resource in storage.
      */
     public function update(UpdateClientTypeRequest $request, ClientType $clientType): RedirectResponse {
+
         $clientType->update([
-            'name' => $request->input(['name']),
+            'name' => $request->input('name'),
         ]);
 
         return redirect()
@@ -79,6 +80,7 @@ class ClientTypeController extends Controller {
      * Remove the specified resource from storage.
      */
     public function destroy(ClientType $clientType): RedirectResponse {
+
         $clientType->delete();
 
         return redirect()

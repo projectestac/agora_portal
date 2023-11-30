@@ -81,18 +81,13 @@
                 </a>
             </li>
             <li>
-                <a href="{{ route('requests.index') }}" @if (str_contains(request()->url(), 'requests')) class="selected" @endif>
-                    {{ __('request.requests') }}
+                <a href="{{ route('request-types.index') }}" @if (str_contains(request()->url(), 'request-types')) class="selected" @endif>
+                    {{ __('request.request_types') }}
                 </a>
             </li>
             <li>
                 <a href="{{ route('model-types.index') }}" @if (str_contains(request()->url(), 'model-types')) class="selected" @endif>
                     {{ __('modeltype.models') }}
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('request-types.index') }}" @if (str_contains(request()->url(), 'request-types')) class="selected" @endif>
-                    {{ __('request.request_types') }}
                 </a>
             </li>
             <li>

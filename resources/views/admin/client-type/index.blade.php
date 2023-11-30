@@ -17,6 +17,7 @@
         </div>
 
         @if (!empty($clientTypes))
+
             <table class="table table-striped">
                 <thead>
                 <tr>
@@ -33,8 +34,8 @@
                     <tr>
                         <td>{{ $clientType->id }}</td>
                         <td>{{ $clientType->name }}</td>
-                        <td>{{ $clientType->created_at }}</td>
-                        <td>{{ $clientType->updated_at }}</td>
+                        <td>{{ \Carbon\Carbon::parse($clientType->created_at)->format('d/m/Y H:i') }}</td>
+                        <td>{{ \Carbon\Carbon::parse($clientType->updated_at)->format('d/m/Y H:i') }}</td>
                         <td>
                             <a href="{{ route('client-types.edit', $clientType->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
                                 <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
@@ -50,6 +51,7 @@
                             </form>
                         </td>
                     </tr>
+
                 @endforeach
 
                 </tbody>
