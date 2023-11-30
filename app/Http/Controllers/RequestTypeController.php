@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreRequestTypeRequest;
 use App\Http\Requests\UpdateRequestTypeRequest;
 use App\Models\RequestType;
+use Illuminate\Http\Request;
 
 class RequestTypeController extends Controller
 {
@@ -13,7 +14,10 @@ class RequestTypeController extends Controller
      */
     public function index()
     {
-        //
+        $requestTypes = RequestType::get();
+
+        return view('admin.request-type.index')
+            ->with('requestTypes', $requestTypes);
     }
 
     /**
@@ -21,7 +25,7 @@ class RequestTypeController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.request-type.create');
     }
 
     /**
@@ -29,7 +33,26 @@ class RequestTypeController extends Controller
      */
     public function store(StoreRequestTypeRequest $request)
     {
-        //
+        $name = $request->input('name');
+        $description = $request->input('description');
+        $prompt = $request->input('prompt');
+
+        $requestType = new RequestType([
+            'name' => $name,
+            'description' => $description,
+            'prompt' => $prompt
+        ]);
+
+        try {
+            $requestType->save();
+        } catch (\Exception $e) {
+
+            return redirect()->route('request-types.create')
+                ->withErrors(['error' => $e->getMessage()]);
+        }
+
+        return redirect()->route('request-types.index')
+            ->with('success', __('request-type.created_request_type_short'));
     }
 
     /**
@@ -43,24 +66,44 @@ class RequestTypeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(RequestType $requestType)
+    public function edit($id)
     {
-        //
+        $requestType = RequestType::findOrFail($id);
+
+        return view('admin.request-type.edit')
+                ->with('requestType', $requestType);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRequestTypeRequest $request, RequestType $requestType)
+    public function update(Request $request, $id)
     {
-        //
+        $validatedData = $request->validate([
+            'name' => 'required|string',
+            'description' => 'required|string',
+            'prompt' => 'required|string'
+        ]);
+
+        $requestType = RequestType::findOrFail($id);
+
+        $requestType->update([
+            'name' => $validatedData['name'],
+            'description' => $validatedData['description'],
+            'prompt' => $validatedData['prompt']
+        ]);
+
+        return redirect()->route('request-types.index')->with('success', __('request.request_created'));
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(RequestType $requestType)
+    public function destroy($id)
     {
-        //
+        $requestType = RequestType::findOrFail($id);
+        $requestType->delete();
+
+        return redirect()->route('request-types.index')->with('success', __('common.deletion_success'));
     }
 }
