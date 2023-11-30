@@ -13,7 +13,8 @@ class ClientTypeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): View {
+    public function index()
+    {
         $clientTypes = ClientType::get();
 
         return view('admin.client-type.index')
@@ -59,9 +60,12 @@ class ClientTypeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ClientType $clientType): View {
+    public function edit($id)
+    {
+        $clientType = ClientType::findOrFail($id);
+
         return view('admin.client-type.edit')
-            ->with('clientType', $clientType);
+                ->with('clientType', $clientType);
     }
 
     /**
