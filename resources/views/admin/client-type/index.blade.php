@@ -16,6 +16,12 @@
             </div>
         </div>
 
+        <div class="row">
+            <div class="col-md-6">
+                <a href="{{ route('client-types.create') }}" class="btn btn-primary">{{ __('client-type.client_type_new') }}</a>
+            </div>
+        </div>
+
         @if (!empty($clientTypes))
             <table class="table table-striped">
                 <thead>
