@@ -5,7 +5,8 @@ namespace App\Http\Requests;
 use App\Helpers\Access;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreClientTypeRequest extends FormRequest {
+class StoreClientTypeRequest extends FormRequest
+{
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -18,7 +19,8 @@ class StoreClientTypeRequest extends FormRequest {
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
-    public function rules(): array {
+    public function rules(): array
+    {
         return [
             'name' => [
                 'required',

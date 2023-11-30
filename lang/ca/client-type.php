@@ -8,8 +8,8 @@ return [
     'client_type_created' => 'S\'ha creat el tipus de centre',
     'client_type_updated' => 'S\'ha actualitzat el tipus de centre',
     'client_type_deleted' => 'S\'ha esborrat el tipus de centre',
-    'no_client_types' => 'No s\'ha trobat cap tipus de centres',
+    'no_client_types' => 'No s\'ha trobat cap tipus de centre',
     'name_required' => 'El nom del tipus de centre és obligatori',
     'name_string' => 'El nom del tipus de centre ha de ser una cadena de caràcters',
-    'name_max' => 'El nom del tipus de centre no pot ser més llarg que :max caràcters',
+    'name_max' => 'El nom del tipus de centre no pot ser més llarg de :max caràcters',
 ];
