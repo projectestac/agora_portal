@@ -10,31 +10,39 @@
 
         <table class="table table-striped">
             <thead>
-                <tr>
-                    <th>NAME</th>
-                    <th>SIZE</th>
-                    <th>UPDATED_AT</th>
-                </tr>
+            <tr>
+                <th>NAME</th>
+                <th>SIZE</th>
+                <th>UPDATED_AT</th>
+            </tr>
             </thead>
             <tbody>
-                @if ($parentDirectory)
-                    <tr>
-                        <td>
-                            <a href="{{ route('files.index', $relativePath.'/..') }}">..</a>
-                        </td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                @endif
+            @if (!empty($parentDirectory))
+                <tr>
+                    <td>
+                        <a href="{{ route('files.index', base64_encode($parentDirectory)) }}">..</a>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            @endif
+            @if (!empty($files))
                 @foreach ($files as $file)
                     <tr>
                         <td>
-                            <a href="{{ route('files.index', $file['name']) }}">{{ $file['name'] }}</a>
+                            @if (is_dir($directory . $file['name']))
+                                @if ($file['name'] !== $baseDirectory)
+                                    <a href="{{ route('files.index', base64_encode($path . '/' . $file['name'])) }}">{{ $file['name'] }}</a>
+                                @endif
+                            @else
+                                {{ $file['name'] }}
+                            @endif
                         </td>
                         <td>{{ $file['size'] }}</td>
                         <td>{{ $file['updated_at'] }}</td>
                     </tr>
                 @endforeach
+            @endif
             </tbody>
         </table>
 

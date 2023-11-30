@@ -9,33 +9,43 @@ use App\Helpers\Util;
 class DirectoryController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * List the contents of the base directory. Takes an optional path parameter to be appended to the base directory.
+     * If the path is empty, show the contents of the base directory. Otherwise, show the contents of the path. The list
+     * of files and directories is sorted alphabetically and it is forbidden to navigate outside the base directory.
+     *
      */
-    public function index($path = null): View {
-        // Genero el directorio raiz
-        $baseDirectory = Util::getAgoraVar('portaldata') . 'data';
+    public function index(string $path = ''): View {
+        $path = base64_decode($path);
+        $path = trim($path, '/');
 
-        // Combina la ruta base con la ruta adicional de la URL
-        $directory = $baseDirectory . ($path ? '/' . $path : '');
+        // Security check: Remove all occurrences of ".." and "." from the path
+        $path = str_replace(['..', '.'], '', $path);
 
-         // Verifica si la ruta es un directorio
-        if (!is_dir($directory)) {
-            die('NO es un directorio');
+        $baseDirectory = Util::getAgoraVar('portaldata') . 'data/';
+
+        if (empty($path)) {
+            $directory = $baseDirectory;
+        } else {
+            $directory = $baseDirectory . $path . '/';
         }
 
-        // Obtén la lista de archivos y carpetas en el directorio
+        // Get the parent directory of $path if there is a path
+        $parentDirectory = empty($path) ? '' : dirname($path);
+
+         // Make sure the directory exists.
+        if (!is_dir($directory)) {
+            return view('admin.files.index')->with('error', 'files.not_a_directory');
+        }
+
+        // Get the list of files and directories in the directory.
         $files = Util::getFiles($directory);
 
-        // Obtén la ruta del directorio padre si hay un path
-        $parentDirectory = $path ? rtrim(dirname($directory), '/') : null;
-
-        // Reemplaza la barra inclinada al principio de la ruta para evitar duplicados en la URL
-        $relativePath = ltrim(str_replace($baseDirectory, '', rtrim($directory, '/')), '/');
-
-        // Asegúrate de que $relativePath sea siempre algo válido para evitar problemas con la URL
-        $relativePath = $relativePath ?: null;
-
-        return view('admin.files.index', compact('baseDirectory', 'directory', 'files', 'relativePath', 'parentDirectory'));
+        return view('admin.files.index')
+            ->with('directory', $directory)
+            ->with('parentDirectory', $parentDirectory)
+            ->with('baseDirectory', $baseDirectory)
+            ->with('files', $files)
+            ->with('path', $path);
     }
 
 }
