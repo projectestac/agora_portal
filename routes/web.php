@@ -85,6 +85,8 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::get('/batch/instance/create', [BatchController::class, 'instanceCreate'])->name('batch.instance.create');
     Route::post('/batch/instance', [BatchController::class, 'instanceStore'])->name('batch.instance.store');
     Route::get('/files/{path?}', [DirectoryController::class, 'index'])->name('files.index');
+    Route::get('/files/download/{path}', [DirectoryController::class, 'download'])->name('files.download');
+    Route::post('/files/upload/{currentPath}', [DirectoryController::class, 'upload'])->name('files.upload');
 
     Route::get('/config', [ConfigController::class, 'edit'])->name('config.edit');
     Route::put('/config', [ConfigController::class, 'update'])->name('config.update');

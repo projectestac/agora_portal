@@ -14,7 +14,8 @@ class DirectoryController extends Controller
      * of files and directories is sorted alphabetically and it is forbidden to navigate outside the base directory.
      *
      */
-    public function index(string $path = ''): View {
+    public function index(string $path = ''): View
+    {
         $path = base64_decode($path);
         $path = trim($path, '/');
 
@@ -32,7 +33,7 @@ class DirectoryController extends Controller
         // Get the parent directory of $path if there is a path
         $parentDirectory = empty($path) ? '' : dirname($path);
 
-         // Make sure the directory exists.
+        // Make sure the directory exists.
         if (!is_dir($directory)) {
             return view('admin.files.index')->with('error', 'files.not_a_directory');
         }
@@ -48,4 +49,49 @@ class DirectoryController extends Controller
             ->with('path', $path);
     }
 
+
+    /**
+     * Download file
+     */
+    public function download(Request $request, string $path)
+    {
+        $path = base64_decode($path);
+
+        if (is_file($path)) {
+            $filename = pathinfo($path, PATHINFO_BASENAME);
+            return response()->file($path, ['Content-Disposition' => 'attachment; filename="' . $filename . '"']);
+            // $response = response()->file($path);
+        } else {
+            abort(404);
+        }
+    }
+
+
+    /**
+     * Upload file
+     */
+    public function upload(Request $request, string $currentPath)
+    {
+        $currentPath = base64_decode($currentPath);
+
+        $request->validate([
+            'file' => 'required|mimes:zip,sql,png',
+        ]);
+
+        try {
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+
+                $filename = $file->getClientOriginalName();
+
+                $file->move($currentPath, $filename);
+
+                return redirect()->back()->with('success', 'Fichero subido exitosamente.');
+            } else {
+                return redirect()->back()->with('error', 'No se proporcionó ningún archivo para subir.');
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error al subir el fichero: ' . $e->getMessage());
+        }
+    }
 }
