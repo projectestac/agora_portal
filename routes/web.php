@@ -48,6 +48,13 @@ Route::get('/managers/list', [ManagerController::class, 'getManagers'])->name('m
 
 // Routes for administrators only.
 Route::group(['middleware' => ['auth', 'permission:Administrate site']], static function () {
+    Route::get('/clients/import', [ClientController::class, 'import'])->name('clients.import');
+
+    /*
+    Route::get('/users/{user}/impersonate', [UserController::class, 'impersonate'])->name('users.impersonate');
+    Route::get('/users/{user}/stop-impersonating', [UserController::class, 'stopImpersonating'])->name('users.stop-impersonating');
+    */
+
     Route::resource('/services', ServiceController::class);
     Route::resource('/clients', ClientController::class);
     Route::resource('/users', UserController::class);
