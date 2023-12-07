@@ -14,8 +14,8 @@ return new class extends Migration {
             $table->integer('service_id')->unsigned();
             $table->string('short_code', 10);
             $table->string('description')->default('');
-            $table->string('url')->default('');
-            $table->string('db', 25)->default('');
+            $table->string('url')->default('')->nullable();
+            $table->string('db', 25)->default('')->nullable();
             $table->timestamps();
 
             $table->foreign('service_id')->references('id')->on('services');
