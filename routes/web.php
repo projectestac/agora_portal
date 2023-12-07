@@ -60,11 +60,6 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::resource('/users', UserController::class);
     Route::resource('/roles', RoleController::class);
 
-    // Maquetes
-    Route::resource('/config/models', ModelTypeController::class);
-    // Serveis territorials
-    Route::resource('/config/locations', LocationController::class);
-
     Route::get('/batch', [BatchController::class, 'batch'])->name('batch');
     Route::get('/batch/query', [BatchController::class, 'query'])->name('batch.query');
     Route::post('/batch/query/confirm', [QueryController::class, 'confirmQuery'])->name('batch.query.confirm');
@@ -85,11 +80,6 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::put('/config', [ConfigController::class, 'update'])->name('config.update');
 
     Route::resource('/config/model-types', ModelTypeController::class);
-
-    Route::resource('/config/locations', LocationController::class);
-    Route::put('/config/locations/{id}', [LocationController::class, 'update'])->name('locations.update');
-    Route::get('/config/locations/{id}/edit', [LocationController::class, 'edit']);
-
     Route::resource('/config/request-types', RequestTypeController::class);
     Route::resource('/config/locations', LocationController::class);
     Route::resource('/config/client-types', ClientTypeController::class);
