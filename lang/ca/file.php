@@ -11,6 +11,7 @@ return [
     'zip_files' => 'Fitxers comprimits',
     'browse' => 'Selecciona un fitxer',
     'upload' => 'Puja',
+    'upload_file' => 'Puja un fitxer',
     'uploaded_to_moodle' => 'S\'ha pujat el fitxer <strong>:filename</strong> al servidor. El trobareu en el repositori <strong>Fitxers</strong> del vostre Moodle.',
     'uploaded_to_moodle_short' => 'S\'ha pujat el fitxer :filename al servidor',
     'selected_file' => 'Fitxer seleccionat',
@@ -29,4 +30,6 @@ return [
     'no_files' => 'No hi ha cap fitxer al repositori',
     'quota_updated' => 'S\'ha actualitzat la quota',
     'no_instance' => 'No teniu activat el servei de Moodle',
+    'upload_missing_file' => 'No s\'ha proporcionat cap fitxer per pujar',
+    'upload_error' => 'S\'ha produït un error en pujar el fitxer: :error',
 ];

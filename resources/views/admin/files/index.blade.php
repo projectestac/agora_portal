@@ -6,15 +6,18 @@
     </div>
 
     <div class="content files">
-        <h3>Llista de fitxers</h3>
+        <h3>{{ __('file.file_list') }}</h3>
+
+        <!-- Upload form -->
+        @include('admin.files.uploadFile')
 
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>NAME</th>
-                    <th>SIZE</th>
-                    <th>UPDATED_AT</th>
-                    <th>DOWNLOAD</th>
+                    <th>{{ __('common.name') }}</th>
+                    <th>{{ __('file.size') }}</th>
+                    <th>{{ __('common.updated_at') }}</th>
+                    <th>{{ __('common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -34,8 +37,7 @@
                             <td>
                                 @if (is_dir($directory . $file['name']))
                                     @if ($file['name'] !== $baseDirectory)
-                                        <a
-                                            href="{{ route('files.index', base64_encode($path . '/' . $file['name'])) }}">{{ $file['name'] }}</a>
+                                        <a href="{{ route('files.index', base64_encode($path . '/' . $file['name'])) }}">{{ $file['name'] }}</a>
                                     @endif
                                 @else
                                     {{ $file['name'] }}
@@ -53,8 +55,6 @@
                 @endif
             </tbody>
         </table>
-
-        <!-- Formulario para subir un fichero -->
-        @include('admin.files.uploadFile')
     </div>
+
 @endsection
