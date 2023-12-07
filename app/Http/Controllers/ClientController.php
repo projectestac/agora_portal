@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 use Spatie\Permission\Models\Role;
 use Yajra\DataTables\DataTables;
@@ -236,6 +237,61 @@ class ClientController extends Controller {
         $user = User::where('name', $username)->first();
         $clientRole = Role::findByName('client');
         $user->assignRole($clientRole);
+    }
+
+
+    /**
+     * Update client information from the import_clients table, which must be created and populated manually. This function
+     * is intended to be used locally, not in production.
+     */
+    public function import(): void {
+
+        // Get all clients from the clients table with the information about location.
+        $clients = Client::with('location')->get();
+
+        $util = new Util();
+
+        foreach ($clients as $client) {
+            // The table import_clients must contain the public information about the clients. It can be created from
+            // the public spreadsheet of school centers.
+            $code = $util->transformClientCode($client->code);
+            $newData = DB::select('SELECT * FROM import_clients WHERE code = ?', [$code]);
+
+            // If the client is not found in the import_clients table, it means that it is not a real school. As long as
+            // there is no information about it, it cannot be updated.
+            if (empty($newData)) {
+                continue;
+            }
+
+            $client->name = $newData[0]->name;
+            $client->address = $newData[0]->address;
+            $client->city = $newData[0]->city;
+            $client->postal_code = $newData[0]->postal_code;
+
+            // Update the location. It is important that the location name in the import_clients table is the same as in the locations
+            // table. Otherwise, the location will be set to UNDEFINED.
+            $newLocation = Location::where('name', $newData[0]->location_name)->first();
+            if (!empty($newLocation)) {
+                $client->location_id = $newLocation->id;
+            } else {
+                $client->location_id = Location::UNDEFINED;
+            }
+
+            // If there has been any change, show the original data and the new data.
+            if ($client->isDirty()) {
+                $clientOriginal = $client->getOriginal();
+                echo '<br/><strong>' . $clientOriginal['name'] . ' (' . $clientOriginal['code'] . ')</strong><br/>';
+                foreach ($client->getDirty() as $key => $value) {
+                    echo $key . ': ' . $clientOriginal[$key] . ' => ' . $value . '<br/>';
+                }
+            }
+
+            // Update the client.
+            $client->save();
+
+        }
+
+        echo '<br/>End of import.';
     }
 
 }
