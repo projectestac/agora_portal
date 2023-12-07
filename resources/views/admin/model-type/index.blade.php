@@ -5,14 +5,13 @@
         @include('menu.adminmenu')
     </div>
 
-    <div class="content batch">
-        {{-- Translations are defined in lang/ca folder --}}
+    <div class="content config">
 
-        <p class="h3">{{ __('model.models') }}</p>
+        <p class="h3">{{ __('modeltype.models') }}</p>
 
         <div class="row">
             <div class="col-md-6">
-                <a href="{{ route('model-types.create') }}" class="btn btn-primary">{{ __('model.new_model') }}</a>
+                <a href="{{ route('model-types.create') }}" class="btn btn-primary">{{ __('modeltype.new_model') }}</a>
             </div>
         </div>
 
@@ -23,7 +22,7 @@
             <table class="table table-striped">
                 <thead>
                 <tr>
-                    <th>{{ __('model.service') }}</th>
+                    <th>{{ __('service.service') }}</th>
                     <th>{{ __('common.description') }}</th>
                     <th>{{ __('common.short_code') }}</th>
                     <th>{{ __('service.url') }}</th>
@@ -38,7 +37,9 @@
                     @foreach ($modelTypes as $modelType)
 
                         <tr>
-                            <td><img src="https://agora-aws.xtec.cat/portal/images/{{ $modelType->service_id == 4 ? "moodle" : "nodes" }}.gif"></td>
+                            <td>
+                                <img src="{{ secure_asset('images/' . mb_strtolower($modelType->service->name . '.gif')) }}" alt="">
+                            </td>
                             <td>{{ $modelType->description }}</td>
                             <td>{{ $modelType->short_code }}</td>
                             <td><a href="{{ $modelType->url }}" target="_blank">{{ $modelType->url }}</a></td>
@@ -50,11 +51,13 @@
                                     <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                                 </a>
 
-                                {{-- <form action="{{ route('model-types.destroy', $modelType->id) }}" method="POST" style="display:inline;">
+                                {{--
+                                <form action="{{ route('model-types.destroy', $modelType->id) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" onclick="return confirm('{{ __('common.confirm_deletion') }}')">{{ __('common.delete') }}</button>
-                                </form> --}}
+                                </form>
+                                --}}
                             </td>
                         </tr>
 

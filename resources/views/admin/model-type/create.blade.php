@@ -5,8 +5,8 @@
         @include('menu.adminmenu')
     </div>
 
-    <div class="content client">
-        <h3>{{ __('model.new_model') }}</h3>
+    <div class="content config">
+        <h3>{{ __('modeltype.new_model') }}</h3>
 
         @include('components.messages')
 
@@ -14,7 +14,7 @@
             @csrf
 
             <div class="form-group">
-                <label class="col-sm-4 control-label clear" for="service_id">{{ __('model.service') }}</label>
+                <label class="col-sm-4 control-label clear" for="service_id">{{ __('service.service') }}</label>
                 <div class="col-sm-8">
                     <select class="form-control" id="service_id" name="service_id">
                         @foreach($services as $service)

@@ -1,6 +1,3 @@
-{{-- How do we land here in the code:
-       Route /config/models/{id}/edit in web.php -> goes to the ModelTypeController.php -> returns this view --}}
-
 @extends('layout.default')
 
 @section('content')
@@ -8,8 +5,10 @@
         @include('menu.adminmenu')
     </div>
 
-    <div class="content service">
-        <h3>{{ __('model.model_edit') }}</h3>
+    <div class="content config">
+        <h3>{{ __('modeltype.model_edit') }}</h3>
+
+        @include('components.messages')
 
         <div class="panel panel-default">
             <div class="panel-body">
@@ -20,7 +19,7 @@
                     <input type="hidden" id="model_id" name="model_id" value="{{ $modelType->id }}"/>
 
                     <div class="form-group">
-                        <label class="col-sm-4 control-label clear" for="service_id">{{ __('model.service') }}</label>
+                        <label class="col-sm-4 control-label clear" for="service_id">{{ __('service.service') }}</label>
                         <div class="col-sm-8">
                             <select class="form-control" id="service_id" name="service_id">
                                 @foreach($services as $service)
