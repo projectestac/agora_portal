@@ -5,13 +5,11 @@ namespace App\Http\Requests;
 use App\Helpers\Access;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreClientTypeRequest extends FormRequest
-{
+class StoreClientTypeRequest extends FormRequest {
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
-    {
+    public function authorize(): bool {
         return Access::isAdmin($this->user());
     }
 
@@ -20,14 +18,27 @@ class StoreClientTypeRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
      */
-    public function rules(): array
-    {
+    public function rules(): array {
         return [
             'name' => [
                 'required',
                 'string',
-                ':max:255',
-            ]
+                'max:100',
+            ],
         ];
     }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array {
+        return [
+            'name.required' => __('client-type.name_required'),
+            'name.string' => __('client-type.name_string'),
+            'name.max' => __('client-type.name_max', ['max' => 100]),
+        ];
+    }
+
 }

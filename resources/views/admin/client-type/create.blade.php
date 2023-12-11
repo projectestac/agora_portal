@@ -14,7 +14,7 @@
             @csrf
 
             <div class="form-group">
-                <label class="col-sm-4 control-label clear" for="name">{{ __('common.name') }}</label>
+                <label class="col-sm-4 control-label clear" for="name">{{ __('client-type.name') }}</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}">
                 </div>
