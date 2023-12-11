@@ -6,7 +6,9 @@
     </div>
 
     <div class="content service">
-        <h3>{{ __('locations.location_edit') }}</h3>
+        <h3>{{ __('location.location_edit') }}</h3>
+
+        @include('components.messages')
 
         <div class="panel panel-default">
             <div class="panel-body">
@@ -17,13 +19,9 @@
                     <input type="hidden" id="location_id" name="location_id" value="{{ $location->id }}"/>
 
                     <div class="form-group">
-                        <label class="col-sm-4 control-label clear">{{ __('common.name') }}</label>
+                        <label class="col-sm-4 control-label clear" for="name">{{ __('location.name') }}</label>
                         <div class="col-sm-8">
                             <input type="text" class="form-control" id="name" name="name" value="{{ $location->name }}">
-
-                            @error('name')
-                                <div class="text-danger">{{ $message }}</div>
-                            @enderror
                         </div>
                     </div>
 
@@ -35,7 +33,6 @@
                 </form>
             </div>
         </div>
-
     </div>
 
 @endsection

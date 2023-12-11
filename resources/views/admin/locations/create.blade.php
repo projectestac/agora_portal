@@ -6,7 +6,7 @@
     </div>
 
     <div class="content client">
-        <h3>{{ __('locations.new_location') }}</h3>
+        <h3>{{ __('location.new_location') }}</h3>
 
         @include('components.messages')
 
@@ -14,7 +14,7 @@
             @csrf
 
             <div class="form-group">
-                <label class="col-sm-4 control-label clear" for="name">{{ __('locations.name') }}</label>
+                <label class="col-sm-4 control-label clear" for="name">{{ __('location.name') }}</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}">
                 </div>

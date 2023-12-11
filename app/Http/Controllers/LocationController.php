@@ -5,11 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreLocationRequest;
 use App\Http\Requests\UpdateLocationRequest;
 use App\Models\Location;
-use Illuminate\Http\Request;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 
-class LocationController extends Controller
-{
+class LocationController extends Controller {
     public function __construct() {
         $this->middleware('auth');
     }
@@ -17,8 +16,7 @@ class LocationController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
+    public function index(): View {
         $locations = Location::get();
 
         return view('admin.locations.index')
@@ -28,76 +26,68 @@ class LocationController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
+    public function create(): View {
         return view('admin.locations.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreLocationRequest $request): RedirectResponse
-    {
-        $name = $request->input('name');
-
+    public function store(StoreLocationRequest $request): RedirectResponse {
         $location = new Location([
-            'name' => $name
+            'name' => $request->input('name'),
         ]);
 
         try {
             $location->save();
         } catch (\Exception $e) {
-
-            return redirect()->route('locations.create')
+            return redirect()
+                ->route('locations.create')
                 ->withErrors(['error' => $e->getMessage()]);
         }
 
-        return redirect()->route('locations.index')
-            ->with('success', __('location.created_location_short'));
+        return redirect()
+            ->route('locations.index')
+            ->with('success', __('location.location_created'));
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Location $location)
-    {
+    public function show(Location $location) {
         //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
-    {
-        $location = Location::findOrFail($id);
-        return view('admin.locations.edit')->with('location', $location); // we send the model type to the view
+    public function edit(Location $location): View {
+        return view('admin.locations.edit')
+            ->with('location', $location);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id) {
-        $validatedData = $request->validate([
-            'name' => 'required|string'
-        ]);
-
-        $location = Location::findOrFail($id);
-
+    public function update(UpdateLocationRequest $request, Location $location): RedirectResponse {
         $location->update([
-            'name' => $validatedData['name']
+            'name' => $request->input(['name']),
         ]);
 
-        return redirect()->route('locations.index')->with('success', __('request.request_created'));
+        return redirect()
+            ->route('locations.index')
+            ->with('success', __('location.location_updated'));
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
-    {
-        $location = Location::findOrFail($id);
+    public function destroy(Location $location): RedirectResponse {
         $location->delete();
 
-        return redirect()->route('locations.index')->with('success', __('common.deletion_success'));
+        return redirect()
+            ->route('locations.index')
+            ->with('success', __('location.location_deleted'));
     }
+
 }
