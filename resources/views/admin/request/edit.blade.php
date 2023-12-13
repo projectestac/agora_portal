@@ -40,6 +40,13 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="col-sm-4 control-label clear">{{ __('common.url') }}</label>
+                        <div class="col-sm-8">
+                            <a href="{{ $instanceUrl }}" target="_blank">{{ $instanceUrl }}</a>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label class="col-sm-4 control-label clear">{{ __('user.name') }}</label>
                         <div class="col-sm-8">
                             {{ $request->user->name }} ({{ $request->user->email }})

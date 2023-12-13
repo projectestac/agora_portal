@@ -35,7 +35,6 @@ return [
     'description' => 'Descripció',
     'url' => 'URL',
     'short_code' => 'Codi curt',
-    'database' => 'Base de dades',
     'params' => 'Paràmetres',
     'continue' => 'Continua',
     'files' => 'Fitxers',

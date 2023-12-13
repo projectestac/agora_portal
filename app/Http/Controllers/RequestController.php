@@ -6,8 +6,9 @@ use App\Helpers\Cache;
 use App\Helpers\Util;
 use App\Http\Requests\StoreRequestRequest;
 use App\Http\Requests\UpdateRequestRequest;
-use App\Models\Log;
 use App\Models\Client;
+use App\Models\Instance;
+use App\Models\Log;
 use App\Models\Request;
 use App\Models\RequestType;
 use App\Models\Service;
@@ -15,7 +16,6 @@ use App\Mail\UpdateRequest;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 
 class RequestController extends Controller {
@@ -29,13 +29,9 @@ class RequestController extends Controller {
      */
     public function index(): View {
         $requests = Request::with('requestType', 'service', 'client', 'user')
-            ->orderByRaw("FIELD(status, \"" . Request::STATUS_PENDING . "\",
-             \"" . Request::STATUS_UNDER_STUDY . "\",
-             \"" . Request::STATUS_DENIED . "\",
-             \"" . Request::STATUS_SOLVED . "\")")
+            ->orderByRaw("FIELD(status, \"" . Request::STATUS_PENDING . "\") DESC")
             ->orderBy('updated_at', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(50);
 
         return view('admin.request.index')
             ->with('requests', $requests);
@@ -90,8 +86,16 @@ class RequestController extends Controller {
      * Show the form for editing the specified resource.
      */
     public function edit(Request $request): View {
+        $instance = Instance::where([
+            'client_id' => $request->client_id,
+            'service_id' => $request->service_id,
+        ])->first();
+
+        $instanceUrl = Util::getInstanceUrl($instance);
+
         return view('admin.request.edit')
             ->with('request', $request)
+            ->with('instanceUrl', $instanceUrl)
             ->with('statusList', $this->getStatusList());
     }
 
