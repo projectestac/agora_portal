@@ -4,6 +4,16 @@ More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/agora_portal
 
 
+Changes 23.12.18
+---------------------------------------------------------------------------------------
+- Client: Added function to update clients information from an external table
+- ClientType: Added CRUD
+- Instance: Moved order logic to server side. Minor improvements
+- Location: Added CRUD
+- ModelType: Implemented List, Creation, Edition and Update
+- Request: Improved list of request and added link to instance on edit form
+
+
 Changes 23.11.28
 ---------------------------------------------------------------------------------------
 - Client: Don't create clients if they don't exist in WS
