@@ -64,6 +64,11 @@
                                 <td class="font-weight-bold">{{ __('instance.requester') }}</td>
                                 <td>{{ $instance->contact_name }}. {{ $instance->contact_profile }}</td>
                             </tr>
+
+                            <tr>
+                                <td>{{ __('common.disk_usage') }}</td>
+                                <td>{{ Util::formatBytes($instance->used_quota) . ' / ' . Util::formatBytes($instance->quota) . ' (' . round($instance->used_quota / $instance->quota * 100) . '%)' }}</td>
+                            </tr>
                             <tr>
                                 <td>{{ __('common.requested_at') }}</td>
                                 <td>{{ Carbon::parse($instance->requested_at)->format('d/m/Y H:i') }}</td>

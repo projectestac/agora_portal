@@ -238,6 +238,9 @@ class InstanceController extends Controller {
         if ($orderColumn === 'instances.location') {
             $orderColumn = 'clients.city';
         }
+        if ($orderColumn === 'instances.used_quota') {
+            $orderColumn = 'instances.used_quota';
+        }
         if ($orderColumn === 'dates') {
             $orderColumn = 'instances.updated_at';
         }
