@@ -152,6 +152,10 @@ class Util {
         return round($bytes / 1024 / 1024 / 1024, $precision);
     }
 
+    public static function getFormattedDiskUsage(int $used, int $total): string {
+        return self::formatBytes($used) . ' / ' . self::formatBytes($total) . ' (' . round($used / $total * 100) . '%)';
+    }
+
     public static function getAgoraVar(string $varName = ''): string {
         if (empty($varName)) {
             return '';
@@ -164,6 +168,14 @@ class Util {
                 Config::get('app.agora.nodes.datadir'),
             'moodledata' => Config::get('app.agora.server.root') .
                 Config::get('app.agora.moodle2.datadir'),
+            'moodle_quotas_file' => Config::get('app.agora.server.root') .
+                Config::get('app.agora.moodle2.datadir') .
+                Config::get('app.agora.moodle2.diskusagefile'),
+            'nodes_quotas_file' => Config::get('app.agora.server.root') .
+                Config::get('app.agora.nodes.datadir') .
+                Config::get('app.agora.nodes.diskusagefile'),
+            'moodle_user_prefix' => Config::get('app.agora.moodle2.userprefix'),
+            'nodes_user_prefix' => Config::get('app.agora.nodes.userprefix'),
             'nodes_domain' => Config::get('app.agora.server.nodes'),
             'moodle_domain' => Config::get('app.agora.server.server'),
             'se_domain' => Config::get('app.agora.server.se-url'),

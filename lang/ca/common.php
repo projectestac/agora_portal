@@ -42,5 +42,5 @@ return [
     'error_occurred' => 'S\'ha produït un error',
     'yes' => 'Sí',
     'no' => 'No',
-    'prompt' => 'Missatge'
+    'prompt' => 'Missatge',
 ];
