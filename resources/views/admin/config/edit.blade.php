@@ -112,6 +112,7 @@
 
                 <div class="form-group">
                     <div class="text-center">
+                        <button class="btn btn-success">{{ __('common.update_disk_usage') }}</button>
                         <button type="submit" class="btn btn-success">{{ __('common.save') }}</button>
                     </div>
                 </div>

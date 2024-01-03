@@ -44,4 +44,5 @@ return [
     'no' => 'No',
     'prompt' => 'Missatge',
     'disk_usage' => 'Ús del disc',
+    'update_disk_usage' => 'Actualitza les quotes del disc',
 ];
