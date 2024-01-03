@@ -292,6 +292,9 @@ class InstanceController extends Controller {
             ->addColumn('location', function ($instance) {
                 return new HtmlString($instance->client->city . '<br/>(<em>' . $instance->client->location->name . '</em>)');
             })
+            ->addColumn('disk_usage', function ($instance) {
+                return new HtmlString(Util::formatBytes($instance->used_quota) . ' / ' . Util::formatBytes($instance->quota) . ' (' . round($instance->used_quota / $instance->quota * 100) . '%)');
+            })
             ->addColumn('updated_at', function ($instance) {
                 return new HtmlString('<strong>E:</strong> ' . $instance->updated_at->format('d/m/Y') . '<br/>' .
                     '<strong>C:</strong> ' . $instance->created_at->format('d/m/Y') . '<br/>' .
