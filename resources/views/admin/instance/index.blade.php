@@ -20,6 +20,7 @@
                 <th>{{ __('common.status') }}</th>
                 <th>{{ __('service.service') }}</th>
                 <th>{{ __('instance.location_long') }}</th>
+                <th>{{ __('service.quota') }}</th>
                 <th>{{ __('common.dates') }}</th>
                 <th>{{ __('common.actions') }}</th>
             </tr>
@@ -45,6 +46,7 @@
                         {data: 'status', name: 'status'},
                         {data: 'service_id', name: 'service_id'},
                         {data: 'location', name: 'location'},
+                        {data: 'quota', name: 'quota'},
                         {data: 'updated_at', name: 'updated_at'},
                         {data: 'actions', name: 'actions', orderable: false, searchable: false}
                     ]

@@ -83,6 +83,8 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::resource('/config/request-types', RequestTypeController::class);
     Route::resource('/config/locations', LocationController::class);
     Route::resource('/config/client-types', ClientTypeController::class);
+
+    Route::post('/updatequotas', [InstanceController::class, 'updateQuotas'])->name('update.quotas');
 });
 
 Route::group(['middleware' => ['auth', 'permission:Administrate site|Manage own managers|Manage clients']], static function () {

@@ -40,4 +40,6 @@ return [
     'model_type_id_required' => 'Seleccioneu una maqueta.',
     'contact_profile_required' => 'Indiqueu el vostre càrrec al centre.',
     'only_managers_can_create_instances' => 'Només poden sol·licitar l\'alta els gestors.',
+    'update_quotas' => 'Actualitza les quotes',
+    'update_quotas_service_ended' => 'El procés d\'actualització de les quotes del servei :service ha finalitzat.',
 ];

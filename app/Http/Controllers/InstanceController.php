@@ -238,6 +238,9 @@ class InstanceController extends Controller {
         if ($orderColumn === 'instances.location') {
             $orderColumn = 'clients.city';
         }
+        if ($orderColumn === 'instances.quota') {
+            $orderColumn = 'instances.used_quota';
+        }
         if ($orderColumn === 'dates') {
             $orderColumn = 'instances.updated_at';
         }
@@ -291,6 +294,9 @@ class InstanceController extends Controller {
             })
             ->addColumn('location', function ($instance) {
                 return new HtmlString($instance->client->city . '<br/>(<em>' . $instance->client->location->name . '</em>)');
+            })
+            ->addColumn('quota', function ($instance) {
+                return new HtmlString(Util::getFormattedDiskUsage($instance->used_quota, $instance->quota));
             })
             ->addColumn('updated_at', function ($instance) {
                 return new HtmlString('<strong>E:</strong> ' . $instance->updated_at->format('d/m/Y') . '<br/>' .
@@ -690,6 +696,46 @@ class InstanceController extends Controller {
             return ['error' => $e->getMessage()];
         }
 
+    }
+
+    public function updateQuotas(): RedirectResponse {
+
+        // Get the list of services and execute the function to update the quota for each one.
+        $serviceNames = Service::get()->where('status', 'active')->pluck('name')->toArray();
+
+        $result = [];
+
+        foreach ($serviceNames as $serviceName) {
+            $result[] = $this->updateQuotaByService($serviceName);
+        }
+
+        return redirect()
+            ->back()
+            ->with('message', implode('<br>', $result));
+    }
+
+    private function updateQuotaByService($serviceName): string {
+
+        $quotasFile = Util::getAgoraVar(mb_strtolower($serviceName) . '_quotas_file');
+        $serviceId = Service::where('name', $serviceName)->first()->id;
+
+        try {
+            $fileContent = file_get_contents($quotasFile);
+        } catch (\Exception $e) {
+            return $serviceName . ': ' . $e->getMessage();
+        }
+
+        $lines = explode("\n", $fileContent);
+
+        foreach ($lines as $line) {
+            if (preg_match('/(\d+)\s+usu(\d+)/', $line, $matches)) {
+                Instance::where('client_id', (int)$matches[2])
+                    ->where('service_id', $serviceId)
+                    ->update(['used_quota' => (int)$matches[1]]);
+            }
+        }
+
+        return __('instance.update_quotas_service_ended', ['service' => $serviceName]);
     }
 
 }
