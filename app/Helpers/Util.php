@@ -152,6 +152,10 @@ class Util {
         return round($bytes / 1024 / 1024 / 1024, $precision);
     }
 
+    public static function getFormattedDiskUsage(int $used, int $total): string {
+        return Util::formatBytes($used) . ' / ' . Util::formatBytes($total) . ' (' . round($used / $total * 100) . '%)';
+    }
+
     public static function getAgoraVar(string $varName = ''): string {
         if (empty($varName)) {
             return '';

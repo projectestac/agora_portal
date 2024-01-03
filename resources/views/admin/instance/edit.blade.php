@@ -67,7 +67,7 @@
 
                             <tr>
                                 <td>{{ __('common.disk_usage') }}</td>
-                                <td>{{ Util::formatBytes($instance->used_quota) . ' / ' . Util::formatBytes($instance->quota) . ' (' . round($instance->used_quota / $instance->quota * 100) . '%)' }}</td>
+                                <td>{{ Util::getFormattedDiskUsage($instance->used_quota, $instance->quota) }}</td>
                             </tr>
                             <tr>
                                 <td>{{ __('common.requested_at') }}</td>
