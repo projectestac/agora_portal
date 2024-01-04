@@ -706,16 +706,12 @@ class InstanceController extends Controller {
 
         $lines = explode("\n", $fileContent);
 
-        $pdo = new PDO('mysql:host=' . env('DB_HOST') . ';dbname=' . env('DB_DATABASE'), env('DB_USERNAME'), env('DB_PASSWORD'));
-
         foreach ($lines as $line) {
             if (preg_match('/(\d+)\s+usu(\d+)/', $line, $matches)) {
                 $username = 'usu' . $matches[2];
                 $size = (int)$matches[1];
 
-                $stmt = $pdo->prepare("UPDATE instances SET used_quota = :size WHERE client_id = " . $matches[2]);
-                $stmt->bindParam(':size', $size, PDO::PARAM_INT);
-                $stmt->execute();
+                Instance::where('client_id', $matches[2])->update(['used_quota' => $size]);
             }
         }
     }
