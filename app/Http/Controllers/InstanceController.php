@@ -700,6 +700,8 @@ class InstanceController extends Controller {
 
     public function updateDiskUsage($serviceName) {
         $folder = $serviceName == "Moodle" ? "moodledata" : "wpdata";
+        $serviceId = $serviceName == "Moodle" ? 4 : 5; // to be optimized later ?
+
         $diskUsageFile = '/dades/data/' . $folder . '/diskUsage' . $serviceName . '.txt';
 
         $fileContent = file_get_contents($diskUsageFile);
@@ -711,7 +713,9 @@ class InstanceController extends Controller {
                 $username = 'usu' . $matches[2];
                 $size = (int)$matches[1];
 
-                Instance::where('client_id', $matches[2])->update(['used_quota' => $size]);
+                Instance::where('client_id', $matches[2])
+                        ->where('service_id', $serviceId)
+                        ->update(['used_quota' => $size]);
             }
         }
     }
@@ -720,7 +724,7 @@ class InstanceController extends Controller {
         $this->updateDiskUsage('Moodle');
         $this->updateDiskUsage('Nodes');
 
-        return redirect()->back()->with('success', 'Disk usage updated successfully');
+        return redirect()->back()->with('success', __('common.disk_usage_update_success'));
     }
 
 }
