@@ -698,46 +698,33 @@ class InstanceController extends Controller {
 
     }
 
-    private function updateDiskUsage($instance) {
-        $serviceName = $instance->service->name;
-        $diskUsageFile = 'diskUsage' . $serviceName . '.txt';
-
-        $serviceNameLower = mb_strtolower($serviceName);
-
-        switch ($serviceName) {
-            case 'Moodle':
-                $serviceKey = 'moodle2';
-                $userPassword = config('app.agora.moodle2.userpwd');
-                break;
-            case 'Nodes':
-                $serviceKey = 'nodes';
-                $userName = config("app.agora.nodes.username");
-                $userPassword = config("app.agora.nodes.userpwd");
-                break;
-        }
-
-        $dbName = config("app.agora.$serviceKey.userprefix") . $instanceId;
-        $userName = ($serviceName === 'Nodes') ? $userName : $dbName;
+    public function updateDiskUsage($serviceName) {
+        $folder = $serviceName == "Moodle" ? "moodledata" : "wpdata";
+        $diskUsageFile = '/dades/data/' . $folder . '/diskUsage' . $serviceName . '.txt';
 
         $fileContent = file_get_contents($diskUsageFile);
 
         $lines = explode("\n", $fileContent);
 
-        $pdo = new PDO('mysql:' . $instance->db_host . '=localhost;dbname=' . $dbName, $userName, $userPassword);
+        $pdo = new PDO('mysql:host=' . env('DB_HOST') . ';dbname=' . env('DB_DATABASE'), env('DB_USERNAME'), env('DB_PASSWORD'));
 
         foreach ($lines as $line) {
-            // Extract the size value associated with "usu" followed by a number
             if (preg_match('/(\d+)\s+usu(\d+)/', $line, $matches)) {
                 $username = 'usu' . $matches[2];
                 $size = (int)$matches[1];
 
-                // Update the SQL table
-                $stmt = $pdo->prepare("UPDATE instances SET used_quota = :size WHERE instance_name = :username");
+                $stmt = $pdo->prepare("UPDATE instances SET used_quota = :size WHERE client_id = " . $matches[2]);
                 $stmt->bindParam(':size', $size, PDO::PARAM_INT);
-                $stmt->bindParam(':username', $username, PDO::PARAM_STR);
                 $stmt->execute();
             }
         }
+    }
+
+    public function updateAllDiskUsages() {
+        $this->updateDiskUsage('Moodle');
+        $this->updateDiskUsage('Nodes');
+
+        return redirect()->back()->with('success', 'Disk usage updated successfully');
     }
 
 }

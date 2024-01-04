@@ -112,10 +112,14 @@
 
                 <div class="form-group">
                     <div class="text-center">
-                        <button class="btn btn-success">{{ __('common.update_disk_usage') }}</button>
                         <button type="submit" class="btn btn-success">{{ __('common.save') }}</button>
                     </div>
                 </div>
+            </form>
+
+            <form action="{{ route('updateAllDiskUsages') }}" method="post">
+                @csrf
+                <button type="submit">{{ __('common.update_disk_usage') }}</button>
             </form>
 
         @else
