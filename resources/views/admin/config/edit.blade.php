@@ -119,7 +119,11 @@
 
             <form action="{{ route('updateAllDiskUsages') }}" method="post">
                 @csrf
-                <button type="submit">{{ __('common.update_disk_usage') }}</button>
+                <div class="form-group">
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success">{{ __('common.update_disk_usage') }}</button>
+                    </div>
+                </div>
             </form>
 
         @else
