@@ -11,6 +11,7 @@ use App\Models\Location;
 use App\Models\Log;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -205,11 +206,20 @@ class ClientController extends Controller {
     }
 
     // for public portal
-    public function getActiveClients(): JsonResponse {
+    public function getActiveClients(Request $request): JsonResponse {
         $clients = Client::where('status', 'active')
-                         ->where('visible', 'yes')
-                         ->with('instances')
-                         ->orderBy('id', 'asc');
+        ->where('visible', 'yes')
+        ->with(['instances', 'service', 'location', 'clientType']);
+
+        if ($request->filled('location_id')) {
+            $clients->where('location_id', $request->input('location_id'));
+        }
+
+        if ($request->filled('type_id')) {
+            $clients->where('type_id', $request->input('type_id'));
+        }
+
+        $filteredClients = $clients->get();
 
         return Datatables::make($clients)
             ->addColumn('instances_links', function ($client) {

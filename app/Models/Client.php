@@ -37,6 +37,14 @@ class Client extends Model {
         return $this->belongsTo(Location::class);
     }
 
+    public function service() {
+        return $this->belongsTo(Service::class);
+    }
+
+    public function clientType() {
+        return $this->belongsTo(ClientType::class);
+    }
+
     public function type(): BelongsTo {
         return $this->belongsTo(ClientType::class);
     }

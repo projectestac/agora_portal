@@ -22,6 +22,9 @@ use App\Http\Controllers\RoleController;
 use App\Mail\UpdateRequest;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
+use App\Models\Service;
+use App\Models\Location;
+use App\Models\ClientType;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +38,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', static function () {
-    return view('home');
+    $services = Service::all(); // Remplacez Service par le nom réel de votre modèle de services
+    $locations = Location::all(); // Remplacez Location par le nom réel de votre modèle de locations
+    $clientTypes = ClientType::all(); // Remplacez ClientType par le nom réel de votre modèle de types de clients
+
+    return view('home', compact('services', 'locations', 'clientTypes'));
 })->name('home');
 
 Route::resource('/queries', QueryController::class);
