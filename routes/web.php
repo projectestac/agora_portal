@@ -22,6 +22,9 @@ use App\Http\Controllers\RoleController;
 use App\Mail\UpdateRequest;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
+use App\Models\Service;
+use App\Models\Location;
+use App\Models\ClientType;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,13 +38,18 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', static function () {
-    return view('home');
+    $services = Service::all();
+    $locations = Location::all();
+    $clientTypes = ClientType::all();
+
+    return view('home', compact('services', 'locations', 'clientTypes'));
 })->name('home');
 
 Route::resource('/queries', QueryController::class);
 
 // AJAX routes for datatables. Must be before the resource route.
 Route::get('/clients/list', [ClientController::class, 'getClients'])->name('clients.list');
+Route::get('/clients/active-list', [ClientController::class, 'getActiveClients'])->name('clients.active.list');
 Route::get('/instances/list', [InstanceController::class, 'getInstances'])->name('instances.list');
 Route::get('/users/list', [UserController::class, 'getUsers'])->name('users.list');
 Route::get('/managers/list', [ManagerController::class, 'getManagers'])->name('managers.list');
