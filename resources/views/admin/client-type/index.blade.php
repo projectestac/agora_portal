@@ -16,12 +16,6 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-6">
-                <a href="{{ route('client-types.create') }}" class="btn btn-primary">{{ __('client-type.client_type_new') }}</a>
-            </div>
-        </div>
-
         @if (!empty($clientTypes))
 
             <table class="table table-striped">
@@ -40,32 +34,25 @@
                     <tr>
                         <td>{{ $clientType->id }}</td>
                         <td>{{ $clientType->name }}</td>
-                        <td>{{ $clientType->created_at }}</td>
-                        <td>{{ $clientType->updated_at }}</td>
+                        <td>{{ \Carbon\Carbon::parse($clientType->created_at)->format('d/m/Y H:i') }}</td>
+                        <td>{{ \Carbon\Carbon::parse($clientType->updated_at)->format('d/m/Y H:i') }}</td>
                         <td>
                             <a href="{{ route('client-types.edit', $clientType->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
                                 <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                             </a>
 
-                        <tr>
-                            <td>{{ $clientType->id }}</td>
-                            <td>{{ $clientType->name }}</td>
-                            <td>{{ $clientType->created_at }}</td>
-                            <td>{{ $clientType->updated_at }}</td>
-                            <td>
-                                <a href="{{ route('client-types.edit', $clientType->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
-                                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                                </a>
+                            <form action="{{ route('client-types.destroy', $clientType->id) }}"
+                                  onsubmit="return confirm('{{ __('common.confirm_deletion') }}')" method="POST" style="display: inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">
+                                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
 
-                                <form action="{{ route('client-types.destroy', $clientType->id) }}" onsubmit="return confirm('{{ __('common.confirm_deletion') }}')" method="POST" style="display: inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
-                              </form>
-                            </td>
-                        </tr>
-
-                    @endforeach
+                @endforeach
 
                 </tbody>
             </table>

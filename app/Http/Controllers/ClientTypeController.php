@@ -7,15 +7,13 @@ use App\Http\Requests\UpdateClientTypeRequest;
 use App\Models\ClientType;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 
-class ClientTypeController extends Controller
-{
+class ClientTypeController extends Controller {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
+    public function index() {
+
         $clientTypes = ClientType::get();
 
         return view('admin.client-type.index')
@@ -25,25 +23,22 @@ class ClientTypeController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
+    public function create() {
         return view('admin.client-type.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreClientTypeRequest $request): RedirectResponse
-    {
-        $name = $request->input('name');
+    public function store(StoreClientTypeRequest $request): RedirectResponse {
+
         $clientType = new ClientType([
-            'name' => $name
+            'name' => $request->input('name'),
         ]);
 
         try {
             $clientType->save();
         } catch (\Exception $e) {
-
             return redirect()->route('client-types.create')
                 ->withErrors(['error' => $e->getMessage()]);
         }
@@ -55,44 +50,37 @@ class ClientTypeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ClientType $clientType)
-    {
+    public function show(ClientType $clientType) {
         //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
-    {
-        $clientType = ClientType::findOrFail($id);
-
+    public function edit(ClientType $clientType): View {
         return view('admin.client-type.edit')
-                ->with('clientType', $clientType);
+            ->with('clientType', $clientType);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
-    {
-        $validatedData = $request->validate([
-            'name' => 'required|string'
-        ]);
-
-        $clientType = ClientType::findOrFail($id);
+    public function update(UpdateClientTypeRequest $request, ClientType $clientType): RedirectResponse {
 
         $clientType->update([
-            'name' => $validatedData['name']
+            'name' => $request->input('name'),
         ]);
 
-        return redirect()->route('client-types.index')->with('success', __('request.request_created'));
+        return redirect()
+            ->route('client-types.index')
+            ->with('success', __('client-type.client_type_updated'));
     }
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(ClientType $clientType): RedirectResponse {
+
         $clientType->delete();
 
         return redirect()
