@@ -38,9 +38,9 @@ use App\Models\ClientType;
 */
 
 Route::get('/', static function () {
-    $services = Service::all(); // Remplacez Service par le nom réel de votre modèle de services
-    $locations = Location::all(); // Remplacez Location par le nom réel de votre modèle de locations
-    $clientTypes = ClientType::all(); // Remplacez ClientType par le nom réel de votre modèle de types de clients
+    $services = Service::all();
+    $locations = Location::all();
+    $clientTypes = ClientType::all();
 
     return view('home', compact('services', 'locations', 'clientTypes'));
 })->name('home');

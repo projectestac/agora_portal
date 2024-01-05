@@ -15,7 +15,7 @@
             <tr>
                 <th>
                     <select class="form-control filter" data-column="0" id="filter-location">
-                        <option value="">{{ __('Filter by Servei Territorial') }}</option>
+                        <option value="">{{ __('home.filter_by_location') }}</option>
                         @foreach($locations as $location)
                             <option value="{{ $location->id }}">{{ $location->name }}</option>
                         @endforeach
@@ -23,7 +23,7 @@
                 </th>
                 <th>
                     <select class="form-control filter" data-column="1" id="filter-clientType">
-                        <option value="">{{ __('Filter by Tipus de centre') }}</option>
+                        <option value="">{{ __('home.filter_by_client_type') }}</option>
                         @foreach($clientTypes as $clientType)
                             <option value="{{ $clientType->id }}">{{ $clientType->name }}</option>
                         @endforeach
@@ -60,12 +60,10 @@
                 ]
             });
 
-            // Ajouter des événements change pour les filtres
             $('.filter').change(function () {
                 var locationFilter = $('#filter-location').val();
                 var clientTypeFilter = $('#filter-clientType').val();
 
-                // Recharger la table avec les nouveaux filtres
                 table.ajax.url('{{ route('clients.active.list') }}' +
                     '?location_id=' + locationFilter +
                     '&type_id=' + clientTypeFilter).load();
