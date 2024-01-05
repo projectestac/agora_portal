@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'instance' => 'Instància',
+    'instances' => 'Instàncies',
     'instance_list' => 'Llista d\'instàncies',
     'instance_edit' => 'Edició de la instància',
     'instance_updated' => 'S\'ha actualitzat la instància correctament',
