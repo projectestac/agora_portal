@@ -204,6 +204,28 @@ class ClientController extends Controller {
 
     }
 
+    // for public portal
+    public function getActiveClients(): JsonResponse {
+        $clients = Client::where('status', 'active')
+                         ->where('visible', 'yes')
+                         ->with('instances')
+                         ->orderBy('id', 'asc');
+
+        return Datatables::make($clients)
+            ->addColumn('instances_links', function ($client) {
+            $links = '';
+
+            foreach ($client->instances as $instance) {
+                $instance_url = '/' . $client->dns . ($instance->service_id == 4 ? '/moodle/' : '/');
+                $instance_logo = '/portal/images/' . ($instance->service_id == 4 ? 'moodle.gif' : 'nodes.gif');
+
+                $links .= '<a href="' . $instance_url . '" target="_blank"><img src="' . $instance_logo . '"></a>&nbsp;&nbsp;&nbsp;';
+            }
+
+            return new HtmlString($links);
+        })->make();
+    }
+
     public function createClientFromWS(mixed $data): void {
         // a8000001$$esc-tramuntana$$Escola Tramuntana$$c. Rosa dels Vents, 8$$Valldevent$$09999
         $data = explode('$$', $data);
