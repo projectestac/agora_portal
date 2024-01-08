@@ -23,7 +23,7 @@
             <div class="form-group">
                 <label class="col-sm-4 control-label clear" for="description">{{ __('common.description') }}</label>
                 <div class="col-sm-8">
-                    <input type="text" class="form-control" id="description" name="description" value="{{ old('description') }}">
+                    <textarea class="form-control" id="description" name="description">{{ old('description') }}</textarea>
                 </div>
             </div>
 

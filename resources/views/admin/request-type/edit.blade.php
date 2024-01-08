@@ -22,7 +22,7 @@
                             <input type="text" class="form-control" id="name" name="name" value="{{ $requestType->name }}">
 
                             @error('name')
-                                <div class="text-danger">{{ $message }}</div>
+                            <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
@@ -30,8 +30,7 @@
                     <div class="form-group">
                         <label class="col-sm-4 control-label clear" for="description">{{ __('common.description') }}</label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control" id="description" name="description" value="{{ $requestType->description }}">
-
+                            <textarea class="form-control" id="description" name="description">{{ $requestType->description }}</textarea>
                             @error('description')
                                 <div class="text-danger">{{ $message }}</div>
                             @enderror
@@ -50,10 +49,28 @@
                     </div>
 
                     <div class="form-group">
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-success">{{ __('common.save') }}</button>
+                        <label class="col-sm-4 control-label clear" for="services">{{ __('service.services') }}</label>
+                        <div class="col-sm-8">
+                            @foreach ($services as $service)
+                                <label>
+                                    <input type="checkbox"
+                                           name="service_{{ $service->name }}"
+                                           value="{{ $service->name }}"
+                                           @if (in_array($service->id, $associatedServices, true)) checked @endif>
+                                </label> {{ $service->name }}
+                                <br>
+                            @endforeach
+
+                            @error('services')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
-                    </div>
+
+                        <div class="form-group">
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-success">{{ __('common.save') }}</button>
+                            </div>
+                        </div>
                 </form>
             </div>
         </div>

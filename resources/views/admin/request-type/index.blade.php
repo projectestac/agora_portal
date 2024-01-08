@@ -21,8 +21,7 @@
                 <tr>
                     <th>{{ __('common.id') }}</th>
                     <th>{{ __('common.name') }}</th>
-                    <th>{{ __('common.description') }}</th>
-                    <th>{{ __('common.prompt') }}</th>
+                    <th>{{ __('service.services') }}</th>
                     <th>{{ __('common.created_at') }}</th>
                     <th>{{ __('common.updated_at') }}</th>
                     <th>{{ __('common.actions') }}</th>
@@ -35,11 +34,13 @@
                         <tr>
                             <td>{{ $requestType->id }}</td>
                             <td>{{ $requestType->name }}</td>
-                            <td>{{ $requestType->description }}</td>
-                            <td>{{ $requestType->prompt }}</td>
-                            <td>{{ $requestType->created_at }}</td>
-                            <td>{{ $requestType->updated_at }}</td>
                             <td>
+                                @foreach ($requestType->services as $service)
+                                    <img src="{{ secure_asset('images/' . mb_strtolower($service->name . '.gif')) }}" alt="{{ $service->name }}">
+                                @endforeach
+                            <td>{{ \Carbon\Carbon::parse($requestType->created_at)->format('d/m/Y H:i')}}</td>
+                            <td>{{ \Carbon\Carbon::parse($requestType->updated_at)->format('d/m/Y H:i')}}</td>
+                            <td style="min-width: 100px;">
                                 <a href="{{ route('request-types.edit', $requestType->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
                                     <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                                 </a>
