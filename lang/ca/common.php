@@ -43,4 +43,12 @@ return [
     'yes' => 'Sí',
     'no' => 'No',
     'prompt' => 'Missatge',
+    'month' => 'Mes',
+    'year' => 'Any',
+    'please_select_a_date' => 'Si us plau, seleccioneu una data',
+    'no_results_found' => 'No s\'han trobat resultats',
+    'moodle' => 'Moodle',
+    'nodes' => 'Nodes',
+    'table' => 'Taula',
+    'chart' => 'Gràfic'
 ];
