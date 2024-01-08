@@ -703,21 +703,28 @@ class InstanceController extends Controller {
         // Get the list of services and execute the function to update the quota for each one.
         $serviceNames = Service::get()->where('status', 'active')->pluck('name')->toArray();
 
+        $result = [];
+
         foreach ($serviceNames as $serviceName) {
-            $this->updateQuotaByService($serviceName);
+            $result[] = $this->updateQuotaByService($serviceName);
         }
 
         return redirect()
             ->back()
-            ->with('success', __('common.update_quotas_success'));
+            ->with('message', implode('<br>', $result));
     }
 
-    private function updateQuotaByService($serviceName): void {
+    private function updateQuotaByService($serviceName): string {
 
         $quotasFile = Util::getAgoraVar(mb_strtolower($serviceName) . '_quotas_file');
         $serviceId = Service::where('name', $serviceName)->first()->id;
 
-        $fileContent = file_get_contents($quotasFile);
+        try {
+            $fileContent = file_get_contents($quotasFile);
+        } catch (\Exception $e) {
+            return $serviceName . ': ' . $e->getMessage();
+        }
+
         $lines = explode("\n", $fileContent);
 
         foreach ($lines as $line) {
@@ -727,6 +734,8 @@ class InstanceController extends Controller {
                     ->update(['used_quota' => (int)$matches[1]]);
             }
         }
+
+        return __('instance.update_quotas_service_ended', ['service' => $serviceName]);
     }
 
 }

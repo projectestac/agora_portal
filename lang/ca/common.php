@@ -43,6 +43,4 @@ return [
     'yes' => 'Sí',
     'no' => 'No',
     'prompt' => 'Missatge',
-    'update_quotas' => 'Actualitza les quotes',
-    'update_quotas_success' => 'S\'ha actualitzat l\'ús del disc correctament',
 ];

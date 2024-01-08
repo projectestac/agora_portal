@@ -123,7 +123,7 @@
                 @csrf
                 <div class="form-group">
                     <div class="text-center">
-                        <button type="submit" class="btn btn-info">{{ __('common.update_quotas') }}</button>
+                        <button type="submit" class="btn btn-info">{{ __('instance.update_quotas') }}</button>
                     </div>
                 </div>
             </form>
