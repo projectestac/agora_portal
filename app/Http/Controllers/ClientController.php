@@ -213,8 +213,7 @@ class ClientController extends Controller {
             'clients.city'
         ])
         ->where('clients.status', 'active')
-        ->where('clients.visible', 'yes')
-        ->with(['instances', 'service', 'location', 'clientType']);
+        ->where('clients.visible', 'yes');
 
         if ($request->filled('location_id')) {
             $clients->where('clients.location_id', $request->input('location_id'));
@@ -231,7 +230,8 @@ class ClientController extends Controller {
             $clients->where('services.id', $request->input('service_id'));
         }
 
-        $filteredClients = $clients->groupBy('clients.id')->get();
+        // Remove duplicates.
+        $clients->groupBy('clients.id')->get();
 
         return Datatables::make($clients)
             ->addColumn('instances_links', function ($client) {
