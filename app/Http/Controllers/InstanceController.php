@@ -698,33 +698,35 @@ class InstanceController extends Controller {
 
     }
 
-    public function updateDiskUsage($serviceName) {
-        $folder = $serviceName === 'Moodle' ? 'moodledata' : 'wpdata';
-        $serviceId = $serviceName === 'Moodle' ? 4 : 5; // to be optimized later ?
+    public function updateQuotas(): RedirectResponse {
 
-        $diskUsageFile = '/dades/data/' . $folder . '/diskUsage' . $serviceName . '.txt';
+        // Get the list of services and execute the function to update the quota for each one.
+        $serviceNames = Service::get()->where('status', 'active')->pluck('name')->toArray();
 
-        $fileContent = file_get_contents($diskUsageFile);
+        foreach ($serviceNames as $serviceName) {
+            $this->updateQuotaByService($serviceName);
+        }
 
+        return redirect()
+            ->back()
+            ->with('success', __('common.update_quotas_success'));
+    }
+
+    private function updateQuotaByService($serviceName): void {
+
+        $quotasFile = Util::getAgoraVar(mb_strtolower($serviceName) . '_quotas_file');
+        $serviceId = Service::where('name', $serviceName)->first()->id;
+
+        $fileContent = file_get_contents($quotasFile);
         $lines = explode("\n", $fileContent);
 
         foreach ($lines as $line) {
             if (preg_match('/(\d+)\s+usu(\d+)/', $line, $matches)) {
-                $username = 'usu' . $matches[2];
-                $size = (int)$matches[1];
-
-                Instance::where('client_id', $matches[2])
-                        ->where('service_id', $serviceId)
-                        ->update(['used_quota' => $size]);
+                Instance::where('client_id', (int)$matches[2])
+                    ->where('service_id', $serviceId)
+                    ->update(['used_quota' => (int)$matches[1]]);
             }
         }
-    }
-
-    public function updateAllDiskUsages() {
-        $this->updateDiskUsage('Moodle');
-        $this->updateDiskUsage('Nodes');
-
-        return redirect()->back()->with('success', __('common.disk_usage_update_success'));
     }
 
 }

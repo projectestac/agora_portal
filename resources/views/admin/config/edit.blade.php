@@ -117,11 +117,13 @@
                 </div>
             </form>
 
-            <form action="{{ route('updateAllDiskUsages') }}" method="post">
+        <br>
+
+            <form action="{{ route('update.quotas') }}" method="post">
                 @csrf
                 <div class="form-group">
                     <div class="text-center">
-                        <button type="submit" class="btn btn-success">{{ __('common.update_disk_usage') }}</button>
+                        <button type="submit" class="btn btn-info">{{ __('common.update_quotas') }}</button>
                     </div>
                 </div>
             </form>

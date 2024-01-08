@@ -168,6 +168,14 @@ class Util {
                 Config::get('app.agora.nodes.datadir'),
             'moodledata' => Config::get('app.agora.server.root') .
                 Config::get('app.agora.moodle2.datadir'),
+            'moodle_quotas_file' => Config::get('app.agora.server.root') .
+                Config::get('app.agora.moodle2.datadir') .
+                Config::get('app.agora.moodle2.diskusagefile'),
+            'nodes_quotas_file' => Config::get('app.agora.server.root') .
+                Config::get('app.agora.nodes.datadir') .
+                Config::get('app.agora.nodes.diskusagefile'),
+            'moodle_user_prefix' => Config::get('app.agora.moodle2.userprefix'),
+            'nodes_user_prefix' => Config::get('app.agora.nodes.userprefix'),
             'nodes_domain' => Config::get('app.agora.server.nodes'),
             'moodle_domain' => Config::get('app.agora.server.server'),
             'se_domain' => Config::get('app.agora.server.se-url'),
