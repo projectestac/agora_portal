@@ -14,6 +14,7 @@ use App\Http\Controllers\MyAgoraController;
 use App\Http\Controllers\QueueController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\RequestTypeController;
+use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\SelectorController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\UserController;
@@ -55,6 +56,7 @@ Route::get('/managers/list', [ManagerController::class, 'getManagers'])->name('m
 // Routes for administrators only.
 Route::group(['middleware' => ['auth', 'permission:Administrate site']], static function () {
     Route::get('/clients/import', [ClientController::class, 'import'])->name('clients.import');
+    Route::get('/clients/search', [ClientController::class, 'search'])->name('clients.search');
 
     /*
     Route::get('/users/{user}/impersonate', [UserController::class, 'impersonate'])->name('users.impersonate');
@@ -65,6 +67,10 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::resource('/clients', ClientController::class);
     Route::resource('/users', UserController::class);
     Route::resource('/roles', RoleController::class);
+
+    Route::get('/stats', [StatisticsController::class, 'showStats'])->name('stats.show');
+    Route::get('/stats/{service}/{periodicity}', [StatisticsController::class, 'showTabStats'])->name('stats.showTabStats');
+    Route::get('/stats/export/{service}/{periodicity}', [StatisticsController::class, 'exportTabStats'])->name('stats.exportTabStats');
 
     Route::get('/batch', [BatchController::class, 'batch'])->name('batch');
     Route::get('/batch/query', [BatchController::class, 'query'])->name('batch.query');
