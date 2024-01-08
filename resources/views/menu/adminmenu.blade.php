@@ -22,7 +22,7 @@
             </a>
         </li>
         <li>
-            <a href="{{ route('home') }}" @if (str_contains(request()->url(), 'stats')) class="selected" @endif>
+            <a href="{{ route('stats.index') }}" @if (str_contains(request()->url(), 'stats')) class="selected" @endif>
                 {{ __('stats.stats') }}
             </a>
         </li>

@@ -14,6 +14,7 @@ use App\Http\Controllers\MyAgoraController;
 use App\Http\Controllers\QueueController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\RequestTypeController;
+use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\SelectorController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\UserController;
@@ -65,6 +66,9 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::resource('/clients', ClientController::class);
     Route::resource('/users', UserController::class);
     Route::resource('/roles', RoleController::class);
+
+    Route::get('/stats/show', [StatisticsController::class, 'showStats'])->name('stats.show');
+    Route::resource('/stats', StatisticsController::class)->except(['show']);
 
     Route::get('/batch', [BatchController::class, 'batch'])->name('batch');
     Route::get('/batch/query', [BatchController::class, 'query'])->name('batch.query');
