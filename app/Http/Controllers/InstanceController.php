@@ -238,7 +238,7 @@ class InstanceController extends Controller {
         if ($orderColumn === 'instances.location') {
             $orderColumn = 'clients.city';
         }
-        if ($orderColumn === 'instances.used_quota') {
+        if ($orderColumn === 'instances.quota') {
             $orderColumn = 'instances.used_quota';
         }
         if ($orderColumn === 'dates') {
@@ -295,7 +295,7 @@ class InstanceController extends Controller {
             ->addColumn('location', function ($instance) {
                 return new HtmlString($instance->client->city . '<br/>(<em>' . $instance->client->location->name . '</em>)');
             })
-            ->addColumn('disk_usage', function ($instance) {
+            ->addColumn('quota', function ($instance) {
                 return new HtmlString(Util::getFormattedDiskUsage($instance->used_quota, $instance->quota));
             })
             ->addColumn('updated_at', function ($instance) {
@@ -699,8 +699,8 @@ class InstanceController extends Controller {
     }
 
     public function updateDiskUsage($serviceName) {
-        $folder = $serviceName == "Moodle" ? "moodledata" : "wpdata";
-        $serviceId = $serviceName == "Moodle" ? 4 : 5; // to be optimized later ?
+        $folder = $serviceName === 'Moodle' ? 'moodledata' : 'wpdata';
+        $serviceId = $serviceName === 'Moodle' ? 4 : 5; // to be optimized later ?
 
         $diskUsageFile = '/dades/data/' . $folder . '/diskUsage' . $serviceName . '.txt';
 

@@ -153,7 +153,7 @@ class Util {
     }
 
     public static function getFormattedDiskUsage(int $used, int $total): string {
-        return Util::formatBytes($used) . ' / ' . Util::formatBytes($total) . ' (' . round($used / $total * 100) . '%)';
+        return self::formatBytes($used) . ' / ' . self::formatBytes($total) . ' (' . round($used / $total * 100) . '%)';
     }
 
     public static function getAgoraVar(string $varName = ''): string {
