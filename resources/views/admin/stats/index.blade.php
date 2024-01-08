@@ -18,24 +18,26 @@
             <tbody>
                 <tr>
                     <td colspan="2">
-                        <form method="get" action="{{ route('stats.show') }}">
+                        <form method="get" action="{{ route('stats.show') }}" class="form-inline">
                             @csrf
-                            <label for="month">{{ __('common.month') }}</label>
-                            <select name="month" id="month">
+
+                            <label for="month" class="visually-hidden">{{ __('common.month') }}</label>
+                            <select name="month" class="form-control" id="month">
                                 @foreach (range(1, 12) as $month)
-                                    <option value="{{ $month }}">{{ $month }}</option>
+                                    <option value="{{ $month }}" {{ $month == request('month') ? 'selected' : '' }}>{{ $month }}</option>
                                 @endforeach
                             </select>
 
-                            <label for="year">{{ __('common.year') }}:</label>
-                            <select name="year" id="year">
+                            <label for="year" class="visually-hidden">{{ __('common.year') }}:</label>
+                            <select name="year" class="form-control" id="year">
                                 @foreach (range(date('Y'), date('Y') - 10, -1) as $year)
-                                    <option value="{{ $year }}">{{ $year }}</option>
+                                    <option value="{{ $year }}" {{ $year == request('year') ? 'selected' : '' }}>{{ $year }}</option>
                                 @endforeach
                             </select>
 
-                            <button type="submit">{{ __('stats.show_stats') }}</button>
+                            <button type="submit" class="btn btn-primary">{{ __('stats.show_stats') }}</button>
                         </form>
+
                     </td>
                 </tr>
 
