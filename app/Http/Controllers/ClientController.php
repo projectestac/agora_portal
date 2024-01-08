@@ -224,8 +224,8 @@ class ClientController extends Controller {
             $clients->where('clients.type_id', $request->input('type_id'));
         }
 
-        $clients->join('instances', 'clients.id', '=', 'instances.client_id')
-            ->join('services', 'instances.service_id', '=', 'services.id');
+        $clients->leftJoin('instances', 'clients.id', '=', 'instances.client_id')
+            ->leftJoin('services', 'instances.service_id', '=', 'services.id');
 
         if ($request->filled('service_id')) {
             $clients->where('services.id', $request->input('service_id'));
