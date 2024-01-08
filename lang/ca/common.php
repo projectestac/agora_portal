@@ -45,5 +45,5 @@ return [
     'prompt' => 'Missatge',
     'disk_usage' => 'Ús del disc',
     'update_disk_usage' => 'Actualitza les quotes del disc',
-    'disk_usage_update_success' => 'S\'ha actualitzat l'ús del disc correctament',
+    'disk_usage_update_success' => 'S\'ha actualitzat l\'ús del disc correctament',
 ];
