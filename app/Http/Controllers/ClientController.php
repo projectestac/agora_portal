@@ -207,19 +207,31 @@ class ClientController extends Controller {
 
     // for public portal
     public function getActiveClients(Request $request): JsonResponse {
-        $clients = Client::where('status', 'active')
-        ->where('visible', 'yes')
+        $clients = Client::select([
+            'clients.id',
+            'clients.name as client_name', // to avoid conflict with services.name
+            'clients.city'
+        ])
+        ->where('clients.status', 'active')
+        ->where('clients.visible', 'yes')
         ->with(['instances', 'service', 'location', 'clientType']);
 
         if ($request->filled('location_id')) {
-            $clients->where('location_id', $request->input('location_id'));
+            $clients->where('clients.location_id', $request->input('location_id'));
         }
 
         if ($request->filled('type_id')) {
-            $clients->where('type_id', $request->input('type_id'));
+            $clients->where('clients.type_id', $request->input('type_id'));
         }
 
-        $filteredClients = $clients->get();
+        $clients->join('instances', 'clients.id', '=', 'instances.client_id')
+            ->join('services', 'instances.service_id', '=', 'services.id');
+
+        if ($request->filled('service_id')) {
+            $clients->where('services.id', $request->input('service_id'));
+        }
+
+        $filteredClients = $clients->groupBy('clients.id')->get();
 
         return Datatables::make($clients)
             ->addColumn('instances_links', function ($client) {

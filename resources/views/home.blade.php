@@ -30,6 +30,12 @@
                     </select>
                 </th>
                 <th>
+                    <select class="form-control filter" data-column="2" id="filter-service">
+                        <option value="">{{ __('home.filter_by_service') }}</option>
+                        @foreach($services as $service)
+                            <option value="{{ $service->id }}">{{ $service->name }}</option>
+                        @endforeach
+                    </select>
                 </th>
             </tr>
             <tr>
@@ -54,7 +60,7 @@
                 pageLength: 25,
                 ajax: '{{ route('clients.active.list') }}',
                 columns: [
-                    {data: 'name', name: 'name'},
+                    {data: 'client_name', name: 'client_name'},
                     {data: 'city', name: 'city'},
                     {data: 'instances_links', name: 'instances_links'}
                 ]
@@ -63,10 +69,12 @@
             $('.filter').change(function () {
                 var locationFilter = $('#filter-location').val();
                 var clientTypeFilter = $('#filter-clientType').val();
+                var serviceFilter = $('#filter-service').val();
 
                 table.ajax.url('{{ route('clients.active.list') }}' +
                     '?location_id=' + locationFilter +
-                    '&type_id=' + clientTypeFilter).load();
+                    '&type_id=' + clientTypeFilter +
+                    '&service_id=' + serviceFilter).load();
             });
         });
     </script>
