@@ -23,7 +23,7 @@ use Illuminate\Contracts\View\View;
 class ClientController extends Controller {
 
     public function __construct() {
-        $this->middleware('auth');
+        $this->middleware('auth')->except('getActiveClients');
     }
 
     /**
