@@ -4,7 +4,7 @@
         <thead>
             <tr>
                 @foreach($results[0] as $key => $value)
-                    <th>{{ $key }}</th>
+                    <th>{{ __('database-table.' . $key) }}</th>
                 @endforeach
             </tr>
         </thead>
