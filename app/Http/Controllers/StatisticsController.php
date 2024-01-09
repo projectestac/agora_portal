@@ -4,12 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Role;
+use App\Models\Client;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 
 class StatisticsController extends Controller {
+    protected $clients;
+
     public function __construct() {
         $this->middleware('auth');
+        $this->clients = Client::all();
     }
 
     /**
@@ -110,7 +114,69 @@ class StatisticsController extends Controller {
                 'invalidPortalsActiveUsersSum' => $invalidPortalsActiveUsersSum,
                 'centresNodesCount' => $centresNodesCount,
                 'postsSum' => $postsSum,
-                'accessNodesSum' => $accessNodesSum]
+                'accessNodesSum' => $accessNodesSum],
+            'view' => 'stats.show'
         ]);
+    }
+
+    // Example: showTabStats('daily', 'moodle')
+    public function showTabStats(Request $request, string $service, string $periodicity) {
+
+        // getting matching stats table
+        $table = 'agoraportal_' . ($service == 'moodle' ? 'moodle2' : 'nodes') . '_stats_' . ($periodicity == 'daily' ? 'day' : str_replace('ly', '', $periodicity));
+
+        if($periodicity == 'monthly')
+        {
+            $month = $request->input('month');
+            $year = $request->input('year');
+            $yearMonth = $year . str_pad($month, 2, '0', STR_PAD_LEFT);
+
+            // getting results
+            $results = DB::table($table)->where('yearmonth', $yearMonth)->get();
+        }
+
+        else
+        {
+            $date = str_replace('-', '', $request->input('date'));
+
+            // getting results
+            $results = DB::table($table)->where('date', $date)->get();
+        }
+
+        $view = 'stats.' . $service . '.' . $periodicity;
+
+        // passing results to matching tab view
+        return view('admin.stats.results', ['results' => $results, 'view' => $view, 'service' => $service, 'periodicity' => $periodicity, 'clients' => $this->clients]);
+
+    }
+
+    public function getMoodleMonthly()
+    {
+        return view('admin.stats.moodle.monthly', ['clients' => $this->clients]);
+    }
+
+    public function getMoodleDaily()
+    {
+        return view('admin.stats.moodle.daily', ['clients' => $this->clients]);
+    }
+
+    public function getMoodleWeekly()
+    {
+        return view('admin.stats.moodle.weekly', ['clients' => $this->clients]);
+    }
+
+    public function getNodesMonthly()
+    {
+        return view('admin.stats.nodes.monthly', ['clients' => $this->clients]);
+    }
+
+    public function getNodesDaily()
+    {
+        return view('admin.stats.nodes.daily', ['clients' => $this->clients]);
+    }
+
+    public function getNodesWeekly()
+    {
+        return view('admin.stats.nodes.weekly', ['clients' => $this->clients]);
     }
 }

@@ -7,7 +7,7 @@
 
     <div class="content stats">
 
-        <p class="h3">{{ __('stats.stats') }}</p>
+        @include('admin.stats.header')
 
         <table class="table table-striped">
             <thead>
