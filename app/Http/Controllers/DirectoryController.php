@@ -71,7 +71,7 @@ class DirectoryController extends Controller {
         $currentPath = base64_decode($currentPath);
 
         $request->validate([
-            'file' => 'required|mimes:zip,sql,jpg,gif,png,txt',
+            'file' => 'required|mimes:zip,sql,jpg,gif,png,txt|max:25000', // Size in kilobytes (25MB = 25000 KB)
         ]);
 
         try {
