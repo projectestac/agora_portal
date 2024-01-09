@@ -12,12 +12,7 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th colspan="2">{{ __('Nombre') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="2">
+                    <th colspan="2">
                         <form method="get" action="{{ route('stats.show') }}" class="form-inline">
                             @csrf
 
@@ -37,13 +32,15 @@
 
                             <button type="submit" class="btn btn-primary">{{ __('stats.show_stats') }}</button>
                         </form>
-
-                    </td>
+                    </th>
                 </tr>
-
-
+            </thead>
+            <tbody>
                 @if(isset($results))
                     <tr>
+                        <td colspan="2"><h4><b>{{ __('common.moodle') }}</b></h4></td>
+                    <tr>
+
                         <td>{{ __('stats.centres_count') }}</td>
                         <td>{{ $results['centresCount'] }}</td>
                     </tr>
@@ -67,6 +64,11 @@
                         <td>{{ __('stats.invalid_portals_active_users_sum') }}</td>
                         <td>{{ $results['invalidPortalsActiveUsersSum'] }}</td>
                     </tr>
+
+                    <tr>
+                        <td colspan="2"><h4><b>{{ __('common.nodes') }}</b></h4></td>
+                    <tr>
+
                     <tr>
                         <td>{{ __('stats.centres_nodes_count') }}</td>
                         <td>{{ $results['centresNodesCount'] }}</td>

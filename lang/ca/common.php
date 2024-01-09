@@ -45,5 +45,7 @@ return [
     'prompt' => 'Missatge',
     'month' => 'Mes',
     'year' => 'Any',
-    'please_select_a_date' => 'Si us plau, seleccioneu una data'
+    'please_select_a_date' => 'Si us plau, seleccioneu una data',
+    'moodle' => 'Moodle',
+    'nodes' => 'Nodes'
 ];
