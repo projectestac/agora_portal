@@ -209,42 +209,49 @@ class ClientController extends Controller {
     public function getActiveClients(Request $request): JsonResponse {
         $clients = Client::select([
             'clients.id',
-            'clients.name as client_name', // to avoid conflict with services.name
-            'clients.city'
+            'clients.name as client_name', // Avoid conflict with services.name
+            'clients.city',
         ])
-        ->where('clients.status', 'active')
-        ->where('clients.visible', 'yes');
+            ->where('clients.status', 'active')
+            ->where('clients.visible', 'yes');
 
         if ($request->filled('location_id')) {
-            $clients->where('clients.location_id', $request->input('location_id'));
+            $locationData = $request->validate([
+                'location_id' => 'string|exists:locations,id',
+            ]);
+            $clients->where('clients.location_id', $locationData['location_id']);
         }
 
         if ($request->filled('type_id')) {
-            $clients->where('clients.type_id', $request->input('type_id'));
+            $clientTypeData = $request->validate([
+                'type_id' => 'string|exists:client_types,id',
+            ]);
+            $clients->where('clients.type_id', $clientTypeData['type_id']);
         }
-
-        $clients->leftJoin('instances', 'clients.id', '=', 'instances.client_id')
-            ->leftJoin('services', 'instances.service_id', '=', 'services.id');
 
         if ($request->filled('service_id')) {
-            $clients->where('services.id', $request->input('service_id'));
+            $serviceData = $request->validate([
+                'service_id' => 'string|exists:services,id',
+            ]);
+            $clients->where('services.id', $serviceData['service_id']);
         }
 
+        $clients->leftJoin('instances', 'clients.id', '=', 'instances.client_id');
+        $clients->leftJoin('services', 'instances.service_id', '=', 'services.id');
         $clients->groupBy('clients.id')->get();
 
         return Datatables::make($clients)
             ->addColumn('instances_links', function ($client) {
-            $links = '';
+                $links = '';
 
-            foreach ($client->instances as $instance) {
-                $instance_url = Util::getInstanceUrl($instance);
-                $instance_logo = '/portal/images/' . strtolower($instance->service->name) . '.gif';
+                foreach ($client->instances as $instance) {
+                    $instanceUrl = Util::getInstanceUrl($instance);
+                    $instanceLogo = secure_asset('images/' . mb_strtolower($instance->service->name) . '.gif');
+                    $links .= '<a href="' . $instanceUrl . '" target="_blank"><img src="' . $instanceLogo . '" alt=""></a>&nbsp;&nbsp;&nbsp;';
+                }
 
-                $links .= '<a href="' . $instance_url . '" target="_blank"><img src="' . $instance_logo . '"></a>&nbsp;&nbsp;&nbsp;';
-            }
-
-            return new HtmlString($links);
-        })->make();
+                return new HtmlString($links);
+            })->make();
     }
 
     public function createClientFromWS(mixed $data): void {
@@ -281,7 +288,6 @@ class ClientController extends Controller {
         $clientRole = Role::findByName('client');
         $user->assignRole($clientRole);
     }
-
 
     /**
      * Update client information from the import_clients table, which must be created and populated manually. This function
