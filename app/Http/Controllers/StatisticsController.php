@@ -61,41 +61,41 @@ class StatisticsController extends Controller {
         $yearMonth = $year . str_pad($month, 2, '0', STR_PAD_LEFT);
 
         // MOODLE QUERIES
-        $centresCount = DB::table('portal.agoraportal_moodle2_stats_month')
+        $centresCount = DB::table('agoraportal_moodle2_stats_month')
             ->where('yearmonth', $yearMonth)
             ->count();
 
-        $activeUsersSum = DB::table('portal.agoraportal_moodle2_stats_month')
+        $activeUsersSum = DB::table('agoraportal_moodle2_stats_month')
             ->where('yearmonth', $yearMonth)
             ->sum('usersactive');
 
-        $coursesSum = DB::table('portal.agoraportal_moodle2_stats_month')
+        $coursesSum = DB::table('agoraportal_moodle2_stats_month')
             ->where('yearmonth', $yearMonth)
             ->sum('courses');
 
-        $activitiesSum = DB::table('portal.agoraportal_moodle2_stats_month')
+        $activitiesSum = DB::table('agoraportal_moodle2_stats_month')
             ->where('yearmonth', $yearMonth)
             ->sum('activities');
 
-        $totalAccessSum = DB::table('portal.agoraportal_moodle2_stats_month')
+        $totalAccessSum = DB::table('agoraportal_moodle2_stats_month')
             ->where('yearmonth', $yearMonth)
             ->sum('total_access');
 
-        $invalidPortalsActiveUsersSum = DB::table('portal.agoraportal_moodle2_stats_month')
+        $invalidPortalsActiveUsersSum = DB::table('agoraportal_moodle2_stats_month')
             ->where('yearmonth', $yearMonth)
             ->whereIn('clientDNS', ['analytics1', 'analytics2', 'analytics3', 'analytics4', 'analytics5', 'analytics6', 'analytics7', 'analytics8', 'analytics9', 'analytics10', 'analytics11', 'analytics12', 'prova2', 'suport', 'esc-vegeta', 'esc-gregal', 'esc-llevant', 'culturadigital', 'demoescola', 'demoinstitut', 'demo', 'monitor', 'eixapps', 'demo-moodle'])
             ->sum('usersactive');
 
         // NODES QUERIES
-        $centresNodesCount = DB::table('portal.agoraportal_nodes_stats_month')
+        $centresNodesCount = DB::table('agoraportal_nodes_stats_month')
             ->where('yearmonth', $yearMonth)
             ->count();
 
-        $postsSum = DB::table('portal.agoraportal_nodes_stats_month')
+        $postsSum = DB::table('agoraportal_nodes_stats_month')
             ->where('yearmonth', $yearMonth)
             ->sum('posts');
 
-        $accessNodesSum = DB::table('portal.agoraportal_nodes_stats_month')
+        $accessNodesSum = DB::table('agoraportal_nodes_stats_month')
             ->where('yearmonth', $yearMonth)
             ->sum('total');
 
