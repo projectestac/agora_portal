@@ -5,8 +5,7 @@ return [
     'department' => 'Departament d\'Educació',
     'xtec' => 'Xarxa Telemàtica Educativa de Catalunya',
     'active_instances' => 'Llista d\'espais actius',
-    'temporarily_unavailable' => 'Temporalment no disponible',
-    'filter_by_location' => 'Filtrar per Servei Territorial',
-    'filter_by_client_type' => 'Filtrar per tipus de centre',
-    'filter_by_service' => 'Filtrar per servei'
+    'filter_by_location' => 'Filtra per Servei Territorial',
+    'filter_by_client_type' => 'Filtra per tipus de centre',
+    'filter_by_service' => 'Filtra per servei'
 ];

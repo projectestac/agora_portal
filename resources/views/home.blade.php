@@ -41,13 +41,13 @@
             <tr>
                 <th>{{ __('common.name') }}</th>
                 <th>{{ __('client.city') }}</th>
-                <th>{{ __('client.instances') }}</th>
+                <th>{{ __('instance.instances') }}</th>
             </tr>
         </thead>
     </table>
 
     <script>
-        var table;
+        let table;
 
         $(function () {
             table = $('#client-list').DataTable({
@@ -67,9 +67,9 @@
             });
 
             $('.filter').change(function () {
-                var locationFilter = $('#filter-location').val();
-                var clientTypeFilter = $('#filter-clientType').val();
-                var serviceFilter = $('#filter-service').val();
+                const locationFilter = $('#filter-location').val();
+                const clientTypeFilter = $('#filter-clientType').val();
+                const serviceFilter = $('#filter-service').val();
 
                 table.ajax.url('{{ route('clients.active.list') }}' +
                     '?location_id=' + locationFilter +
@@ -85,4 +85,5 @@
         @endif
 
     @include('components.messages')
+
 @endsection

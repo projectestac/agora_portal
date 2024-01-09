@@ -12,7 +12,6 @@ return [
     'old_host' => 'Servidor antic',
     'address' => 'Adreça',
     'city' => 'Ciutat',
-    'instances' => 'Instàncies',
     'postal_code' => 'Codi postal',
     'description' => 'Descripció',
     'visible' => 'Visible',
