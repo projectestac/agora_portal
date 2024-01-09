@@ -230,7 +230,6 @@ class ClientController extends Controller {
             $clients->where('services.id', $request->input('service_id'));
         }
 
-        // Remove duplicates.
         $clients->groupBy('clients.id')->get();
 
         return Datatables::make($clients)
@@ -238,8 +237,8 @@ class ClientController extends Controller {
             $links = '';
 
             foreach ($client->instances as $instance) {
-                $instance_url = '/' . $client->dns . ($instance->service_id == 4 ? '/moodle/' : '/');
-                $instance_logo = '/portal/images/' . ($instance->service_id == 4 ? 'moodle.gif' : 'nodes.gif');
+                $instance_url = Util::getInstanceUrl($instance);
+                $instance_logo = '/portal/images/' . strtolower($instance->service->name) . '.gif';
 
                 $links .= '<a href="' . $instance_url . '" target="_blank"><img src="' . $instance_logo . '"></a>&nbsp;&nbsp;&nbsp;';
             }
