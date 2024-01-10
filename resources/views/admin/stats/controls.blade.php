@@ -1,16 +1,18 @@
 
-<div class="controls-container">
+<div class="controls-container" style="margin: 10px 0;">
     <form method="get" action="{{ route('stats.' . $service . '.' . $periodicity) }}" class="form-inline">
         @csrf
 
         @if($periodicity == 'monthly')
 
-            <label for="month" class="visually-hidden">{{ __('common.month') }}</label>
+            <label for="month" class="visually-hidden">{{ __('common.month') }}:</label>
             <select name="month" class="form-control" id="month">
                 @foreach (range(1, 12) as $month)
                     <option value="{{ $month }}" {{ $month == request('month') ? 'selected' : '' }}>{{ $month }}</option>
                 @endforeach
             </select>
+
+            &nbsp;
 
             <label for="year" class="visually-hidden">{{ __('common.year') }}:</label>
             <select name="year" class="form-control" id="year">
@@ -26,6 +28,8 @@
 
         @endif
 
+        &nbsp;
+
         <label>{{ __('stats.center_selector') }}</label>
         <select name="client_code" class="form-control">
             @foreach ($clients as $client)
@@ -35,6 +39,8 @@
 
         <button type="submit" class="btn btn-primary">{{ __('stats.show_stats') }}</button>
     </form>
+
+    <br>
 
     <a href="{{ route('stats.exportTabStats', ['service' => $service, 'periodicity' => $periodicity]) }}" class="btn btn-success">{{ __('stats.export_csv_button') }}</a>
 </div>

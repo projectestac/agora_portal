@@ -10,7 +10,7 @@
         </li>
     </ul>
 
-    <div class="tab-content">
+    <div class="tab-content" style="padding: 10px 0;">
         <div class="tab-pane fade active in" id="table">
             <table class="table table-striped" id="results">
                 <thead>
