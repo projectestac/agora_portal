@@ -37,5 +37,4 @@
     </form>
 
     <a href="{{ route('stats.exportTabStats', ['service' => $service, 'periodicity' => $periodicity]) }}" class="btn btn-success">{{ __('stats.export_csv_button') }}</a>
-    <button disabled class="btn btn-info">{{ __('stats.show_graph_button') }}</button>
 </div>
