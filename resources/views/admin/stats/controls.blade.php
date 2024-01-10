@@ -22,7 +22,7 @@
         @else
 
             <label for="date" class="visually-hidden">{{ __('common.date') }}</label>
-            <input name="date" type="date" class="form-control" value="{{ request('date') }}">
+            <input name="date" type="date" class="form-control" value="{{ request('date') ? request('date') : '2024-01-01' }}">
 
         @endif
 

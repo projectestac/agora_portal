@@ -23,40 +23,8 @@ class StatisticsController extends Controller {
         return view('admin.stats.index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create() {
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Role $role) {
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Role $role) {
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id) {
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Role $role) {
+    public function getTable(string $service, string $periodicity) {
+        return 'agoraportal_' . ($service == 'moodle' ? 'moodle2' : 'nodes') . '_stats_' . ($periodicity == 'daily' ? 'day' : str_replace('ly', '', $periodicity));
     }
 
     public function showStats(Request $request) {
@@ -121,9 +89,7 @@ class StatisticsController extends Controller {
 
     // Example: showTabStats('daily', 'moodle')
     public function showTabStats(Request $request, string $service, string $periodicity) {
-
-        // getting matching stats table
-        $table = 'agoraportal_' . ($service == 'moodle' ? 'moodle2' : 'nodes') . '_stats_' . ($periodicity == 'daily' ? 'day' : str_replace('ly', '', $periodicity));
+        $table = $this->getTable($service, $periodicity);
 
         $client_code = $request->input('client_code');
 
@@ -154,9 +120,8 @@ class StatisticsController extends Controller {
 
     }
 
-    public function exportTabStats(Request $request, string $service, string $periodicity)
-    {
-        $table = 'agoraportal_' . ($service == 'moodle' ? 'moodle2' : 'nodes') . '_stats_' . ($periodicity == 'daily' ? 'day' : str_replace('ly', '', $periodicity));
+    public function exportTabStats(Request $request, string $service, string $periodicity) {
+        $table = $this->getTable($service, $periodicity);
 
         $data = DB::table($table)->get();
 
@@ -172,7 +137,13 @@ class StatisticsController extends Controller {
         $handle = fopen('php://output', 'w');
 
         // column names
-        fputcsv($handle, array_keys((array) $data->first()));
+        $columnNames = array_keys((array) $data->first());
+
+        $translatedColumnNames = array_map(function ($columnName) {
+            return __('database-table.' . $columnName);
+        }, $columnNames);
+
+        fputcsv($handle, $translatedColumnNames);
 
         // full table data
         foreach ($data as $row) {
@@ -182,35 +153,5 @@ class StatisticsController extends Controller {
         fclose($handle);
 
         return response()->make(rtrim(ob_get_clean()), 200, $headers);
-    }
-
-    public function getMoodleMonthly()
-    {
-        return view('admin.stats.moodle.monthly', ['clients' => $this->clients]);
-    }
-
-    public function getMoodleDaily()
-    {
-        return view('admin.stats.moodle.daily', ['clients' => $this->clients]);
-    }
-
-    public function getMoodleWeekly()
-    {
-        return view('admin.stats.moodle.weekly', ['clients' => $this->clients]);
-    }
-
-    public function getNodesMonthly()
-    {
-        return view('admin.stats.nodes.monthly', ['clients' => $this->clients]);
-    }
-
-    public function getNodesDaily()
-    {
-        return view('admin.stats.nodes.daily', ['clients' => $this->clients]);
-    }
-
-    public function getNodesWeekly()
-    {
-        return view('admin.stats.nodes.weekly', ['clients' => $this->clients]);
     }
 }
