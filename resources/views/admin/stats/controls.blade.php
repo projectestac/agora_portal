@@ -19,13 +19,6 @@
                 @endforeach
             </select>
 
-            <label>{{ __('stats.center_selector') }}</label>
-            <select name="center_selector" class="form-control">
-                @foreach ($clients as $client)
-                    <option value="{{ $client->id }}">{{ $client->name }}</option>
-                @endforeach
-            </select>
-
         @else
 
             <label for="date" class="visually-hidden">{{ __('common.date') }}</label>
@@ -33,10 +26,16 @@
 
         @endif
 
+        <label>{{ __('stats.center_selector') }}</label>
+        <select name="client_code" class="form-control">
+            @foreach ($clients as $client)
+                <option value="{{ $client->code }}">{{ $client->name }}</option>
+            @endforeach
+        </select>
+
         <button type="submit" class="btn btn-primary">{{ __('stats.show_stats') }}</button>
     </form>
 
-    <button class="btn btn-primary">{{ __('stats.show_button') }}</button>
-    <button class="btn btn-success">{{ __('stats.export_csv_button') }}</button>
-    <button class="btn btn-info">{{ __('stats.show_graph_button') }}</button>
+    <a href="{{ route('stats.exportTabStats', ['service' => $service, 'periodicity' => $periodicity]) }}" class="btn btn-success">{{ __('stats.export_csv_button') }}</a>
+    <button disabled class="btn btn-info">{{ __('stats.show_graph_button') }}</button>
 </div>

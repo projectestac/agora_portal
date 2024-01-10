@@ -125,6 +125,8 @@ class StatisticsController extends Controller {
         // getting matching stats table
         $table = 'agoraportal_' . ($service == 'moodle' ? 'moodle2' : 'nodes') . '_stats_' . ($periodicity == 'daily' ? 'day' : str_replace('ly', '', $periodicity));
 
+        $client_code = $request->input('client_code');
+
         if($periodicity == 'monthly')
         {
             $month = $request->input('month');
@@ -132,7 +134,7 @@ class StatisticsController extends Controller {
             $yearMonth = $year . str_pad($month, 2, '0', STR_PAD_LEFT);
 
             // getting results
-            $results = DB::table($table)->where('yearmonth', $yearMonth)->get();
+            $results = DB::table($table)->where('yearmonth', $yearMonth);
         }
 
         else
@@ -140,14 +142,46 @@ class StatisticsController extends Controller {
             $date = str_replace('-', '', $request->input('date'));
 
             // getting results
-            $results = DB::table($table)->where('date', $date)->get();
+            $results = DB::table($table)->where('date', $date);
         }
+
+        $results = $results->where('clientcode', $client_code)->get();
 
         $view = 'stats.' . $service . '.' . $periodicity;
 
         // passing results to matching tab view
         return view('admin.stats.results', ['results' => $results, 'view' => $view, 'service' => $service, 'periodicity' => $periodicity, 'clients' => $this->clients]);
 
+    }
+
+    public function exportTabStats(Request $request, string $service, string $periodicity)
+    {
+        $table = 'agoraportal_' . ($service == 'moodle' ? 'moodle2' : 'nodes') . '_stats_' . ($periodicity == 'daily' ? 'day' : str_replace('ly', '', $periodicity));
+
+        $data = DB::table($table)->get();
+
+        $csvFileName = 'statistics.csv';
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$csvFileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0",
+        );
+
+        $handle = fopen('php://output', 'w');
+
+        // column names
+        fputcsv($handle, array_keys((array) $data->first()));
+
+        // full table data
+        foreach ($data as $row) {
+            fputcsv($handle, get_object_vars($row));
+        }
+
+        fclose($handle);
+
+        return response()->make(rtrim(ob_get_clean()), 200, $headers);
     }
 
     public function getMoodleMonthly()

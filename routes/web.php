@@ -69,6 +69,7 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
 
     Route::get('/stats/show', [StatisticsController::class, 'showStats'])->name('stats.show');
     Route::get('/stats/{service}/{periodicity}', [StatisticsController::class, 'showTabStats'])->name('stats.showTabStats');
+    Route::get('/stats/export/{service}/{periodicity}', [StatisticsController::class, 'exportTabStats'])->name('stats.exportTabStats');
     Route::get('/stats/moodle/monthly', [StatisticsController::class, 'getMoodleMonthly'])->name('stats.moodle.monthly');
     Route::get('/stats/moodle/daily', [StatisticsController::class, 'getMoodleDaily'])->name('stats.moodle.daily');
     Route::get('/stats/moodle/weekly', [StatisticsController::class, 'getMoodleWeekly'])->name('stats.moodle.weekly');
