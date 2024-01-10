@@ -106,7 +106,9 @@ class StatisticsController extends Controller {
 
         $data = DB::table($table)->get();
 
-        $csvFileName = 'statistics.csv';
+        $formattedDateTime = strftime('%d%m%Y_%H%M%S');
+
+        $csvFileName = 'stats_' . $service. '_' . $periodicity . '_' . $formattedDateTime . '.csv';
         $headers = array(
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$csvFileName",
