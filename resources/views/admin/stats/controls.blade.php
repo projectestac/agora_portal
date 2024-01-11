@@ -32,8 +32,9 @@
 
         <label>{{ __('stats.center_selector') }}</label>
         <select name="client_code" class="form-control">
+            <option value="">&ndash;</option>
             @foreach ($clients as $client)
-                <option value="{{ $client->code }}">{{ $client->name }}</option>
+                <option value="{{ $client->code }}" {{ $client->code == request('client_code') ? 'selected' : '' }}>{{ $client->name }}</option>
             @endforeach
         </select>
 

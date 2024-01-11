@@ -33,6 +33,7 @@
         </div>
 
         <div class="tab-pane fade" id="chart" style="height: 400px">
+            <p><i>{{ __('stats.chart_tutorial') }}</i></p>
             <canvas id="myChart" width="800" height="400"></canvas>
         </div>
     </div>
@@ -66,19 +67,28 @@
 
         var chartData = {
             labels: dataTableData.map(function (row) {
-                return row[columnNames[0]];
+                return row['clientDNS'];
             }),
-            datasets: columnNames.slice(1).map(function (columnName, index) {
-                return {
-                    label: columnName,
+            datasets: [
+                {
+                    label: '{{ __('database-table.usersactive') }}',
                     data: dataTableData.map(function (row) {
-                        return row[columnName];
+                        return row['usersactive'];
                     }),
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
-                };
-            })
+                },
+                {
+                    label: '{{ __('database-table.diskConsume') }}',
+                    data: dataTableData.map(function (row) {
+                        return row['diskConsume'];
+                    }),
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }
+            ]
         };
 
         var chartOptions = {

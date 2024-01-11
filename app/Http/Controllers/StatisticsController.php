@@ -92,7 +92,12 @@ class StatisticsController extends Controller {
             $results = DB::table($table)->where('date', $date);
         }
 
-        $results = $results->where('clientcode', $client_code)->get();
+        if($client_code != '')
+        {
+            $results = $results->where('clientcode', $client_code);
+        }
+
+        $results = $results->get();
 
         $view = 'stats.' . $service . '.' . $periodicity;
 

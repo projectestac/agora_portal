@@ -24,5 +24,6 @@ return [
     'field_selector' => 'Selector de camp',
     'show_button' => 'Mostrar',
     'export_csv_button' => 'Exportar CSV (tot)',
-    'show_graph_button' => 'Mostrar gràfic'
+    'show_graph_button' => 'Mostrar gràfic',
+    'chart_tutorial' => 'Pot ocultar o mostrar un valor en prement sobre les etiquetes sobre el gràfic.'
 ];
