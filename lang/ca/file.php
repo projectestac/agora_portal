@@ -32,4 +32,8 @@ return [
     'no_instance' => 'No teniu activat el servei de Moodle',
     'upload_missing_file' => 'No s\'ha proporcionat cap fitxer per pujar',
     'upload_error' => 'S\'ha produït un error en pujar el fitxer: :error',
+    'allowed_extensions' => 'Tipus de fitxer permesos: :extensions',
+    'upload_max_size' => 'Mida màxima: :size',
+    'invalid_file_extension' => 'Per a la pujada de fitxers, aquesta extensió no està permesa',
+    'file_size_exceeded' => 'Per a la pujada de fitxers, aquest fitxer es massa gran'
 ];
