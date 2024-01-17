@@ -87,6 +87,7 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::get('/files/{path?}', [DirectoryController::class, 'index'])->name('files.index');
     Route::get('/files/download/{path}', [DirectoryController::class, 'download'])->name('files.download');
     Route::post('/files/upload/{currentPath}', [DirectoryController::class, 'upload'])->name('files.upload');
+    Route::delete('/files/delete/{path}/{file}', [DirectoryController::class, 'destroy'])->name('files.destroy');
 
     Route::get('/config', [ConfigController::class, 'edit'])->name('config.edit');
     Route::put('/config', [ConfigController::class, 'update'])->name('config.update');

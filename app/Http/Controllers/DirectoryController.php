@@ -6,6 +6,8 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Helpers\Util;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class DirectoryController extends Controller {
     /**
@@ -41,12 +43,18 @@ class DirectoryController extends Controller {
         // Get the list of files and directories in the directory.
         $files = Util::getFiles($directory);
 
+        $extensions = Util::getConfigParam('file_extensions_allowed');
+
+        $uploadMaxFilesize = ini_get('upload_max_filesize');
+
         return view('admin.files.index')
             ->with('directory', $directory)
             ->with('parentDirectory', $parentDirectory)
             ->with('baseDirectory', $baseDirectory)
             ->with('files', $files)
-            ->with('path', $path);
+            ->with('path', $path)
+            ->with('ext', $extensions)
+            ->with('maxFileSize', $uploadMaxFilesize);
 
     }
 
@@ -70,22 +78,63 @@ class DirectoryController extends Controller {
     public function upload(Request $request, string $currentPath): RedirectResponse {
         $currentPath = base64_decode($currentPath);
 
-        $request->validate([
-            'file' => 'required|mimes:zip,sql,jpg,gif,png,txt|max:25000', // Size in kilobytes (25MB = 25000 KB)
-        ]);
+        $extensions = Util::getConfigParam('file_extensions_allowed');
 
         try {
+            $uploadMaxFilesize = ini_get('upload_max_filesize');
+            $maxFileSizeInBytes = Util::convertToBytes($uploadMaxFilesize);
+
             if ($request->hasFile('file')) {
                 $file = $request->file('file');
+
+                // Check file's extension
+                $extensions = str_replace(' ', '', $extensions);
+                $allowedExtensions = explode(',', $extensions);
+                $fileExtension = $file->getClientOriginalExtension();
+
+                if (!in_array($fileExtension, $allowedExtensions)) {
+                    return redirect()->back()->with('error', __('file.invalid_file_extension'));
+                }
+
+                // Verify file size
+                $fileSize = $file->getSize(); // Size in kilobytes
+
+                if ($fileSize > $maxFileSizeInBytes) {
+                    return redirect()->back()->with('error', __('file.file_size_exceeded'));
+                }
+
+                // If everything went OK, move file.
                 $filename = $file->getClientOriginalName();
                 $file->move($currentPath, $filename);
-
                 return redirect()->back()->with('success', __('files.uploaded_to_moodle', ['filename' => $filename]));
             }
-            return redirect()->back()->with('error', __('files.upload_missing_file'));
+            return redirect()->back()->with('error', __('file.upload_missing_file'));
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', __('files.upload_error', ['error' => $e->getMessage()]));
+            return redirect()->back()->with('error', __('file.upload_error', ['error' => $e->getMessage()]));
         }
     }
 
+    public function destroy(Request $request, string $path, string $file){
+        try{
+            $path = base64_decode($path);
+            $file = base64_decode($file);
+            $wholeRoute = $path . $file;
+
+            // Verificar si el archivo existe antes de intentar eliminarlo
+            if (Storage::exists($path)) {
+                if (File::exists($wholeRoute)) {
+                    $info = 'OK - Delete file';
+                    // Storage::delete($normalizedPath);
+                } else {
+                    $info = 'Ruta existe - Fichero NO';
+                }
+            } else {
+                $info = 'Ruta inexistente';
+            }
+        } catch (\Exception $e) {
+            // Manejar cualquier error que pueda ocurrir
+            return redirect()->route('files.index')->with('error', 'Error al eliminar el archivo');
+        }
+        dd($info);
+    }
 }
