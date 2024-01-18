@@ -35,5 +35,6 @@ return [
     'allowed_extensions' => 'Tipus de fitxer permesos: :extensions',
     'upload_max_size' => 'Mida màxima: :size',
     'invalid_file_extension' => 'Per a la pujada de fitxers, aquesta extensió no està permesa',
-    'file_size_exceeded' => 'Per a la pujada de fitxers, aquest fitxer es massa gran'
+    'file_size_exceeded' => 'Per a la pujada de fitxers, aquest fitxer es massa gran',
+    'deleted_file' => 'El fitxer <strong>:file</strong> s\'ha eliminat correctament del directori <strong>:path</strong>.'
 ];

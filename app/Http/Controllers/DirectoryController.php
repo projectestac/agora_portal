@@ -37,7 +37,7 @@ class DirectoryController extends Controller {
 
         // Make sure the directory exists.
         if (!is_dir($directory)) {
-            return view('admin.files.index')->with('error', 'files.not_a_directory');
+            return view('admin.files.index')->with('error', 'file.not_a_directory');
         }
 
         // Get the list of files and directories in the directory.
@@ -106,7 +106,7 @@ class DirectoryController extends Controller {
                 // If everything went OK, move file.
                 $filename = $file->getClientOriginalName();
                 $file->move($currentPath, $filename);
-                return redirect()->back()->with('success', __('files.uploaded_to_moodle', ['filename' => $filename]));
+                return redirect()->back()->with('success', __('file.uploaded_to_moodle', ['filename' => $filename]));
             }
             return redirect()->back()->with('error', __('file.upload_missing_file'));
         } catch (\Exception $e) {
@@ -120,21 +120,18 @@ class DirectoryController extends Controller {
             $file = base64_decode($file);
             $wholeRoute = $path . $file;
 
-            // Verificar si el archivo existe antes de intentar eliminarlo
             if (Storage::exists($path)) {
                 if (File::exists($wholeRoute)) {
-                    $info = 'OK - Delete file';
-                    // Storage::delete($normalizedPath);
+                    File::delete($wholeRoute);
+                    return redirect()->back()->with('success', __('file.deleted_file', ['file' => $file, 'path' => $path]));
                 } else {
-                    $info = 'Ruta existe - Fichero NO';
+                    return redirect()->back()->with('error', __('file.upload_error', ['error' => $file]));
                 }
             } else {
-                $info = 'Ruta inexistente';
+                return redirect()->back()->with('error', __('file.upload_error', ['error' => $file]));
             }
         } catch (\Exception $e) {
-            // Manejar cualquier error que pueda ocurrir
-            return redirect()->route('files.index')->with('error', 'Error al eliminar el archivo');
+            return redirect()->route('file.index')->with('error', 'Error al eliminar el archivo');
         }
-        dd($info);
     }
 }
