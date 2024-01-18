@@ -39,7 +39,7 @@
             $(function () {
                 $('#client-list').DataTable({
                     processing: true,
-                    serverSide: false,
+                    serverSide: true,
                     language: {
                         url: '{{ url('/datatable/ca.json') }}'
                     },

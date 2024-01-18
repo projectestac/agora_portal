@@ -173,9 +173,41 @@ class ClientController extends Controller {
         //
     }
 
-    public function getClients(): JsonResponse {
+    public function getClients(Request $request): JsonResponse {
 
-        $clients = Client::orderBy('id', 'asc');
+        $search = $request->validate(['search.value' => 'string|max:50|nullable']);
+        $searchValue = $search['search']['value'] ?? '';
+
+        $columns = $request->input('columns');
+        $order = $request->input('order')[0];
+        $orderColumn = 'clients.' . $columns[$order['column']]['data'] ?? 'clients.updated_at';
+        $orderDirection = $order['dir'] ?? 'desc';
+
+        if ($orderColumn === 'clients.services') {
+             $orderColumn = 'services.name';
+        }
+
+        if ($orderColumn === 'clients.dates') {
+            $orderColumn = 'clients.updated_at';
+        }
+
+        $clients = Client::select('clients.*')
+            ->selectRaw('GROUP_CONCAT(services.name) as service_names')
+            ->leftJoin('instances', 'clients.id', '=', 'instances.client_id')
+            ->leftJoin('services', 'instances.service_id', '=', 'services.id')
+            ->groupBy('clients.id')
+            ->orderBy($orderColumn, $orderDirection);
+
+        if (!empty($searchValue)) {
+            $clients = $clients->where('clients.code', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('clients.name', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('clients.dns', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('clients.old_dns', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('clients.city', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('services.name', 'LIKE', '%' . $searchValue . '%');
+        }
+
+        $clients = $clients->get();
 
         return Datatables::make($clients)
             ->addColumn('name', function ($client) {
