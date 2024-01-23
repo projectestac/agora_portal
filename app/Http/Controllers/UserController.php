@@ -57,12 +57,24 @@ class UserController extends Controller {
     public function destroy(User $user) {
     }
 
-    public function getUsers(): JsonResponse {
+    public function getUsers(Request $request): JsonResponse {
 
-        $users = User::orderBy('updated_at', 'desc');
+        $search = $request->validate(['search.value' => 'string|max:50|nullable']);
+        $searchValue = $search['search']['value'] ?? '';
+        $users = User::select(['users.*']);
+
+        if (!empty($searchValue)) {
+            $users = $users->where('name', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('email', 'LIKE', '%' . $searchValue . '%')
+                ->orWhereHas('roles', function ($query) use ($searchValue) {
+                    // https://laravel.com/docs/10.x/eloquent-relationships#querying-relationship-existence
+                    $query->where('name', 'LIKE', '%' . $searchValue . '%');
+                });
+        }
+
+        $users = $users->get();
 
         return DataTables::make($users)
-            ->rawColumns(['id'])
             ->addColumn('name', function ($user) {
                 return new HtmlString('<span>' . $user->name . '</span>');
             })
@@ -80,8 +92,7 @@ class UserController extends Controller {
             ->addColumn('actions', static function ($user) {
                 return view('admin.user.action', ['user' => $user]);
             })
-            ->make();
-
+            ->rawColumns(['id', 'name', 'email', 'roles'])
+            ->make(true);
     }
-
 }
