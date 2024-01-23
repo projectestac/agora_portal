@@ -70,6 +70,7 @@ class StatisticsController extends Controller {
 
     // Example: showTabStats('daily', 'moodle')
     public function showTabStats(Request $request, string $service, string $periodicity) {
+        $daily_stats = null;
         $table = $this->getTable($service, $periodicity);
 
         $client_code = $request->input('client_code');
@@ -82,6 +83,7 @@ class StatisticsController extends Controller {
 
             // getting results
             $results = DB::table($table)->where('yearmonth', $yearMonth);
+            $daily_stats = DB::select("SELECT SUBSTRING(date, 1, 8) AS day, SUM(usersactive) AS total_visitors FROM agoraportal_" . ($service == 'moodle' ? 'moodle2' : 'nodes') . "_stats_day WHERE SUBSTRING(date, 1, 6) = '" . $yearMonth . "' GROUP BY SUBSTRING(date, 1, 8)");
         }
 
         else
@@ -101,8 +103,9 @@ class StatisticsController extends Controller {
 
         $view = 'stats.' . $service . '.' . $periodicity;
 
+
         // passing results to matching tab view
-        return view('admin.stats.results', ['results' => $results, 'view' => $view, 'service' => $service, 'periodicity' => $periodicity, 'clients' => $this->clients]);
+        return view('admin.stats.results', ['results' => $results, 'daily_stats' => $daily_stats, 'view' => $view, 'service' => $service, 'periodicity' => $periodicity, 'clients' => $this->clients]);
 
     }
 

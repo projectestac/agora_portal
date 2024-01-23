@@ -33,8 +33,14 @@
         </div>
 
         <div class="tab-pane fade" id="chart" style="height: 400px">
-            <p><i>{{ __('stats.chart_tutorial') }}</i></p>
-            <canvas id="myChart" width="800" height="400"></canvas>
+
+            @if($daily_stats != null)
+                <p><i>{{ __('stats.chart_tutorial') }}</i></p>
+                <canvas id="myChart" width="800" height="400"></canvas>
+            @else
+                <p><i>{{ __('stats.chart_unavailable') }}</i></p>
+            @endif
+
         </div>
     </div>
 
@@ -60,50 +66,45 @@
             });
         });
 
-        // Generating chart (chart config to be changed)
-        var ctx = document.getElementById('myChart').getContext('2d'),
-            dataTableData = {!! json_encode($results) !!},
-            columnNames = {!! json_encode(array_keys((array) $results[0])) !!};
+        @if($daily_stats != null)
 
-        var chartData = {
-            labels: dataTableData.map(function (row) {
-                return row['clientDNS'];
-            }),
-            datasets: [
-                {
-                    label: '{{ __('database-table.usersactive') }}',
-                    data: dataTableData.map(function (row) {
-                        return row['usersactive'];
-                    }),
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                },
-                {
-                    label: '{{ __('database-table.diskConsume') }}',
-                    data: dataTableData.map(function (row) {
-                        return row['diskConsume'];
-                    }),
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
+            // Generating chart (chart config to be changed)
+            var ctx = document.getElementById('myChart').getContext('2d'),
+                dataTableData = {!! json_encode($daily_stats) !!},
+                columnNames = {!! json_encode(array_keys((array) $daily_stats[0])) !!};
+
+            var chartData = {
+                labels: dataTableData.map(function (row) {
+                    return row['day'];
+                }),
+                datasets: [
+                    {
+                        label: '{{ __('database-table.usersactive') }}',
+                        data: dataTableData.map(function (row) {
+                            return row['total_visitors'];
+                        }),
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            };
+
+            var chartOptions = {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
-            ]
-        };
+            };
 
-        var chartOptions = {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        };
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: chartData,
+                options: chartOptions
+            });
 
-        var myChart = new Chart(ctx, {
-            type: 'bar',
-            data: chartData,
-            options: chartOptions
-        });
+        @endif
 
     </script>
 
