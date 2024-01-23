@@ -57,12 +57,30 @@ class UserController extends Controller {
     public function destroy(User $user) {
     }
 
-    public function getUsers(): JsonResponse {
+    public function getUsers(Request $request): JsonResponse {
 
-        $users = User::orderBy('updated_at', 'desc');
+        $search = $request->validate(['search.value' => 'string|max:50|nullable']);
+        $searchValue = $search['search']['value'] ?? '';
+
+        $columns = $request->input('columns');
+        $order = $request->input('order')[0];
+        $orderColumn = 'users.' . $columns[$order['column']]['data'] ?? 'users.updated_at';
+        $orderDirection = $order['dir'] ?? 'desc';
+
+        $users = User::select(['users.*']);
+            // ->orderBy($orderColumn, $orderDirection);
+
+        if (!empty($searchValue)) {
+            $users = $users->where('name', 'LIKE', '%' . $searchValue . '%')
+                ->orWhere('email', 'LIKE', '%' . $searchValue . '%');
+        }
+
+        $users = $users->get();
+
+        // SQL query is over, now filter by role...
+        // var_dump($users[0]->getRoleNames());
 
         return DataTables::make($users)
-            ->rawColumns(['id'])
             ->addColumn('name', function ($user) {
                 return new HtmlString('<span>' . $user->name . '</span>');
             })
@@ -80,7 +98,8 @@ class UserController extends Controller {
             ->addColumn('actions', static function ($user) {
                 return view('admin.user.action', ['user' => $user]);
             })
-            ->make();
+            ->rawColumns(['id', 'name', 'email', 'roles'])
+            ->make(true);
 
     }
 
