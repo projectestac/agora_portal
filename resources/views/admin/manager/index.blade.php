@@ -25,7 +25,7 @@
         $(function () {
             $('#manager-list').DataTable({
                 processing: true,
-                serverSide: false,
+                serverSide: true,
                 language: {
                     url: '{{ url('/datatable/ca.json') }}'
                 },
@@ -36,7 +36,7 @@
                     {data: 'id', name: 'id'},
                     {data: 'client_name', name: 'client_name'},
                     {data: 'user_name', name: 'user_name'},
-                    {data: 'assigned', name: 'assigned'},
+                    {data: 'assigned', name: 'assigned', orderable: true, searchable: false},
                     {data: 'actions', name: 'actions', orderable: false, searchable: false}
                 ]
             });
