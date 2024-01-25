@@ -72,13 +72,14 @@ class UserController extends Controller {
 
         if (!empty($searchValue)) {
             $users = $users->where('name', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('email', 'LIKE', '%' . $searchValue . '%');
+                ->orWhere('email', 'LIKE', '%' . $searchValue . '%')
+                ->orWhereHas('roles', function ($query) use ($searchValue) {
+                    //? https://laravel.com/docs/10.x/eloquent-relationships#querying-relationship-existence
+                    $query->where('name', 'LIKE', '%' . $searchValue . '%');
+                });
         }
 
         $users = $users->get();
-
-        // SQL query is over, now filter by role...
-        // var_dump($users[0]->getRoleNames());
 
         return DataTables::make($users)
             ->addColumn('name', function ($user) {
@@ -100,7 +101,5 @@ class UserController extends Controller {
             })
             ->rawColumns(['id', 'name', 'email', 'roles'])
             ->make(true);
-
     }
-
 }
