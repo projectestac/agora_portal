@@ -11,6 +11,7 @@ use App\Models\Manager;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
@@ -148,17 +149,21 @@ class ManagerController extends Controller {
         $user->removeRole($managerRole);
     }
 
-    public function getManagers(): JsonResponse {
+    public function getManagers(Request $request): JsonResponse {
 
-        $manager = Manager::orderBy('id', 'desc');
+        $manager = Manager::select(['managers.*', 'clients.code'])
+            ->leftJoin('clients', 'managers.user_id', '=', 'clients.id')
+            ->leftJoin('users', 'managers.user_id', '=', 'users.id');
+
+        $manager = $manager->get();
 
         return DataTables::make($manager)
-            ->rawColumns(['id'])
+            ->rawColumns(['id', 'client_name', 'user_name', 'assigned'])
             ->addColumn('client_name', function ($manager) {
                 return new HtmlString('<a href="' . route('myagora.instances', ['code' => $manager->client->code]) . '">' .
                     $manager->client->name . '</a><br/>' . $manager->client->dns . ' - ' . $manager->client->code);
             })
-             ->addColumn('user_name', function ($manager) {
+            ->addColumn('user_name', function ($manager) {
                 return new HtmlString('<span>' . $manager->user->name . '</span>');
             })
             ->addColumn('assigned', function ($manager) {
@@ -167,7 +172,7 @@ class ManagerController extends Controller {
             ->addColumn('actions', static function ($manager) {
                 return view('admin.manager.action', ['manager' => $manager]);
             })
-            ->make();
+            ->make(true);
 
     }
 
