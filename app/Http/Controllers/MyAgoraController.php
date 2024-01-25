@@ -413,8 +413,14 @@ class MyAgoraController extends Controller {
             'option' => 'regex:/^\d+:\d+$/',
         ]);
 
-        $requestTypeId = explode(':', $option['option'])[1];
-        $requestDetails = RequestType::find($requestTypeId)->first()->toArray();
+        $requestIds = explode(':', $option['option']);
+
+        $requestDetails = RequestType::select('request_types.name', 'request_types.description', 'request_types.prompt')
+            ->join('request_type_service', 'request_type_service.request_type_id', '=', 'request_types.id')
+            ->where('request_type_service.request_type_id', $requestIds[1])
+            ->where('request_type_service.service_id', $requestIds[0])
+            ->first()
+            ->toArray();
 
         $content = view('myagora.components.request_content')
             ->with('requestDetails', $requestDetails)

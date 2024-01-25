@@ -1,6 +1,6 @@
-<div class="alert alert-info">{{ $requestDetails['prompt'] }}</div>
+<div class="alert alert-info">{!! $requestDetails['description'] !!}</div>
 <div class="form-group clearfix row">
-    <label class="col-xs-12 col-sm-4 text-right" for="user-comment">{{ __('request.observations') }}</label>
+    <label class="col-xs-12 col-sm-4 text-right" for="user-comment">{{ $requestDetails['prompt'] }}</label>
     <div class="col-xs-12 col-sm-8">
         <textarea class="form-control" id="user-comment" name="user-comment" rows="3"></textarea>
     </div>
