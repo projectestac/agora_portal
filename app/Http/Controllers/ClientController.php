@@ -286,6 +286,16 @@ class ClientController extends Controller {
             })->make();
     }
 
+    public function search(Request $request) {
+        $keyword = $request->input('keyword');
+
+        $clients = Client::where('name', 'like', '%' . $keyword . '%')
+                         ->get(['code', 'name']);
+
+        return response()->json($clients);
+    }
+
+
     public function createClientFromWS(mixed $data): void {
         // a8000001$$esc-tramuntana$$Escola Tramuntana$$c. Rosa dels Vents, 8$$Valldevent$$09999
         $data = explode('$$', $data);

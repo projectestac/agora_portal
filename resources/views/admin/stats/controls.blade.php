@@ -31,12 +31,50 @@
         &nbsp;
 
         <label>{{ __('stats.center_selector') }}</label>
-        <select name="client_code" class="form-control">
+        {{-- <select name="client_code" class="form-control">
             <option value="">&ndash;</option>
             @foreach ($clients as $client)
                 <option value="{{ $client->code }}" {{ $client->code == request('client_code') ? 'selected' : '' }}>{{ $client->name }}</option>
             @endforeach
-        </select>
+        </select> --}}
+
+        <input type="text" name="client_name" id="client_name" class="form-control" value="{{ request('client_name') }}" autocomplete="off">
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+        <script>
+            $(function() {
+                $("#client_name").autocomplete({
+                    source: function(request, response) {
+                        if (request.term.length >= 3) {
+                            $.ajax({
+                                url: '{{ route("clients.search") }}',
+                                dataType: 'json',
+                                data: {
+                                    keyword: request.term
+                                },
+                                success: function(data) {
+                                    response(data.map(function(client) {
+                                                return {
+                                                    label: client.name,
+                                                    value: client.code
+                                                }}));
+                                }
+                            });
+                        } else {
+                            response([]);
+                        }
+                    },
+                    minLength: 3,
+                    select: function(event, ui) {
+                        $("#client_name").val(ui.item.label + " - " + ui.item.value);
+                        return false;
+                    }
+                });
+            });
+        </script>
+
 
         <button type="submit" class="btn btn-primary">{{ __('stats.show_stats') }}</button>
     </form>

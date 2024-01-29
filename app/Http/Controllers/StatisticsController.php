@@ -73,7 +73,7 @@ class StatisticsController extends Controller {
         $daily_stats = null;
         $table = $this->getTable($service, $periodicity);
 
-        $client_code = $request->input('client_code');
+        $client_name = $request->input('client_name');
 
         if($periodicity == 'monthly')
         {
@@ -94,8 +94,9 @@ class StatisticsController extends Controller {
             $results = DB::table($table)->where('date', $date);
         }
 
-        if($client_code != '')
+        if($client_name != '')
         {
+            $client_code = explode(' - ', $client_name)[1];
             $results = $results->where('clientcode', $client_code);
         }
 
