@@ -74,6 +74,12 @@ class StatisticsController extends Controller {
         $table = $this->getTable($service, $periodicity);
 
         $client_name = $request->input('client_name');
+        $client_code = NULL;
+
+        if($client_name != '')
+        {
+            $client_code = explode(' - ', $client_name)[1];
+        }
 
         if($periodicity == 'monthly')
         {
@@ -83,7 +89,10 @@ class StatisticsController extends Controller {
 
             // getting results
             $results = DB::table($table)->where('yearmonth', $yearMonth);
-            $daily_stats = DB::select("SELECT SUBSTRING(date, 1, 8) AS day, SUM(usersactive) AS total_visitors FROM agoraportal_" . ($service == 'moodle' ? 'moodle2' : 'nodes') . "_stats_day WHERE SUBSTRING(date, 1, 6) = '" . $yearMonth . "' GROUP BY SUBSTRING(date, 1, 8)");
+            $daily_stats = DB::select("SELECT SUBSTRING(date, 1, 8) AS day, SUM(userstotal) AS total_visitors
+                                              FROM agoraportal_" . ($service == 'moodle' ? 'moodle2' : 'nodes') . "_stats_day
+                                              WHERE SUBSTRING(date, 1, 6) = '" . $yearMonth . "' " . ($client_code != NULL ? " AND clientcode LIKE '%$client_code%'" : "") . "
+                                              GROUP BY SUBSTRING(date, 1, 8)");
         }
 
         else
@@ -94,9 +103,8 @@ class StatisticsController extends Controller {
             $results = DB::table($table)->where('date', $date);
         }
 
-        if($client_name != '')
+        if($client_code != NULL)
         {
-            $client_code = explode(' - ', $client_name)[1];
             $results = $results->where('clientcode', $client_code);
         }
 
