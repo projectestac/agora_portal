@@ -57,7 +57,7 @@
                                 success: function(data) {
                                     response(data.map(function(client) {
                                                 return {
-                                                    label: client.name,
+                                                    label: client.name + ' - ' + client.code,
                                                     value: client.code
                                                 }}));
                                 }
@@ -68,7 +68,7 @@
                     },
                     minLength: 3,
                     select: function(event, ui) {
-                        $("#client_name").val(ui.item.label + " - " + ui.item.value);
+                        $("#client_name").val(ui.item.label);
                         return false;
                     }
                 });

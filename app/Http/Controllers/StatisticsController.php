@@ -87,9 +87,13 @@ class StatisticsController extends Controller {
             $year = $request->input('year');
             $yearMonth = $year . str_pad($month, 2, '0', STR_PAD_LEFT);
 
+            $columns = $service == 'moodle'
+                       ? 'SUM(total) AS total, SUM(userstotal) AS userstotal, SUM(usersactive) AS usersactive'
+                       : 'SUM(total) AS total, SUM(posts) AS posts';
+
             // getting results
             $results = DB::table($table)->where('yearmonth', $yearMonth);
-            $daily_stats = DB::select("SELECT SUBSTRING(date, 1, 8) AS day, SUM(userstotal) AS total_visitors
+            $daily_stats = DB::select("SELECT SUBSTRING(date, 1, 8) AS day," . $columns . "
                                               FROM agoraportal_" . ($service == 'moodle' ? 'moodle2' : 'nodes') . "_stats_day
                                               WHERE SUBSTRING(date, 1, 6) = '" . $yearMonth . "' " . ($client_code != NULL ? " AND clientcode LIKE '%$client_code%'" : "") . "
                                               GROUP BY SUBSTRING(date, 1, 8)");

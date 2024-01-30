@@ -47,6 +47,18 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
+        function formatDate(date) {
+            const matches = date.match(/^(\d{4})(\d{2})(\d{2})$/);
+            const year = parseInt(matches[1]);
+            const month = parseInt(matches[2]) - 1;
+            const day = parseInt(matches[3]);
+
+            const formattedDate = new Date(year, month, day);
+            const formattedDateString = `${formattedDate.getDate()}/${formattedDate.getMonth() + 1}/${formattedDate.getFullYear()}`;
+
+            return formattedDateString;
+        }
+
         // Generating datatable
         $(function () {
             var columnNames = {!! json_encode(array_keys((array) $results[0])) !!};
@@ -75,20 +87,35 @@
 
             var chartData = {
                 labels: dataTableData.map(function (row) {
-                    return row['day'];
+                    return formatDate(row['day']);
                 }),
-                datasets: [
-                    {
-                        label: '{{ __('database-table.usersactive') }}',
-                        data: dataTableData.map(function (row) {
-                            return row['total_visitors'];
-                        }),
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }
-                ]
+                datasets: []
             };
+
+            var keys = Object.keys(dataTableData[0]);
+
+            var colors = [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+            ];
+
+            var index = 0;
+
+            keys.forEach(function(key) {
+                if (key !== 'day') {
+                    chartData.datasets.push({
+                        label: key,
+                        data: dataTableData.map(function (row) {
+                            return row[key];
+                        }),
+                        backgroundColor: colors[index % colors.length],
+                        borderColor: colors[index % colors.length],
+                        borderWidth: 1
+                    });
+                    index++;
+                }
+            });
 
             var chartOptions = {
                 scales: {

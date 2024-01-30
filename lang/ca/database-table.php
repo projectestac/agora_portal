@@ -4,6 +4,8 @@ return [
     'clientcode' => 'Codi de client',
     'clientDNS' => 'DNS del client',
     'yearmonth' => 'Any i mes',
+    'total' => 'Total',
+    'userstotal' => 'Total usuaris',
     'usersactive' => 'Usuaris actius',
     'userlogin' => 'Inici de sessió d\'usuari',
     'courses' => 'Cursos',
