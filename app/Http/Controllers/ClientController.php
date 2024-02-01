@@ -239,6 +239,9 @@ class ClientController extends Controller {
 
     // For public portal.
     public function getActiveClients(Request $request): JsonResponse {
+        $perPage = $request->input('length', 25);
+        $page = $request->input('page', 1);
+
         $clients = Client::select([
             'clients.id',
             'clients.name as client_name', // Avoid conflict with services.name
@@ -272,18 +275,21 @@ class ClientController extends Controller {
         $clients->leftJoin('services', 'instances.service_id', '=', 'services.id');
         $clients->groupBy('clients.id')->get();
 
-        return Datatables::make($clients)
-            ->addColumn('instances_links', function ($client) {
-                $links = '';
+        $clients = $clients->paginate($perPage, ['*'], 'page', $page);
 
-                foreach ($client->instances as $instance) {
-                    $instanceUrl = Util::getInstanceUrl($instance);
-                    $instanceLogo = secure_asset('images/' . mb_strtolower($instance->service->name) . '.gif');
-                    $links .= '<a href="' . $instanceUrl . '" target="_blank"><img src="' . $instanceLogo . '" alt=""></a>&nbsp;&nbsp;&nbsp;';
-                }
+        foreach ($clients as $client) {
+            $links = '';
 
-                return new HtmlString($links);
-            })->make();
+            foreach ($client->instances as $instance) {
+                $instanceUrl = Util::getInstanceUrl($instance);
+                $instanceLogo = secure_asset('images/' . mb_strtolower($instance->service->name) . '.gif');
+                $links .= '<a href="' . $instanceUrl . '" target="_blank"><img src="' . $instanceLogo . '" alt=""></a>&nbsp;&nbsp;&nbsp;';
+            }
+
+            $client->instances_links = $links;
+        }
+
+        return response()->json($clients);
     }
 
     public function search(Request $request): JsonResponse {
