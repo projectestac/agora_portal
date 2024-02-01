@@ -244,7 +244,7 @@ class ClientController extends Controller {
 
         $clients = Client::select([
             'clients.id',
-            'clients.name as client_name', // Avoid conflict with services.name
+            'clients.name',
             'clients.city',
         ])
             ->where('clients.status', 'active')

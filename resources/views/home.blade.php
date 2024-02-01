@@ -67,7 +67,7 @@
                     }
                 },
                 columns: [
-                    {data: 'client_name', name: 'client_name'},
+                    {data: 'name', name: 'name'},
                     {data: 'city', name: 'city'},
                     {data: 'instances_links', name: 'instances_links'}
                 ]
