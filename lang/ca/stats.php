@@ -21,6 +21,8 @@ return [
     'nodes_weekly_summary' => 'Resum setmanal de Nodes',
     'date_selector' => 'Selector de data',
     'center_selector' => 'Selector de centre',
+    'start_typing_a_center_name' => 'Comença a escriure un nom de centre...',
+    'clear_filter' => 'Esborrar filtre',
     'field_selector' => 'Selector de camp',
     'show_button' => 'Mostrar',
     'export_csv_button' => 'Exportar CSV (tot)',

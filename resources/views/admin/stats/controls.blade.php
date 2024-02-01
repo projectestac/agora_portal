@@ -31,14 +31,10 @@
         &nbsp;
 
         <label>{{ __('stats.center_selector') }}</label>
-        {{-- <select name="client_code" class="form-control">
-            <option value="">&ndash;</option>
-            @foreach ($clients as $client)
-                <option value="{{ $client->code }}" {{ $client->code == request('client_code') ? 'selected' : '' }}>{{ $client->name }}</option>
-            @endforeach
-        </select> --}}
 
-        <input type="text" name="client_name" id="client_name" class="form-control" value="{{ request('client_name') }}" autocomplete="off">
+        <input type="text" name="client_name" id="client_name" class="form-control" style="width:300px" placeholder="{{ __('stats.start_typing_a_center_name') }}" value="{{ request('client_name') }}" autocomplete="off">
+        <button type="button" class="btn btn-danger" onclick="$('#client_name').val('')">{{ __('stats.clear_filter') }}</button>
+
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
