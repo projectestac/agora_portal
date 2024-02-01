@@ -72,42 +72,45 @@
 
         @if($daily_stats != null)
 
-            // Generating chart (chart config to be changed)
-            var ctx = document.getElementById('myChart').getContext('2d'),
-                dataTableData = {!! json_encode($daily_stats) !!},
-                columnNames = {!! json_encode(array_keys((array) $daily_stats[0])) !!};
+            <?php
 
-            var chartData = {
-                labels: dataTableData.map(function (row) {
-                    return formatDate(row['day']);
-                }),
-                datasets: []
-            };
+            $daily_stats = json_decode(json_encode($daily_stats), true);
 
-            var keys = Object.keys(dataTableData[0]);
+            $chartData = [
+                'labels' => array_map(function ($row) {
+                    return date('d/m/Y', strtotime($row['day']));
+                }, $daily_stats),
+                'datasets' => []
+            ];
 
-            var colors = [
+            $keys = array_keys($daily_stats[0]);
+            $colors = [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(75, 192, 192, 0.2)',
                 'rgba(54, 162, 235, 0.2)',
             ];
+            $index = 0;
 
-            var index = 0;
-
-            keys.forEach(function(key) {
-                if (key !== 'day') {
-                    chartData.datasets.push({
-                        label: key,
-                        data: dataTableData.map(function (row) {
-                            return row[key];
-                        }),
-                        backgroundColor: colors[index % colors.length],
-                        borderColor: colors[index % colors.length],
-                        borderWidth: 1
-                    });
-                    index++;
+            foreach ($keys as $key) {
+                if ($key !== 'day') {
+                    $chartData['datasets'][] = [
+                        'label' => __('database-table.' . $key),
+                        'data' => array_map(function ($row) use ($key) {
+                            return $row[$key];
+                        }, $daily_stats),
+                        'backgroundColor' => $colors[$index % count($colors)],
+                        'borderColor' => $colors[$index % count($colors)],
+                        'borderWidth' => 1
+                    ];
+                    $index++;
                 }
-            });
+            }
+
+            ?>
+
+            // Generating chart (chart config to be changed)
+            var ctx = document.getElementById('myChart').getContext('2d'),
+                chartData = <?php echo json_encode($chartData); ?>;
 
             var chartOptions = {
                 scales: {
