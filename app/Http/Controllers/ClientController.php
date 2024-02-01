@@ -275,21 +275,21 @@ class ClientController extends Controller {
         $clients->leftJoin('services', 'instances.service_id', '=', 'services.id');
         $clients->groupBy('clients.id')->get();
 
-        $clients = $clients->paginate($perPage, ['*'], 'page', $page);
+        return Datatables::make($clients)
+            ->addColumn('instances_links', function ($client) {
 
-        foreach ($clients as $client) {
-            $links = '';
+                $links = '';
 
-            foreach ($client->instances as $instance) {
-                $instanceUrl = Util::getInstanceUrl($instance);
-                $instanceLogo = secure_asset('images/' . mb_strtolower($instance->service->name) . '.gif');
-                $links .= '<a href="' . $instanceUrl . '" target="_blank"><img src="' . $instanceLogo . '" alt=""></a>&nbsp;&nbsp;&nbsp;';
-            }
+                foreach ($client->instances as $instance) {
+                    $instanceUrl = Util::getInstanceUrl($instance);
+                    $instanceLogo = secure_asset('images/' . mb_strtolower($instance->service->name) . '.gif');
+                    $links .= '<a href="' . $instanceUrl . '" target="_blank"><img src="' . $instanceLogo . '" alt=""></a>&nbsp;&nbsp;&nbsp;';
+                }
 
-            $client->instances_links = $links;
-        }
+                return new HtmlString($links);
 
-        return response()->json($clients);
+            })
+            ->make();
     }
 
     public function search(Request $request): JsonResponse {
