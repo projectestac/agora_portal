@@ -1,6 +1,6 @@
 
 <div class="controls-container" style="margin: 10px 0;">
-    <form method="get" action="{{ route('stats.' . $service . '.' . $periodicity) }}" class="form-inline">
+    <form id="stats-form" method="get" action="{{ route('stats.' . $service . '.' . $periodicity) }}" class="form-inline">
         @csrf
 
         @if($periodicity == 'monthly')
@@ -33,7 +33,7 @@
         <label>{{ __('stats.center_selector') }}</label>
 
         <input type="text" name="client_name" id="client_name" class="form-control" style="width:300px" placeholder="{{ __('stats.start_typing_a_center_name') }}" value="{{ request('client_name') }}" autocomplete="off">
-        <button type="button" class="btn btn-danger" onclick="$('#client_name').val('')">{{ __('stats.clear_filter') }}</button>
+        <button type="button" class="btn btn-danger" onclick="$('#client_name').val('') ; $('#stats-form').submit()">{{ __('stats.clear_filter') }}</button>
 
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
