@@ -239,9 +239,10 @@ class ClientController extends Controller {
 
     // For public portal.
     public function getActiveClients(Request $request): JsonResponse {
+
         $clients = Client::select([
             'clients.id',
-            'clients.name as client_name', // Avoid conflict with services.name
+            'clients.name',
             'clients.city',
         ])
             ->where('clients.status', 'active')
@@ -274,6 +275,7 @@ class ClientController extends Controller {
 
         return Datatables::make($clients)
             ->addColumn('instances_links', function ($client) {
+
                 $links = '';
 
                 foreach ($client->instances as $instance) {
@@ -283,7 +285,9 @@ class ClientController extends Controller {
                 }
 
                 return new HtmlString($links);
-            })->make();
+
+            })
+            ->make();
     }
 
     public function search(Request $request): JsonResponse {
