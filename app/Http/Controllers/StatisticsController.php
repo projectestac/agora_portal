@@ -130,6 +130,7 @@ class StatisticsController extends Controller {
         $formattedDateTime = strftime('%d%m%Y_%H%M%S');
 
         $csvFileName = 'stats_' . $service. '_' . $periodicity . '_' . $formattedDateTime . '.csv';
+
         $headers = array(
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$csvFileName",
@@ -137,6 +138,10 @@ class StatisticsController extends Controller {
             "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
             "Expires"             => "0",
         );
+
+        foreach ($headers as $header => $value) {
+            header("$header: $value");
+        }
 
         $handle = fopen('php://output', 'w');
 
@@ -155,7 +160,5 @@ class StatisticsController extends Controller {
         }
 
         fclose($handle);
-
-        return response()->make(rtrim(ob_get_clean()), 200, $headers);
     }
 }
