@@ -17,4 +17,5 @@ return [
     'total_access' => 'Accés total',
     'usersactivelast30days' => 'Usuaris actius els darrers 30 dies',
     'diskConsume' => 'Consum de disc',
+    'posts' => 'Entrades (posts)'
 ];
