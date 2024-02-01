@@ -52,15 +52,22 @@
         $(function () {
             table = $('#client-list').DataTable({
                 processing: true,
-                serverSide: false,
+                serverSide: true,
                 language: {
                     url: '{{ url('/datatable/ca.json') }}'
                 },
                 lengthMenu: [10, 25, 50, 100, 250],
                 pageLength: 25,
-                ajax: '{{ route('clients.active.list') }}',
+                ajax: {
+                    url: '{{ route('clients.active.list') }}',
+                    type: 'GET',
+                    data: function (d) {
+                        d.length = $('#client-list').DataTable().page.len();
+                        d.page = $('#client-list').DataTable().page.info().page + 1;
+                    }
+                },
                 columns: [
-                    {data: 'client_name', name: 'client_name'},
+                    {data: 'name', name: 'name'},
                     {data: 'city', name: 'city'},
                     {data: 'instances_links', name: 'instances_links'}
                 ]
