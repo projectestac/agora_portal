@@ -2,7 +2,7 @@
 
 return [
     'stats' => 'Estadístiques',
-    'show_stats' => 'Mostra estadístiques',
+    'show_stats' => 'Mostra les estadístiques',
     'centres_count' => 'Centres',
     'active_users_sum' => 'Usuaris actius',
     'courses_sum' => 'Cursos',
@@ -22,11 +22,11 @@ return [
     'date_selector' => 'Selector de data',
     'center_selector' => 'Selector de centre',
     'start_typing_a_center_name' => 'Comença a escriure un nom de centre...',
-    'clear_filter' => 'Esborrar filtre',
+    'clear_filter' => 'Esborra el filtre',
     'field_selector' => 'Selector de camp',
-    'show_button' => 'Mostrar',
-    'export_csv_button' => 'Exportar CSV (tot)',
-    'show_graph_button' => 'Mostrar gràfic',
-    'chart_tutorial' => 'Pot ocultar o mostrar un valor en prement sobre les etiquetes sobre el gràfic.',
-    'chart_unavailable' => 'Gràfic no disponible'
+    'show_button' => 'Mostra',
+    'export_csv_button' => 'Exporta a CSV (tot)',
+    'show_graph_button' => 'Mostra el gràfic',
+    'chart_tutorial' => 'Podeu ocultar o mostrar un valor clicant a les etiquetes del gràfic.',
+    'chart_unavailable' => 'No hi ha cap gràfic disponible',
 ];

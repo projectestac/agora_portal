@@ -11,8 +11,8 @@ use App\Models\Location;
 use App\Models\Log;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
@@ -184,7 +184,7 @@ class ClientController extends Controller {
         $orderDirection = $order['dir'] ?? 'desc';
 
         if ($orderColumn === 'clients.services') {
-             $orderColumn = 'services.name';
+            $orderColumn = 'services.name';
         }
 
         if ($orderColumn === 'clients.dates') {
@@ -237,7 +237,7 @@ class ClientController extends Controller {
 
     }
 
-    // for public portal
+    // For public portal.
     public function getActiveClients(Request $request): JsonResponse {
         $clients = Client::select([
             'clients.id',
@@ -286,15 +286,14 @@ class ClientController extends Controller {
             })->make();
     }
 
-    public function search(Request $request) {
+    public function search(Request $request): JsonResponse {
         $keyword = $request->input('keyword');
 
         $clients = Client::where('name', 'like', '%' . $keyword . '%')
-                         ->get(['code', 'name']);
+            ->get(['code', 'name']);
 
         return response()->json($clients);
     }
-
 
     public function createClientFromWS(mixed $data): void {
         // a8000001$$esc-tramuntana$$Escola Tramuntana$$c. Rosa dels Vents, 8$$Valldevent$$09999

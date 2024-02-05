@@ -1,11 +1,11 @@
 <?php
 
 return [
-    'clientcode' => 'Codi de client',
+    'clientcode' => 'Codi del client',
     'clientDNS' => 'DNS del client',
     'yearmonth' => 'Any i mes',
     'total' => 'Pàgines carregades',
-    'userstotal' => 'Total usuaris',
+    'userstotal' => 'Total d\'usuaris',
     'usersactive' => 'Usuaris actius',
     'userlogin' => 'Inici de sessió d\'usuari',
     'courses' => 'Cursos',
@@ -14,8 +14,8 @@ return [
     'lastaccess' => 'Darrer accés',
     'lastaccess_date' => 'Data del darrer accés',
     'lastaccess_user' => 'Usuari del darrer accés',
-    'total_access' => 'Accés total',
+    'total_access' => 'Total d\'accessos',
     'usersactivelast30days' => 'Usuaris actius els darrers 30 dies',
-    'diskConsume' => 'Consum de disc',
-    'posts' => 'Entrades (posts)'
+    'diskConsume' => 'Consum de quota',
+    'posts' => 'Entrades (posts)',
 ];
