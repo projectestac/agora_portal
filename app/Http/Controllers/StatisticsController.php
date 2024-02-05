@@ -7,6 +7,8 @@ use App\Models\Role;
 use App\Models\Client;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\DataTables;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class StatisticsController extends Controller {
     protected $clients;
@@ -76,6 +78,54 @@ class StatisticsController extends Controller {
         $client_name = $request->input('client_name');
         $client_code = NULL;
 
+        $column_names =
+            $service == 'moodle' ? ['total', 'usersactive']
+                                 : ['total', 'posts', 'userstotal'];
+
+        if($client_name != '')
+        {
+            $client_code = explode(' - ', $client_name)[1];
+        }
+
+        if($periodicity == 'monthly')
+        {
+            $month = $request->input('month');
+            $year = $request->input('year');
+            $yearMonth = $year . str_pad($month, 2, '0', STR_PAD_LEFT);
+
+            $columns = '';
+
+            for($i = 0; $i < count($column_names); $i++)
+            {
+                $columns .= 'SUM(' . $column_names[$i] . ') AS ' . $column_names[$i] . ($i < count($column_names) - 1 ? ', ' : '');
+            }
+
+            // getting results
+            $daily_stats = DB::select("SELECT SUBSTRING(date, 1, 8) AS day," . $columns . "
+                                              FROM agoraportal_" . ($service == 'moodle' ? 'moodle2' : 'nodes') . "_stats_day
+                                              WHERE SUBSTRING(date, 1, 6) = '" . $yearMonth . "' " . ($client_code != NULL ? " AND clientcode LIKE '%$client_code%'" : "") . "
+                                              GROUP BY SUBSTRING(date, 1, 8)");
+        }
+
+        $view = 'stats.' . $service . '.' . $periodicity;
+
+        if($service == 'moodle') $column_names[0] = 'total_access';
+
+
+        // passing results to matching tab view
+        return view('admin.stats.results', ['column_names' => $column_names, 'daily_stats' => $daily_stats, 'view' => $view, 'service' => $service, 'periodicity' => $periodicity, 'clients' => $this->clients]);
+
+    }
+
+    public function getTabStats(Request $request, string $service, string $periodicity) {
+        $perPage = $request->input('length', 25);
+        $page = $request->input('page', 1);
+
+        $table = $this->getTable($service, $periodicity);
+
+        $client_name = $request->input('client_name');
+        $client_code = NULL;
+
         if($client_name != '')
         {
             $client_code = explode(' - ', $client_name)[1];
@@ -88,15 +138,11 @@ class StatisticsController extends Controller {
             $yearMonth = $year . str_pad($month, 2, '0', STR_PAD_LEFT);
 
             $columns = $service == 'moodle'
-                       ? 'SUM(total) AS total, SUM(userstotal) AS userstotal, SUM(usersactive) AS usersactive'
+                       ? 'SUM(total_access) AS total_access, SUM(usersactive) AS usersactive, SUM(courses) AS courses, SUM(activites) AS activites'
                        : 'SUM(total) AS total, SUM(posts) AS posts';
 
             // getting results
             $results = DB::table($table)->where('yearmonth', $yearMonth);
-            $daily_stats = DB::select("SELECT SUBSTRING(date, 1, 8) AS day," . $columns . "
-                                              FROM agoraportal_" . ($service == 'moodle' ? 'moodle2' : 'nodes') . "_stats_day
-                                              WHERE SUBSTRING(date, 1, 6) = '" . $yearMonth . "' " . ($client_code != NULL ? " AND clientcode LIKE '%$client_code%'" : "") . "
-                                              GROUP BY SUBSTRING(date, 1, 8)");
         }
 
         else
@@ -112,13 +158,7 @@ class StatisticsController extends Controller {
             $results = $results->where('clientcode', $client_code);
         }
 
-        $results = $results->get();
-
-        $view = 'stats.' . $service . '.' . $periodicity;
-
-
-        // passing results to matching tab view
-        return view('admin.stats.results', ['results' => $results, 'daily_stats' => $daily_stats, 'view' => $view, 'service' => $service, 'periodicity' => $periodicity, 'clients' => $this->clients]);
+        return Datatables::make($results)->make(true);
 
     }
 

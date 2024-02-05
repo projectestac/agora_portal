@@ -1,5 +1,3 @@
-@if(isset($results) && count($results) > 0)
-
 
     <ul class="nav nav-tabs" id="myTabs">
         <li class="nav-item active">
@@ -14,11 +12,6 @@
         <div class="tab-pane fade active in" id="table">
             <table class="table table-striped" id="results">
                 <thead>
-                    <tr>
-                        @foreach($results[0] as $key => $value)
-                            <th>{{ __('database-table.' . $key) }}</th>
-                        @endforeach
-                    </tr>
                 </thead>
             </table>
         </div>
@@ -53,17 +46,24 @@
 
         // Generating datatable
         $(function () {
-            var columnNames = {!! json_encode(array_keys((array) $results[0])) !!};
+            var columnNames = {!! json_encode($column_names) !!};
 
             $('#results').DataTable({
                 processing: true,
-                serverSide: false,
+                serverSide: true,
                 language: {
                     url: '{{ url('/datatable/ca.json') }}'
                 },
                 lengthMenu: [10, 25, 50, 100, 250],
                 pageLength: 25,
-                data: {!! json_encode($results) !!},
+                ajax: {
+                    url: '{{ route('stats.getTabStats', ['service' => $service, 'periodicity' => $periodicity]) }}',
+                    type: 'GET',
+                    data: function (d) {
+                        d.length = $('#results').DataTable().page.len();
+                        d.page = $('#results').DataTable().page.info().page + 1;
+                    }
+                },
                 columns: columnNames.map(function(column) {
                     return { data: column, name: column };
                 })
@@ -129,9 +129,3 @@
         @endif
 
     </script>
-
-@else
-
-    <p>{{ __('common.no_results_found') }}</p>
-
-@endif
