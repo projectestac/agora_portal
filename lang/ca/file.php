@@ -12,6 +12,7 @@ return [
     'browse' => 'Selecciona un fitxer',
     'upload' => 'Puja',
     'upload_file' => 'Puja un fitxer',
+    'uploaded' => 'S\'ha pujat el fitxer <strong>:filename</strong> al servidor.',
     'uploaded_to_moodle' => 'S\'ha pujat el fitxer <strong>:filename</strong> al servidor. El trobareu en el repositori <strong>Fitxers</strong> del vostre Moodle.',
     'uploaded_to_moodle_short' => 'S\'ha pujat el fitxer :filename al servidor',
     'selected_file' => 'Fitxer seleccionat',
@@ -32,9 +33,10 @@ return [
     'no_instance' => 'No teniu activat el servei de Moodle',
     'upload_missing_file' => 'No s\'ha proporcionat cap fitxer per pujar',
     'upload_error' => 'S\'ha produït un error en pujar el fitxer: :error',
-    'allowed_extensions' => 'Tipus de fitxer permesos: :extensions',
+    'remove_error' => 'S\'ha produït un error en esborrar el fitxer: :error',
+    'allowed_extensions' => 'Extensions permeses: :extensions',
     'upload_max_size' => 'Mida màxima: :size',
     'invalid_file_extension' => 'Per a la pujada de fitxers, aquesta extensió no està permesa',
     'file_size_exceeded' => 'Per a la pujada de fitxers, aquest fitxer es massa gran',
-    'deleted_file' => 'El fitxer <strong>:file</strong> s\'ha eliminat correctament del directori <strong>:path</strong>.'
+    'deleted_file' => 'El fitxer <strong>:file</strong> s\'ha eliminat correctament del directori <strong>:path</strong>.',
 ];

@@ -77,7 +77,6 @@ class DirectoryController extends Controller {
      */
     public function upload(Request $request, string $currentPath): RedirectResponse {
         $currentPath = base64_decode($currentPath);
-
         $extensions = Util::getConfigParam('file_extensions_allowed');
 
         try {
@@ -87,7 +86,7 @@ class DirectoryController extends Controller {
             if ($request->hasFile('file')) {
                 $file = $request->file('file');
 
-                // Check file's extension
+                // Check file's extension.
                 $extensions = str_replace(' ', '', $extensions);
                 $allowedExtensions = explode(',', $extensions);
                 $fileExtension = $file->getClientOriginalExtension();
@@ -96,8 +95,8 @@ class DirectoryController extends Controller {
                     return redirect()->back()->with('error', __('file.invalid_file_extension'));
                 }
 
-                // Verify file size
-                $fileSize = $file->getSize(); // Size in kilobytes
+                // Verify file size.
+                $fileSize = $file->getSize();
 
                 if ($fileSize > $maxFileSizeInBytes) {
                     return redirect()->back()->with('error', __('file.file_size_exceeded'));
@@ -106,32 +105,29 @@ class DirectoryController extends Controller {
                 // If everything went OK, move file.
                 $filename = $file->getClientOriginalName();
                 $file->move($currentPath, $filename);
-                return redirect()->back()->with('success', __('file.uploaded_to_moodle', ['filename' => $filename]));
+
+                return redirect()->back()->with('success', __('file.uploaded', ['filename' => $filename]));
             }
+
             return redirect()->back()->with('error', __('file.upload_missing_file'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', __('file.upload_error', ['error' => $e->getMessage()]));
         }
     }
 
-    public function destroy(Request $request, string $path, string $file){
-        try{
+    public function destroy(Request $request, string $path, string $file): RedirectResponse {
+        try {
             $path = base64_decode($path);
             $file = base64_decode($file);
             $wholeRoute = $path . $file;
 
-            if (Storage::exists($path)) {
-                if (File::exists($wholeRoute)) {
-                    File::delete($wholeRoute);
-                    return redirect()->back()->with('success', __('file.deleted_file', ['file' => $file, 'path' => $path]));
-                } else {
-                    return redirect()->back()->with('error', __('file.upload_error', ['error' => $file]));
-                }
-            } else {
-                return redirect()->back()->with('error', __('file.upload_error', ['error' => $file]));
+            if (File::exists($wholeRoute)) {
+                File::delete($wholeRoute);
+                return redirect()->back()->with('success', __('file.deleted_file', ['file' => $file, 'path' => $path]));
             }
+            return redirect()->back()->with('error', __('file.remove_error', ['error' => $file]));
         } catch (\Exception $e) {
-            return redirect()->route('file.index')->with('error', 'Error al eliminar el archivo');
+            return redirect()->route('file.index')->with('error', __('file.remove_error', ['error' => $e->getMessage()]));
         }
     }
 }

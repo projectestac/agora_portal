@@ -128,8 +128,7 @@ class Util {
      * @param string $sizeString String representing the file size, e.g., "2M" or "512K".
      * @return int Size of the file in bytes.
      */
-    public static function convertToBytes($sizeString)
-    {
+    public static function convertToBytes(string $sizeString): int {
         // Convert the string to uppercase to handle file size units in either case.
         $sizeString = strtoupper($sizeString);
 
@@ -141,7 +140,7 @@ class Util {
 
         // Get the size and unit.
         $size = (int)$matches[1];
-        $unit = isset($matches[2]) ? $matches[2] : 'B';
+        $unit = $matches[2] ?? 'B';
 
         // Calculate and return the size in bytes.
         return $size * (1024 ** $units[$unit]);
