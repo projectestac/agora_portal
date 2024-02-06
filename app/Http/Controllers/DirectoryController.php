@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Util;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Helpers\Util;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 
 class DirectoryController extends Controller {

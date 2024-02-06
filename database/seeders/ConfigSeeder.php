@@ -24,7 +24,7 @@ class ConfigSeeder extends Seeder {
             'max_file_size_for_large_upload' => 800,
             'nodes_create_db' => 1,
             'min_db_id' => 1,
-            'file_extensions_allowed' => 'zip,sql,jpg,png,txt,pdf'
+            'file_extensions_allowed' => 'zip,sql,jpg,png,txt,pdf,gz,doc,docx,xls,xlsx,ppt,pptx,odt,ods,odp,odg',
         ];
 
         foreach ($params as $name => $value) {
