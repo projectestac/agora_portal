@@ -700,6 +700,31 @@ class InstanceController extends Controller {
         return ['success' => true];
     }
 
+    // basic, simple and working function to send an email...
+    private function sendEmail($to, $subject, $content, $cc = null)
+    {
+        try {
+            Mail::send([], [], function ($message) use ($to, $subject, $content, $cc) {
+                $message->to($to)
+                        ->subject($subject);
+
+                $htmlContent = '<p>' . $content . '</p>';
+                $htmlContent .= '<p>' . __('email.sent_automatically_on') . ' ' . date('d/m/Y @ H:i:s') . '</p>';
+                $htmlContent .= '<p><b>' . $_SERVER['REQUEST_URI'] . '</b> : <code>' . __FILE__ . '</code> @ ' . __LINE__ . '</p>';
+
+                $message->html($htmlContent);
+
+                if ($cc) {
+                    $message->cc($cc);
+                }
+            });
+
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
     private function notifyByEmail(Instance $instance, string $password = ''): array {
 
         $adminEmail = Util::getConfigParam('notify_address_user_cco');
@@ -742,7 +767,12 @@ class InstanceController extends Controller {
 
         try {
             $fileContent = file_get_contents($quotasFile);
-        } catch (\Exception $e) {
+        }
+
+        catch (\Exception $e) {
+
+            $this->sendEmail(Util::getConfigParam('notify_address_quota'), '/!\\ ' . __('email.problem_report') . ' /!\\', __('email.quotas_file_not_found'));
+
             return $serviceName . ': ' . $e->getMessage();
         }
 
