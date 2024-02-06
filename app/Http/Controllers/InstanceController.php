@@ -8,7 +8,10 @@ use App\Helpers\Util;
 use App\Http\Requests\StoreInstanceRequest;
 use App\Http\Requests\UpdateInstanceRequest;
 use App\Jobs\ProcessOperation;
+use App\Mail\QuotaReport;
+use App\Mail\QuotasFileError;
 use App\Mail\UpdateInstance;
+use App\Mail\QuotaWarning;
 use App\Models\Client;
 use App\Models\Instance;
 use App\Models\Log;
@@ -181,7 +184,12 @@ class InstanceController extends Controller {
 
         // Email the client. If it is an activation, send the password and welcome information.
         if ($sendEmail) {
-            $emailResult = $this->notifyByEmail($instance, $log['password'] ?? '');
+            $adminEmail = Util::getConfigParam('notify_address_user_cco');
+            $to = Util::getManagersEmail(Client::find($instance->client_id));
+            $emailResult = $this->notifyByEmail('update_instance', $to, $adminEmail, [
+                'instance' => $instance,
+                'password' => $log['password'] ?? '',
+            ]);
             if (isset($emailResult['success'])) {
                 $messages[] = $emailResult['success'];
             }
@@ -700,18 +708,40 @@ class InstanceController extends Controller {
         return ['success' => true];
     }
 
-    private function notifyByEmail(Instance $instance, string $password = ''): array {
-
-        $adminEmail = Util::getConfigParam('notify_address_user_cco');
-        $to = Util::getManagersEmail(Client::find($instance->client_id));
+    private function notifyByEmail($template = 'update_instance', $to = [], $bcc = '', $data = null): array {
 
         try {
-            Mail::to($to)
-                ->bcc($adminEmail)
-                ->send(new UpdateInstance($instance, $password));
+            $email = null;
 
-            $message = __('email.email_sent', ['to' => implode(', ', $to), 'bcc' => $adminEmail]);
-            return ['success' => $message];
+            switch ($template) {
+                // Email sent to the administrators when an instance is activated.
+                case 'update_instance':
+                    $email = new UpdateInstance($data['instance'], $data['password']);
+                    break;
+
+                // Email sent to the administrators when the quotas file is not found.
+                case 'quotas_file_error':
+                    $email = new QuotasFileError($data['fileName'], $data['error'], $data['serviceName']);
+                    break;
+
+                // Email sent to the client address and to the managers when the quota is near to be full.
+                case 'quota_warning':
+                    $email = new QuotaWarning($data['serviceName'], $data['percentage'], $data['url']);
+                    break;
+
+                // Report sent to the administrators with the list of instances that are near to be full.
+                case 'quota_report':
+                    $email = new QuotaReport($data['warning'], $data['danger']);
+                    break;
+            }
+
+            if (!is_null($email)) {
+                Mail::to($to)
+                    ->bcc($bcc)
+                    ->send($email);
+            }
+
+            return ['success' => __('email.email_sent', ['to' => implode(', ', $to), 'bcc' => $bcc])];
 
         } catch (\Exception $e) {
             return ['error' => $e->getMessage()];
@@ -724,39 +754,138 @@ class InstanceController extends Controller {
         // Get the list of services and execute the function to update the quota for each one.
         $serviceNames = Service::get()->where('status', 'active')->pluck('name')->toArray();
 
-        $result = [];
+        $notified = ['warning' => [], 'danger' => []];
+        $success = [];
+        $error = [];
 
+        // One iteration per service (Moodle, Nodes).
         foreach ($serviceNames as $serviceName) {
-            $result[] = $this->updateQuotaByService($serviceName);
+            $partialResult = $this->updateQuotaByService($serviceName);
+
+            if (isset($partialResult['success'])) {
+                $success[] = $partialResult['success'];
+                $notified['warning'] = array_merge($notified['warning'], $partialResult['notified']['warning']);
+                $notified['danger'] = array_merge($notified['danger'], $partialResult['notified']['danger']);
+            }
+
+            if (isset($partialResult['error'])) {
+                $error[] = $partialResult['error'];
+            }
         }
 
+        // Generate the report for the administrators and send it by email.
+        if (!empty($notified['warning']) || !empty($notified['danger'])) {
+            $to = [Util::getConfigParam('notify_address_quota')];
+            $data = [
+                'warning' => $notified['warning'],
+                'danger' => $notified['danger'],
+            ];
+
+            $this->notifyByEmail('quota_report', $to, '', $data);
+        }
+
+        $report = view('email.quota-report', [
+            'warning' => $notified['warning'],
+            'danger' => $notified['danger'],
+        ])->render();
+
         return redirect()
-            ->back()
-            ->with('message', implode('<br>', $result));
+            ->route('instances.index')
+            ->with('message', $report)
+            ->with('success', implode('<br>', $success))
+            ->with('error', implode('<br>', $error));
+
     }
 
-    private function updateQuotaByService($serviceName): string {
+    private function updateQuotaByService($serviceName): array {
 
         $quotasFile = Util::getAgoraVar(mb_strtolower($serviceName) . '_quotas_file');
         $serviceId = Service::where('name', $serviceName)->first()->id;
+        $adminEmail = Util::getConfigParam('notify_address_quota');
 
+        // Ensure the quotas file exists.
         try {
             $fileContent = file_get_contents($quotasFile);
         } catch (\Exception $e) {
-            return $serviceName . ': ' . $e->getMessage();
+            $to = [$adminEmail];
+            $this->notifyByEmail('quotas_file_error', $to, '', [
+                'serviceName' => $serviceName,
+                'fileName' => $quotasFile,
+                'error' => $e->getMessage(),
+            ]);
+
+            return ['error' => __('email.quotas_file_not_found', ['filename' => $quotasFile])];
         }
+
+        $notified = [
+            'warning' => [],
+            'danger' => [],
+        ];
 
         $lines = explode("\n", $fileContent);
 
         foreach ($lines as $line) {
             if (preg_match('/(\d+)\s+usu(\d+)/', $line, $matches)) {
-                Instance::where('client_id', (int)$matches[2])
+                $clientId = (int)$matches[2];
+                $quotaUsed = (int)$matches[1];
+
+                // Update the used quota in the instances table.
+                Instance::where('client_id', $clientId)
                     ->where('service_id', $serviceId)
-                    ->update(['used_quota' => (int)$matches[1]]);
+                    ->update(['used_quota' => $quotaUsed]);
+
+                // Get the instance and check if it is necessary to notify the client.
+                $instance = Instance::where('client_id', $clientId)
+                    ->where('service_id', $serviceId)
+                    ->first();
+
+                // Process the instance.
+                if (!empty($instance)) {
+                    $quota = $instance->quota;
+                    $quotaFree = $quota - $quotaUsed;
+                    $ratioUsed = $quotaUsed / $quota;
+                    $quotaUsageToNotify = Util::getConfigParam('quota_usage_to_notify');
+
+                    $needToNotify = ($ratioUsed >= $quotaUsageToNotify) &&
+                        ($quotaFree / (1024 * 1024 * 1024) <= Util::getConfigParam('quota_free_to_notify'));
+
+                    // Do the notification.
+                    if ($needToNotify) {
+                        $to = Util::getManagersEmail(Client::find($instance->client_id));
+                        $url = Util::getInstanceUrl($instance);
+                        $data = [
+                            'serviceName' => $serviceName,
+                            'percentage' => round($ratioUsed * 100),
+                            'url' => $url,
+                        ];
+
+                        $this->notifyByEmail('quota_warning', $to, $adminEmail, $data);
+
+                        // Store the instance data to generate a report for the administrators.
+                        $instanceData = [
+                            'serviceName' => $serviceName,
+                            'code' => $instance->client->code,
+                            'percentage' => round($ratioUsed * 100),
+                            'quotaUsed' => $quotaUsed,
+                            'quota' => $quota,
+                            'url' => $url,
+                        ];
+
+                        if ($ratioUsed >= 1) {
+                            $notified['danger'][] = $instanceData;
+                        } else {
+                            $notified['warning'][] = $instanceData;
+                        }
+                    }
+                }
             }
         }
 
-        return __('instance.update_quotas_service_ended', ['service' => $serviceName]);
+        return [
+            'success' => __('email.update_quotas_service_ended', ['service' => $serviceName]),
+            'notified' => $notified,
+        ];
+
     }
 
 }
