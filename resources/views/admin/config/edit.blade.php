@@ -126,14 +126,11 @@
 
         <br>
 
-            <form action="{{ route('update.quotas') }}" method="post">
-                @csrf
-                <div class="form-group">
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-info">{{ __('instance.update_quotas') }}</button>
-                    </div>
-                </div>
-            </form>
+        <div style="text-align: center;">
+            <button class="btn btn-info">
+                <a href="{{ route('update.quotas') }}" style="color:#ffffff">{{ __('instance.update_quotas') }}</a>
+            </button>
+        </div>
 
         @else
             <div class="alert alert-warning">{{ __('config.no_config_settings') }}</div>
