@@ -701,16 +701,20 @@ class InstanceController extends Controller {
     }
 
     // basic, simple and working function to send an email...
-    private function sendEmail($to, $subject, $content, $cc = null)
+    private function sendEmail($to, $subject, $content, $forAdmin = false, $cc = null)
     {
         try {
-            Mail::send([], [], function ($message) use ($to, $subject, $content, $cc) {
+            Mail::send([], [], function ($message) use ($to, $subject, $content, $forAdmin, $cc) {
                 $message->to($to)
                         ->subject($subject);
 
                 $htmlContent = '<p>' . $content . '</p>';
-                $htmlContent .= '<p>' . __('email.sent_automatically_on') . ' ' . date('d/m/Y @ H:i:s') . '</p>';
-                $htmlContent .= '<p><b>' . $_SERVER['REQUEST_URI'] . '</b> : <code>' . __FILE__ . '</code> @ ' . __LINE__ . '</p>';
+
+                if($forAdmin) {
+                    $htmlContent .= '<p>' . __('email.sent_automatically_on') . ' ' . date('d/m/Y @ H:i:s') . '</p>' .
+                                    '<p><code>' . $_SERVER['HTTP_USER_AGENT'] . '</code> @ <b>' . $_SERVER['REQUEST_URI'] . '</b></p>' .
+                                    '<p><code>' . __FILE__ . '</code> @ <b>' . __LINE__ . '</b></p>';
+                }
 
                 $message->html($htmlContent);
 
@@ -771,7 +775,10 @@ class InstanceController extends Controller {
 
         catch (\Exception $e) {
 
-            $this->sendEmail(Util::getConfigParam('notify_address_quota'), '/!\\ ' . __('email.problem_report') . ' /!\\', __('email.quotas_file_not_found'));
+            $this->sendEmail(Util::getConfigParam('notify_address_quota'),
+                            '/!\\ ' . __('email.problem_report') . ' /!\\',
+                            __('email.quotas_file_not_found'),
+                            true);
 
             return $serviceName . ': ' . $e->getMessage();
         }
@@ -780,9 +787,49 @@ class InstanceController extends Controller {
 
         foreach ($lines as $line) {
             if (preg_match('/(\d+)\s+usu(\d+)/', $line, $matches)) {
-                Instance::where('client_id', (int)$matches[2])
+                $clientId = (int)$matches[2];
+                $usedQuota = (int)$matches[1];
+
+                Instance::where('client_id', $clientId)
                     ->where('service_id', $serviceId)
-                    ->update(['used_quota' => (int)$matches[1]]);
+                    ->update(['used_quota' => $usedQuota]);
+
+                $instance = Instance::where('client_id', $clientId)
+                    ->where('service_id', $serviceId)
+                    ->first();
+
+                if($instance != NULL) {
+
+                    $client = Client::where('id', $clientId)
+                        ->first();
+
+                    $quota = $instance->quota;
+                    $quotaFree = $quota - $usedQuota;
+                    $ratioUsed = $usedQuota / $quota;
+                    $quotaUsageToNotify = Util::getConfigParam('quota_usage_to_notify');
+
+                    $needToNotify = $ratioUsed >= $quotaUsageToNotify &&
+                                    $quotaFree / 1e+9 <= Util::getConfigParam('quota_free_to_notify');
+
+                    $notifyAddress = 'testticxcat@gmail.com';//$client->code . '@xtec.cat';
+
+                    if ($needToNotify) {
+                        $percentageUsed = round($ratioUsed * 100);
+                        $quotaUsageToNotifyFormatted = round($quotaUsageToNotify * 100);
+
+                        $maxSpace = round($quota / 1e+9);
+                        $usedSpace = round($usedQuota / 1e+9);
+
+                        $this->sendEmail($notifyAddress,
+                                         __('email.quota_warning_subject'),
+                                         __('email.quota_warning_body',
+                                         ['serviceName' => $serviceName,
+                                          'quotaUsageToNotifyFormatted' => $quotaUsageToNotifyFormatted,
+                                          'percentageUsed' => $percentageUsed,
+                                          'maxSpace' => $maxSpace,
+                                          'usedSpace' => $usedSpace]));
+                    }
+                }
             }
         }
 
