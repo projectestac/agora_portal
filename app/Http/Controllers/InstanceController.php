@@ -96,7 +96,8 @@ class InstanceController extends Controller {
     public function edit(Instance $instance): View {
         return view('admin.instance.edit')
             ->with('instance', $instance)
-            ->with('statusList', $this->getStatusList());
+            ->with('statusList', $this->getStatusList())
+            ->with('modelTypeList', $this->getModelTypeList($instance->service_id));
     }
 
     /**
@@ -112,7 +113,8 @@ class InstanceController extends Controller {
         $statusFinal = $request->validated('status');
         $sendEmail = (bool)$request->validated('send_email');
 
-        $instance->db_host = $request->validated('db_host');
+        $instance->model_type_id = $request->validated('model_type_id');
+        $instance->db_host = $request->validated('db_host') ?? '';
         $instance->quota = $request->validated('quota') * 1024 * 1024 * 1024; // GB to Bytes
         $instance->observations = $request->validated('observations');
         $instance->annotations = $request->validated('annotations');
@@ -217,6 +219,25 @@ class InstanceController extends Controller {
             Instance::STATUS_WITHDRAWN => __('instance.status_withdrawn'),
             Instance::STATUS_BLOCKED => __('instance.status_blocked'),
         ];
+    }
+
+    public function getModelTypeList(int $serviceId = 0): array {
+
+        if ($serviceId) {
+            $modelTypes = ModelType::select('id', 'description')
+                ->where('service_id', $serviceId)
+                ->get();
+        } else {
+            $modelTypes = ModelType::select('id', 'description')->get();
+        }
+
+        $modelTypeList = [];
+
+        foreach ($modelTypes as $modelType) {
+            $modelTypeList[$modelType->id] = $modelType->description;
+        }
+
+        return $modelTypeList;
     }
 
     public function getInstances(Request $request): JsonResponse {
