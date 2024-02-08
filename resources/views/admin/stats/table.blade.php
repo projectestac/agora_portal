@@ -35,8 +35,8 @@
         </div>
     </div>
 
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" charset="utf8" src="{{ secure_asset('js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ secure_asset('js/chart.js') }}"></script>
 
     <script>
         function formatDate(date) {
