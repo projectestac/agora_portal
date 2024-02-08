@@ -9,6 +9,7 @@ use App\Http\Requests\StoreInstanceRequest;
 use App\Http\Requests\UpdateInstanceRequest;
 use App\Jobs\ProcessOperation;
 use App\Mail\UpdateInstance;
+use App\Mail\NotifyQuotaWarning;
 use App\Models\Client;
 use App\Models\Instance;
 use App\Models\Log;
@@ -748,6 +749,33 @@ class InstanceController extends Controller {
 
     }
 
+    private function notifyByEmailNew($type = 'update_instance', $data = null): array {
+        $adminEmail = Util::getConfigParam('notify_address_user_cco');
+        $to = ['testticxcat@gmail.com'];//Util::getManagersEmail(Client::find($instance->client_id));
+
+        try {
+            switch($type) {
+                case 'update_instance':
+                    $mail = new UpdateInstance($data);
+                    break;
+                case 'notify_quota_warning':
+                    $mail = new NotifyQuotaWarning($data);
+                    break;
+            }
+
+            if($type == 'notify_quota_warning') {
+                Mail::to($to)->send($mail);
+            }
+
+            $message = __('email.email_sent', ['to' => implode(', ', $to), 'bcc' => $adminEmail]);
+            return ['success' => $message];
+
+        } catch (\Exception $e) {
+            return ['error' => $e->getMessage()];
+        }
+    }
+
+
     public function updateQuotas(): RedirectResponse {
 
         // Get the list of services and execute the function to update the quota for each one.
@@ -814,20 +842,15 @@ class InstanceController extends Controller {
                     $notifyAddress = 'testticxcat@gmail.com';//$client->code . '@xtec.cat';
 
                     if ($needToNotify) {
-                        $percentageUsed = round($ratioUsed * 100);
-                        $quotaUsageToNotifyFormatted = round($quotaUsageToNotify * 100);
+                        $data = [
+                            'serviceName' => $serviceName,
+                            'percentageUsed' => round($ratioUsed * 100),
+                            'quotaUsageToNotifyFormatted' => round($quotaUsageToNotify * 100),
+                            'maxSpace' => round($quota / 1e+9),
+                            'usedSpace' => round($usedQuota / 1e+9)
+                        ];
 
-                        $maxSpace = round($quota / 1e+9);
-                        $usedSpace = round($usedQuota / 1e+9);
-
-                        $this->sendEmail($notifyAddress,
-                                         __('email.quota_warning_subject'),
-                                         __('email.quota_warning_body',
-                                         ['serviceName' => $serviceName,
-                                          'quotaUsageToNotifyFormatted' => $quotaUsageToNotifyFormatted,
-                                          'percentageUsed' => $percentageUsed,
-                                          'maxSpace' => $maxSpace,
-                                          'usedSpace' => $usedSpace]));
+                        $emailResult = $this->notifyByEmailNew('notify_quota_warning', $data);
                     }
                 }
             }
