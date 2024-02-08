@@ -23,6 +23,7 @@ class UpdateInstanceRequest extends FormRequest {
         return [
             'status' => 'required|string|in:' . Instance::STATUS_PENDING . ',' . Instance::STATUS_ACTIVE . ',' .
                 Instance::STATUS_INACTIVE . ',' . Instance::STATUS_DENIED . ',' . Instance::STATUS_WITHDRAWN . ',' . Instance::STATUS_BLOCKED,
+            'model_type_id' => 'required|numeric',
             'db_host' => 'nullable|string',
             'send_email' => 'nullable|in:on',
             'quota' => 'required|numeric|min:1',
