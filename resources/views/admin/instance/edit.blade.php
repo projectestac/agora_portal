@@ -49,10 +49,6 @@
                                 </tr>
                             @endif
                             <tr>
-                                <td>{{ __('common.type') }}</td>
-                                <td>{{ $instance->modelType->description }}</td>
-                            </tr>
-                            <tr>
                                 <td>{{ __('config.location') }}</td>
                                 <td>{{ $instance->client->location->name }}</td>
                             </tr>
@@ -116,6 +112,21 @@
                                     </label>
                                 </div>
                             </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label clear" for="model_type_id">{{ __('common.type') }}</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="model_type_id" name="model_type_id">
+                                        @foreach($modelTypeList as $key => $description)
+                                            <option value="{{ $key }}" {{ $instance->model_type_id === $key ? 'selected' : '' }}>{{ $description }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @error('model_type_id')
+                                <div class="text-danger">{{ __('common.error_occurred') }}</div>
+                                @enderror
+                            </div>
+
 
                             <div class="form-group">
                                 <div class="form-group">
