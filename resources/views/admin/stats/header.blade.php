@@ -1,4 +1,4 @@
-<p class="h3">{{ __('stats.stats') }}</p>
+<h3>{{ __('stats.stats') }}</h3>
 
 <ul class="nav nav-tabs">
     @foreach([
