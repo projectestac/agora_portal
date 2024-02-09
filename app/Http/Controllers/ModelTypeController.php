@@ -36,11 +36,11 @@ class ModelTypeController extends Controller {
     public function store(StoreModelTypeRequest $request): RedirectResponse {
 
         $modelType = new ModelType([
-            'service_id' => $request->input('service_id'),
-            'description' => $request->input('description'),
-            'short_code' => $request->input('short_code'),
-            'url' => $request->input('url'),
-            'db' => $request->input('db'),
+            'service_id' => $request->validated('service_id'),
+            'description' => $request->validated('description'),
+            'short_code' => $request->validated('short_code'),
+            'url' => $request->validated('url'),
+            'db' => $request->validated('db'),
         ]);
 
         try {
@@ -83,11 +83,11 @@ class ModelTypeController extends Controller {
         $modelType = ModelType::findOrFail($id);
 
         $modelType->update([
-            'service_id' => $request->input('service_id'),
-            'description' => $request->input('description'),
-            'short_code' => $request->input('short_code'),
-            'url' => $request->input('url'),
-            'db' => $request->input('db'),
+            'service_id' => $request->validated('service_id'),
+            'description' => $request->validated('description'),
+            'short_code' => $request->validated('short_code'),
+            'url' => $request->validated('url'),
+            'db' => $request->validated('db'),
         ]);
 
         return redirect()

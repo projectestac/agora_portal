@@ -20,6 +20,11 @@ class UpdateModelTypeRequest extends FormRequest {
      */
     public function rules(): array {
         return [
+            'service_id' => [
+                'required',
+                'integer',
+                'exists:services,id',
+            ],
             'description' => [
                 'required',
                 'string',
