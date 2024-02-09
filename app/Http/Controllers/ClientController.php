@@ -239,8 +239,6 @@ class ClientController extends Controller {
 
     // For public portal.
     public function getActiveClients(Request $request): JsonResponse {
-        $perPage = $request->input('length', 25);
-        $page = $request->input('page', 1);
 
         $clients = Client::select([
             'clients.id',
