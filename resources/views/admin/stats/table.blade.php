@@ -35,7 +35,6 @@
         </div>
     </div>
 
-    <script type="text/javascript" charset="utf8" src="{{ secure_asset('js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ secure_asset('js/chart.js') }}"></script>
 
     <script>
