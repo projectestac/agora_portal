@@ -22,8 +22,9 @@ class UpdateInstanceRequest extends FormRequest {
     public function rules(): array {
         return [
             'status' => 'required|string|in:' . Instance::STATUS_PENDING . ',' . Instance::STATUS_ACTIVE . ',' .
-                Instance::STATUS_INACTIVE . ',' . Instance::STATUS_DENIED . ',' . Instance::STATUS_WITHDRAWN . ',' . Instance::STATUS_BLOCKED,
-            'model_type_id' => 'required|numeric',
+                Instance::STATUS_INACTIVE . ',' . Instance::STATUS_DENIED . ',' . Instance::STATUS_WITHDRAWN . ',' .
+                Instance::STATUS_BLOCKED,
+            'model_type_id' => 'required|integer|exists:model_types,id',
             'db_host' => 'nullable|string',
             'send_email' => 'nullable|in:on',
             'quota' => 'required|numeric|min:1',
