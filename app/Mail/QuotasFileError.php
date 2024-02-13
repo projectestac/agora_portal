@@ -9,13 +9,13 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class NotifyQuotaWarning extends Mailable {
+class QuotasFileError extends Mailable {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(private $data) {
+    public function __construct(private $fileName, private $error, private $serviceName) {
         //
     }
 
@@ -24,7 +24,7 @@ class NotifyQuotaWarning extends Mailable {
      */
     public function envelope(): Envelope {
         return new Envelope(
-            subject: __('email.quota_warning_subject')
+            subject: __('email.quotas_file_error_subject'),
         );
     }
 
@@ -33,9 +33,11 @@ class NotifyQuotaWarning extends Mailable {
      */
     public function content(): Content {
         return new Content(
-            view: 'email.notify-quota-warning',
+            view: 'email.quotas-file-error',
             with: [
-                'data' => $this->data
+                'fileName' => $this->fileName,
+                'error' => $this->error,
+                'serviceName' => $this->serviceName,
             ]
         );
     }
