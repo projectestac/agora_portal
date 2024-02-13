@@ -22,5 +22,6 @@ return [
     'config_updated' => 'S\'ha actualitzat la configuració',
     'location' => 'Servei Territorial',
     'locations' => 'Serveis Territorials',
-    'file_extensions_allowed' => 'Extensions permeses per a la pujada de fitxers'
+    'file_extensions_allowed' => 'Extensions permeses per a la pujada de fitxers',
+    'send_quotas_email' => 'Envia correu electrònic en actualitzar les quotes',
 ];

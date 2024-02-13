@@ -118,6 +118,13 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="col-sm-4 control-label clear" for="send_quotas_email">{{ __('config.send_quotas_email') }}</label>
+                    <div class="col-sm-8">
+                        <input type="checkbox" id="send_quotas_email" name="send_quotas_email" @if($config['send_quotas_email']) checked @endif>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <div class="text-center">
                         <button type="submit" class="btn btn-success">{{ __('common.save') }}</button>
                     </div>
