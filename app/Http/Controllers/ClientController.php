@@ -182,9 +182,11 @@ class ClientController extends Controller {
         $order = $request->input('order')[0];
         $orderColumn = 'clients.' . $columns[$order['column']]['data'] ?? 'clients.updated_at';
         $orderDirection = $order['dir'] ?? 'desc';
+        $groupBy = 'clients.id';
 
         if ($orderColumn === 'clients.services') {
-            $orderColumn = 'services.name';
+            $orderColumn = 'service_names';
+            $groupBy = 'service_names';
         }
 
         if ($orderColumn === 'clients.dates') {
