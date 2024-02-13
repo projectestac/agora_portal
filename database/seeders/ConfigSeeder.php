@@ -25,6 +25,7 @@ class ConfigSeeder extends Seeder {
             'nodes_create_db' => 1,
             'min_db_id' => 1,
             'file_extensions_allowed' => 'zip,sql,jpg,png,txt,pdf,gz,doc,docx,xls,xlsx,ppt,pptx,odt,ods,odp,odg',
+            'send_quotas_email' => 1,
         ];
 
         foreach ($params as $name => $value) {
