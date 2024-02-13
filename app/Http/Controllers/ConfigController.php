@@ -42,12 +42,13 @@ class ConfigController extends Controller {
             'nodes_create_db' => ($request->input('nodes_create_db') === 'on') ? 1 : 0,
             'min_db_id' => $request->input('min_db_id'),
             'file_extensions_allowed' => $request->input('file_extensions'),
+            'send_quotas_email' => ($request->input('send_quotas_email') === 'on') ? 1 : 0,
         ];
 
         // Encrypt password if needed.
         $params['xtecadmin_hash'] = (strlen($params['xtecadmin_hash']) === 32) ? $params['xtecadmin_hash'] : md5($params['xtecadmin_hash']);
 
-        // Divide by 100 quota usage values.
+        // Divide quota usage values by 100.
         $params['quota_usage_to_request'] /= 100;
         $params['quota_usage_to_notify'] /= 100;
 
