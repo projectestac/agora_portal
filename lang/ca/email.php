@@ -9,4 +9,5 @@ return [
     'update_quotas_service_ended' => 'S\'ha completat l\'actualització de les quotes del servei :service',
     'quota_warning_subject' => '[Àgora] Avís de quota',
     'quota_report_subject' => '[Àgora] Resum de missatges sobre quotes als usuaris',
+    'email_disabled' => 'L\'enviament de correu electrònic està deshabilitat',
 ];

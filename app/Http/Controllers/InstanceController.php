@@ -710,6 +710,12 @@ class InstanceController extends Controller {
 
     private function notifyByEmail($template = 'update_instance', $to = [], $bcc = '', $data = null): array {
 
+        // Check if the email notification is enabled.
+        $notifyByEmail = Util::getConfigParam('send_quotas_email');
+        if (!$notifyByEmail) {
+            return ['message' => __('email.email_disabled')];
+        }
+
         try {
             $email = null;
 
