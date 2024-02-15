@@ -186,7 +186,7 @@ class InstanceController extends Controller {
         if ($sendEmail) {
             $adminEmail = Util::getConfigParam('notify_address_user_cco');
             $to = Util::getManagersEmail(Client::find($instance->client_id));
-            $emailResult = $this->notifyByEmail('update_instance', $to, $adminEmail, [
+            $emailResult = $this->notifyByEmail('update_instance', $to, $adminEmail, true, [
                 'instance' => $instance,
                 'password' => $log['password'] ?? '',
             ]);
@@ -708,11 +708,11 @@ class InstanceController extends Controller {
         return ['success' => true];
     }
 
-    private function notifyByEmail($template = 'update_instance', $to = [], $bcc = '', $data = null): array {
+    private function notifyByEmail($template = 'update_instance', $to = [], $bcc = '', $force = false, $data = null): array {
 
         // Check if the email notification is enabled.
         $notifyByEmail = Util::getConfigParam('send_quotas_email');
-        if (!$notifyByEmail) {
+        if (!$force && !$notifyByEmail) {
             return ['message' => __('email.email_disabled')];
         }
 
@@ -787,7 +787,7 @@ class InstanceController extends Controller {
                 'danger' => $notified['danger'],
             ];
 
-            $this->notifyByEmail('quota_report', $to, '', $data);
+            $this->notifyByEmail('quota_report', $to, '', false, $data);
         }
 
         $report = view('email.quota-report', [
@@ -806,15 +806,16 @@ class InstanceController extends Controller {
     private function updateQuotaByService($serviceName): array {
 
         $quotasFile = Util::getAgoraVar(mb_strtolower($serviceName) . '_quotas_file');
-        $serviceId = Service::where('name', $serviceName)->first()->id;
+        $userPrefix = Util::getAgoraVar(mb_strtolower($serviceName) . '_user_prefix');
         $adminEmail = Util::getConfigParam('notify_address_quota');
+        $quotaUsageToNotify = Util::getConfigParam('quota_usage_to_notify');
+        $serviceId = Service::where('name', $serviceName)->first()->id;
 
         // Ensure the quotas file exists.
         try {
             $fileContent = file_get_contents($quotasFile);
         } catch (\Exception $e) {
-            $to = [$adminEmail];
-            $this->notifyByEmail('quotas_file_error', $to, '', [
+            $this->notifyByEmail('quotas_file_error', [$adminEmail], '', false, [
                 'serviceName' => $serviceName,
                 'fileName' => $quotasFile,
                 'error' => $e->getMessage(),
@@ -831,57 +832,59 @@ class InstanceController extends Controller {
         $lines = explode("\n", $fileContent);
 
         foreach ($lines as $line) {
-            if (preg_match('/(\d+)\s+usu(\d+)/', $line, $matches)) {
-                $clientId = (int)$matches[2];
-                $quotaUsed = (int)$matches[1];
+            // Format: <quota_used>\t<user_prefix><db_id>
+            if (!preg_match('/^(\d+)\t' . $userPrefix . '([0-9]*)$/', $line, $matches)) {
+                continue;
+            }
 
-                // Update the used quota in the instances table.
-                Instance::where('client_id', $clientId)
-                    ->where('service_id', $serviceId)
-                    ->update(['used_quota' => $quotaUsed]);
+            $dbId = (int)$matches[2];
+            $quotaUsed = (int)$matches[1];
 
-                // Get the instance and check if it is necessary to notify the client.
-                $instance = Instance::where('client_id', $clientId)
-                    ->where('service_id', $serviceId)
-                    ->first();
+            // Update the used quota in the instances table.
+            Instance::where('db_id', $dbId)
+                ->where('service_id', $serviceId)
+                ->update(['used_quota' => $quotaUsed]);
 
-                // Process the instance.
-                if (!empty($instance)) {
-                    $quota = $instance->quota;
-                    $quotaFree = $quota - $quotaUsed;
-                    $ratioUsed = $quotaUsed / $quota;
-                    $quotaUsageToNotify = Util::getConfigParam('quota_usage_to_notify');
+            // Get the instance and check if it is necessary to notify the client.
+            $instance = Instance::where('db_id', $dbId)
+                ->where('service_id', $serviceId)
+                ->first();
 
-                    $needToNotify = ($ratioUsed >= $quotaUsageToNotify) &&
-                        ($quotaFree / (1024 * 1024 * 1024) <= Util::getConfigParam('quota_free_to_notify'));
+            // Process the instance.
+            if (!empty($instance)) {
+                $quota = $instance->quota;
+                $quotaFree = $quota - $quotaUsed;
+                $ratioUsed = $quotaUsed / $quota;
 
-                    // Do the notification.
-                    if ($needToNotify) {
-                        $to = Util::getManagersEmail(Client::find($instance->client_id));
-                        $url = Util::getInstanceUrl($instance);
-                        $data = [
-                            'serviceName' => $serviceName,
-                            'percentage' => round($ratioUsed * 100),
-                            'url' => $url,
-                        ];
+                $needToNotify = ($ratioUsed >= $quotaUsageToNotify) &&
+                    ($quotaFree / (1024 * 1024 * 1024) <= (float)Util::getConfigParam('quota_free_to_notify'));
 
-                        $this->notifyByEmail('quota_warning', $to, $adminEmail, $data);
+                // Do the notification.
+                if ($needToNotify) {
+                    $to = Util::getManagersEmail(Client::find($instance->client_id));
+                    $url = Util::getInstanceUrl($instance);
+                    $data = [
+                        'serviceName' => $serviceName,
+                        'percentage' => round($ratioUsed * 100),
+                        'url' => $url,
+                    ];
 
-                        // Store the instance data to generate a report for the administrators.
-                        $instanceData = [
-                            'serviceName' => $serviceName,
-                            'code' => $instance->client->code,
-                            'percentage' => round($ratioUsed * 100),
-                            'quotaUsed' => $quotaUsed,
-                            'quota' => $quota,
-                            'url' => $url,
-                        ];
+                    $this->notifyByEmail('quota_warning', $to, $adminEmail, false, $data);
 
-                        if ($ratioUsed >= 1) {
-                            $notified['danger'][] = $instanceData;
-                        } else {
-                            $notified['warning'][] = $instanceData;
-                        }
+                    // Store the instance data to generate a report for the administrators.
+                    $instanceData = [
+                        'serviceName' => $serviceName,
+                        'code' => $instance->client->code,
+                        'percentage' => round($ratioUsed * 100),
+                        'quotaUsed' => $quotaUsed,
+                        'quota' => $quota,
+                        'url' => $url,
+                    ];
+
+                    if ($ratioUsed >= 1) {
+                        $notified['danger'][] = $instanceData;
+                    } else {
+                        $notified['warning'][] = $instanceData;
                     }
                 }
             }

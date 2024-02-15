@@ -1,8 +1,10 @@
 <div style="padding:10px; background-color:#ffffff">
-    <h3>Instàncies notificades per correu</h3>
+    <h3>Instàncies amb ocupació elevada</h3>
 
     @if(!empty($warning) && is_array($warning))
-        <h4 style="color:#856404; background-color:#fff3cd; border-color:#ffeeba;">A punt d'exhaurir la quota</h4>
+        <h4 style="color:#856404; background-color:#fff3cd; border-color:#ffeeba; display:inline-block; padding:3px;">
+            A punt d'exhaurir la quota
+        </h4>
 
         <table class="table table-striped" style="border: 1px solid #856404;">
             <thead>
@@ -30,7 +32,9 @@
     @endif
 
     @if(!empty($danger) && is_array($danger))
-        <h4 style="color:#721c24; background-color:#f8d7da; border-color:#f5c6cb;">Quota exhaurida</h4>
+        <h4 style="color:#721c24; background-color:#f8d7da; border-color:#f5c6cb; display:inline-block; padding:3px;">
+            Quota exhaurida
+        </h4>
 
         <table class="table table-striped" style="border: 1px solid #721c24;">
             <thead>
