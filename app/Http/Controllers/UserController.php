@@ -61,20 +61,13 @@ class UserController extends Controller {
 
         $search = $request->validate(['search.value' => 'string|max:50|nullable']);
         $searchValue = $search['search']['value'] ?? '';
-
-        $columns = $request->input('columns');
-        $order = $request->input('order')[0];
-        $orderColumn = 'users.' . $columns[$order['column']]['data'] ?? 'users.updated_at';
-        $orderDirection = $order['dir'] ?? 'desc';
-
         $users = User::select(['users.*']);
-            // ->orderBy($orderColumn, $orderDirection);
 
         if (!empty($searchValue)) {
             $users = $users->where('name', 'LIKE', '%' . $searchValue . '%')
                 ->orWhere('email', 'LIKE', '%' . $searchValue . '%')
                 ->orWhereHas('roles', function ($query) use ($searchValue) {
-                    //? https://laravel.com/docs/10.x/eloquent-relationships#querying-relationship-existence
+                    // https://laravel.com/docs/10.x/eloquent-relationships#querying-relationship-existence
                     $query->where('name', 'LIKE', '%' . $searchValue . '%');
                 });
         }
