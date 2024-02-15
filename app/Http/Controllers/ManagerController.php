@@ -150,25 +150,6 @@ class ManagerController extends Controller {
     }
 
     public function getManagers(Request $request): JsonResponse {
-        $search = $request->validate(['search.value' => 'string|max:50|nullable']);
-        $searchValue = $search['search']['value'] ?? '';
-
-        $columns = $request->input('columns');
-        $order = $request->input('order')[0];
-        $orderColumn = 'managers.' . $columns[$order['column']]['data'] ?? 'managers.updated_at';
-        $orderDirection = $order['dir'] ?? 'desc';
-
-        if ($orderColumn == 'managers.client_name') {
-            $orderColumn = 'clients.name';
-        }
-
-        if ($orderColumn == 'managers.user_name') {
-            $orderColumn = 'users.name';
-        }
-
-        if ($orderColumn == 'managers.assigned') {
-            $orderColumn = 'managers.created_at';
-        }
 
         $manager = Manager::select(['managers.*', 'clients.code'])
             ->leftJoin('clients', 'managers.user_id', '=', 'clients.id')
