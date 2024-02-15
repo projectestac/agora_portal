@@ -11,8 +11,8 @@
                 <thead>
                     <tr>
                         <th>{{ __('common.id') }}</th>
-                        <th>{{ __('client.client') }}</th>
                         <th>{{ __('user.user') }}</th>
+                        <th>{{ __('client.client') }}</th>
                         <th>{{ __('manager.manager_added_date') }}</th>
                         <th>{{ __('common.actions') }}</th>
 
@@ -34,8 +34,8 @@
                 ajax: '{{ route('managers.list') }}',
                 columns: [
                     {data: 'id', name: 'id'},
-                    {data: 'client_name', name: 'client_name'},
                     {data: 'user_name', name: 'user_name'},
+                    {data: 'client_name', name: 'client_name'},
                     {data: 'assigned', name: 'assigned'},
                     {data: 'actions', name: 'actions', orderable: false, searchable: false}
                 ]
