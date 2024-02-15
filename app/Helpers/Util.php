@@ -280,8 +280,8 @@ class Util {
 
     public static function getManagersEmail(Client $client): array {
 
-        $clientEmail = User::where('name', $client->code)->first()->email;
-        $emails = (!empty($clientEmail)) ? [$clientEmail] : [$client->code . '@xtec.cat'];
+        $clientUser = User::where('name', $client->code)->first();
+        $emails = (!empty($clientUser)) ? [$clientUser->email] : [$client->code . '@xtec.cat'];
         $managers = $client->managers()->get()->toArray();
 
         foreach ($managers as $manager) {
