@@ -139,9 +139,9 @@
                                     <td>{{ \App\Helpers\Util::formatBytes($file['size']) }}</td>
                                     <td>{{ $file['updated_at'] }}</td>
                                     <td>
-                                        <a href="{{ route('myagora.file.download') }}?file={{ $file['name'] }}" title="{{ __('file.download') }}">
+                                        <a href="{{ route('myagora.file.download') }}?file={{ urlencode($file['name']) }}" title="{{ __('file.download') }}">
                                             <span class="btn btn-info glyphicon glyphicon-download" aria-hidden="true"></span></a>
-                                        <a href="{{ route('myagora.file.delete') }}?file={{ $file['name'] }}" title="{{ __('common.delete') }}"
+                                        <a href="{{ route('myagora.file.delete') }}?file={{ urlencode($file['name']) }}" title="{{ __('common.delete') }}"
                                            onclick="return confirm('{{ __('file.confirm_deletion', ['filename' => $file['name']]) }}');">
                                             <span class="btn btn-danger glyphicon glyphicon-trash" aria-hidden="true"></span></a>
                                     </td>
