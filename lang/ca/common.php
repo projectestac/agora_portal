@@ -52,5 +52,6 @@ return [
     'moodle' => 'Moodle',
     'nodes' => 'Nodes',
     'table' => 'Taula',
-    'chart' => 'Gràfic'
+    'chart' => 'Gràfic',
+    'disk_usage' => 'Ús de disc',
 ];
