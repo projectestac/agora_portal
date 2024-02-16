@@ -49,7 +49,8 @@
                             url: '{{ url('/myagora/request/details') }}',
                             method: 'GET',
                             data: {
-                                option: $(this).val()
+                                option: $(this).val(),
+                                clientId: '{{ $currentClient['id'] }}'
                             },
                             success: function (response) {
                                 $('#request-user-messages').html(response.html);
