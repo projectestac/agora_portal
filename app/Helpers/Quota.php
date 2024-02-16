@@ -61,4 +61,22 @@ class Quota {
         return reset($usedQuota);
     }
 
+    /**
+     * Check if the instance can request more quota.
+     *
+     * @param Instance $instance
+     * @return bool
+     */
+    public static function canRequestQuota(Instance $instance): bool {
+
+        $quotaPercentLimit = (float)Util::getConfigParam('quota_usage_to_request'); // 0.75
+        $quotaFreeLimit = (float)Util::getConfigParam('quota_free_to_request'); // 3
+
+        $quotaPercentUsed = round($instance->used_quota / $instance->quota, 4);
+        $quotaRemaining = round(($instance->quota - $instance->used_quota) / (1024 * 1024 * 1024), 4);
+
+        return ($quotaPercentUsed > $quotaPercentLimit) && ($quotaRemaining < $quotaFreeLimit);
+
+    }
+
 }

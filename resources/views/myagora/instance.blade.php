@@ -37,6 +37,7 @@
                         $date = Carbon::parse($instance->created_at);
                         $quota = Util::formatBytes($instance->quota);
                         $usedQuota = Util::formatBytes($instance->used_quota);
+                        $ratio = round($instance->used_quota / $instance->quota, 4);
                         $percent = round($instance->used_quota / $instance->quota * 100);
                         $instanceId = $instance->id;
                         $url = Util::getInstanceUrl($instance);

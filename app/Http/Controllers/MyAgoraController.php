@@ -25,6 +25,10 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class MyAgoraController extends Controller {
 
+
+    // Must fit the value in the database.
+    public const QUOTA_NAME = 'Ampliació de quota';
+
     public function myagora(): RedirectResponse {
         return redirect()->route('myagora.instances');
     }
@@ -63,13 +67,16 @@ class MyAgoraController extends Controller {
             $newDNS = explode('$$', $data['message'])[1];
         }
 
+        $configQuota = floatval(Util::getConfigParam('quota_usage_to_request'));
+
         return view('myagora.instance')
             ->with('instances', $instances)
             ->with('currentClient', $currentClient)
             ->with('availableServices', $availableServices)
             ->with('error', $error ?? '')
             ->with('currentDNS', $currentDNS)
-            ->with('newDNS', $newDNS ?? '');
+            ->with('newDNS', $newDNS ?? '')
+            ->with('configQuota', $configQuota);
 
     }
 
@@ -107,7 +114,8 @@ class MyAgoraController extends Controller {
         // The quota information in the cache can be out of date. Using getQuota() it is ensured that is updated.
         $quota = Quota::getQuota($currentInstance['id']);
         $percent = round($quota['used_quota'] / $quota['quota'] * 100);
-
+        $ratio = round($quota['used_quota'] / $quota['quota'], 4);
+        $configQuota = (float)Util::getConfigParam('quota_usage_to_request');
         $files = Util::getFiles(Util::getAgoraVar('moodledata') .
             Config::get('app.agora.moodle2.userprefix') . $currentInstance['db_id'] .
             Config::get('app.agora.moodle2.repository_files'));
@@ -119,7 +127,9 @@ class MyAgoraController extends Controller {
             ->with('quota', Util::formatBytes($quota['quota'], 2))
             ->with('percent', $percent)
             ->with('instanceId', $currentInstance['id'])
-            ->with('files', $files);
+            ->with('files', $files)
+            ->with('ratio', $ratio)
+            ->with('configQuota', $configQuota);
 
     }
 
@@ -425,6 +435,23 @@ class MyAgoraController extends Controller {
         $content = view('myagora.components.request_content')
             ->with('requestDetails', $requestDetails)
             ->render();
+
+        if ($requestDetails['name'] === $this::QUOTA_NAME) {
+
+            $clientId = (int)$request->get('clientId');
+            $instance = Instance::where('service_id', $requestIds[0])->where('client_id', $clientId)->first();
+            $canRequestQuota = Quota::canRequestQuota($instance);
+
+            if (!$canRequestQuota) {
+                $content = '<div class="alert alert-danger">' .
+                    __('request.quota_usage_message', [
+                        'percentage' => (float)Util::getConfigParam('quota_usage_to_request') * 100,
+                        'size' => Util::getConfigParam('quota_free_to_request'),
+                        ]) .
+                    '</div>';
+            }
+
+        }
 
         return response()->json(['html' => $content]);
     }
