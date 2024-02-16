@@ -426,6 +426,17 @@ class MyAgoraController extends Controller {
             ->with('requestDetails', $requestDetails)
             ->render();
 
+        if ($option['option'] === "4:1") {
+            $client_id = intval($request->get('clientID'));
+            $configQuota = floatval(Util::getConfigParam('quota_usage_to_request')); // 0.75
+            $myInstance = Instance::where('service_id', $requestIds[0])->where('client_id', $client_id)->first();
+            $ratio = round($myInstance->used_quota / $myInstance->quota, 4);
+
+            if ($ratio < $configQuota) {
+                $content = '<div class="alert alert-danger">'.__('request.status_denied').'</div>';
+            }
+        }
+
         return response()->json(['html' => $content]);
     }
 
