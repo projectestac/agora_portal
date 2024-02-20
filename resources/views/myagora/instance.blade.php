@@ -1,6 +1,7 @@
 @extends('layout.default')
 
 @php
+    use App\Helpers\Access;
     use App\Helpers\Util;
     use Carbon\Carbon;
 @endphp
@@ -12,7 +13,14 @@
 
     <div class="content myagora">
         @if (isset($currentClient['name']))
-            <h3>{{ __('myagora.instance_list', ['name' => $currentClient['name']]) }}</h3>
+            <h3>{{ __('myagora.instance_list', ['name' => $currentClient['name']]) }}
+
+                @if (Access::isAdmin(Auth::user()))
+                    <a href="{{ route('clients.edit', $currentClient['id']) }}" class="btn btn-primary" title="{{ __('common.edit') }}" target="_blank">
+                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                    </a>
+                @endif
+            </h3>
         @endif
 
         @if (!empty($error))
