@@ -105,15 +105,21 @@
                                 },
 
                                 UploadComplete: function (up, files) {
-                                    document.getElementById('upload-status').innerHTML = '<div class="alert alert-success">{{ __('file.upload_completed') }}</div>';
-                                    plupload.each(files, function (file) {
-                                        let loc = '{{ route('myagora.files') }}' + '?file=' + file.name;
-                                        location.assign(loc);
-                                    });
+                                    if (files.length > 0) {
+                                        document.getElementById('upload-status').innerHTML = '<div class="alert alert-success">{{ __('file.upload_completed') }}</div>';
+                                        plupload.each(files, function (file) {
+                                            let loc = '{{ route('myagora.files') }}' + '?file=' + file.name;
+                                            location.assign(loc);
+                                        });
+                                    } else {
+                                        document.getElementById('upload-status').innerHTML = '<div class="alert alert-danger">{{ __('file.upload_missing_file') }}</div>';
+                                    }
                                 },
 
                                 Error: function (up, err) {
-                                    document.getElementById('console').appendChild(document.createTextNode("\nError #" + err.code + ": " + err.message));
+                                    const errorCode = err.code;
+                                    const errorLog = err.message;
+                                    document.getElementById('upload-status').innerHTML = `<div class="alert alert-danger">Error #${errorCode}: ${errorLog}</div>`;
                                 }
                             }
                         });
