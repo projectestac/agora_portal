@@ -180,6 +180,21 @@ class Util {
         return self::formatBytes($used) . ' / ' . self::formatBytes($total) . ' (' . round($used / $total * 100) . '%)';
     }
 
+    public static function getColoredFormattedDiskUsage(int $used, int $total): string {
+        $quota_usage_to_request = self::getConfigParam('quota_usage_to_request');
+        $usage_ratio = $used / $total;
+
+        if ($usage_ratio < $quota_usage_to_request) {
+            $color_class = 'alert alert-success';
+        } elseif ($usage_ratio < 1) {
+            $color_class = 'alert alert-warning';
+        } else {
+            $color_class = 'alert alert-danger';
+        }
+
+        return '<span class="' . $color_class . '" style="display:inline-block; width:100%; text-align:center; height:75px; margin-bottom:0;">' . self::getFormattedDiskUsage($used, $total) . '</span>';
+    }
+
     public static function getAgoraVar(string $varName = ''): string {
         if (empty($varName)) {
             return '';
