@@ -325,7 +325,7 @@ class InstanceController extends Controller {
                 return new HtmlString($instance->client->city . '<br/>(<em>' . $instance->client->location->name . '</em>)');
             })
             ->addColumn('quota', function ($instance) {
-                return new HtmlString(Util::getFormattedDiskUsage($instance->used_quota, $instance->quota));
+                return new HtmlString(Util::getColoredFormattedDiskUsage($instance->used_quota, $instance->quota));
             })
             ->addColumn('updated_at', function ($instance) {
                 return new HtmlString('<strong>E:</strong> ' . $instance->updated_at->format('d/m/Y') . '<br/>' .
