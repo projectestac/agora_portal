@@ -433,7 +433,7 @@ class MyAgoraController extends Controller {
             $ratio = round($myInstance->used_quota / $myInstance->quota, 4);
 
             if ($ratio < $configQuota) {
-                $content = '<div class="alert alert-danger">'.__('request.status_denied').'</div>';
+                $content = '<div class="alert alert-danger">'.__('request.underQuota', ['quotaLimit'=>$configQuota*100]).'</div>';
             }
         }
 
