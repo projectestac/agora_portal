@@ -7,10 +7,39 @@
 
     <div class="content service">
         <h3>{{ __('request.request_list') }}</h3>
-        @if (!empty($requests))
-            <div class="pull-right">
-                {{ $requests->links('pagination::bootstrap-4') }}
+
+        <div class="row" style="margin-bottom: 30px">
+            <div class="col-md-6">
+                <form id="requests-form" action="{{ route('requests.index') }}" method="GET" class="form-inline">
+                    <select name="request_type_id" class="form-control">
+                        <option value="">- {{ __('common.all') }} -</option>
+                        @foreach(\App\Models\RequestType::all() as $requestType)
+                            <option value="{{ $requestType->id }}" @if(request('request_type_id') === $requestType->id) selected @endif>
+                                {{ $requestType->name }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <input type="text" name="client_name" id="client_name" class="form-control" style="width:300px"
+                           placeholder="{{ __('stats.start_typing_a_center_name') }}" value="{{ request('client_name') }}" autocomplete="off">
+
+                    <button type="button" class="btn btn-danger"
+                            onclick="$('#client_name').val(''); $('#requests-form').submit()">{{ __('stats.clear_filter') }}</button>
+
+                    <button type="submit" class="btn btn-primary">{{ __('common.filter') }}</button>
+                </form>
             </div>
+
+            <div class="col-md-6 text-right">
+                <x-client-autocomplete></x-client-autocomplete>
+
+                <div>
+                    {{ $requests->links('pagination::bootstrap-4') }}
+                </div>
+            </div>
+        </div>
+
+        @if (!empty($requests))
 
             <table class="table table-striped">
                 <thead>
