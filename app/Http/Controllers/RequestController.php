@@ -10,6 +10,7 @@ use App\Models\Client;
 use App\Models\Instance;
 use App\Models\Log;
 use App\Models\Request;
+use Illuminate\Http\Request as LaravelRequest;
 use App\Models\RequestType;
 use App\Models\Service;
 use App\Mail\UpdateRequest;
@@ -27,11 +28,27 @@ class RequestController extends Controller {
     /**
      * Display a listing of the resource.
      */
-    public function index(): View {
-        $requests = Request::with('requestType', 'service', 'client', 'user')
+    public function index(LaravelRequest $request): View {
+        $query = Request::with('requestType', 'service', 'client', 'user')
             ->orderByRaw("FIELD(status, \"" . Request::STATUS_PENDING . "\") DESC")
-            ->orderBy('updated_at', 'desc')
-            ->paginate(50);
+            ->orderBy('updated_at', 'desc');
+
+        if ($request->filled('request_type_id')) {
+            $query->where('request_type_id', $request->input('request_type_id'));
+        }
+
+        if ($request->filled('client_name')) {
+            $client_name = $request->input('client_name');
+
+            // Working with client code here, because autocomplete is used by stats as well, which works
+            // with client code and not ID...
+            $client_code = (!empty($client_name)) ? explode(' - ', $client_name)[1] : null;
+            $client_id = Client::where('code', $client_code)->value('id');
+
+            $query->where('client_id', $client_id);
+        }
+
+        $requests = $query->paginate(50);
 
         return view('admin.request.index')
             ->with('requests', $requests);
