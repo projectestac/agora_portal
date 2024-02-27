@@ -7,17 +7,19 @@
 
     <div class="content users">
         <h3>{{ __('user.users_list') }}</h3>
-            <table class="table table-striped" id="user-list">
-                <thead>
-                    <tr>
-                        <th>{{ __('common.id') }}</th>
-                        <th>{{ __('user.name') }}</th>
-                        <th>{{ __('user.email') }}</th>
-                        <th>{{ __('user.roles') }}</th>
-                        <th>{{ __('common.actions') }}</th>
-                    </tr>
-                </thead>
-            </table>
+        @include('components.messages')
+
+        <table class="table table-striped" id="user-list">
+            <thead>
+            <tr>
+                <th>{{ __('common.id') }}</th>
+                <th>{{ __('user.name') }}</th>
+                <th>{{ __('user.email') }}</th>
+                <th>{{ __('user.roles') }}</th>
+                <th style="text-align: right; padding-right: 50px;">{{ __('common.actions') }}</th>
+            </tr>
+            </thead>
+        </table>
     </div>
 
     <script>
@@ -37,7 +39,12 @@
                     {data: 'email', name: 'email'},
                     {data: 'roles', name: 'roles'},
                     {data: 'actions', name: 'actions', orderable: false, searchable: false}
-                ]
+                ],
+                "createdRow": function (row, data, dataIndex) {
+                    if (data.deleted_at) {
+                        $(row).css('background-color', '#ffcccc');
+                    }
+                }
             });
         });
     </script>
