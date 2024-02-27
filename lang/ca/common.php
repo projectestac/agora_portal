@@ -59,4 +59,5 @@ return [
     'change_statuses' => 'Canvia els estats',
     'dashboard' => 'Tauler del centre',
     'affected_rows' => 'Fila/es afectada/es',
+    'not_implemented_yet' => 'Funció no implementada encara',
 ];
