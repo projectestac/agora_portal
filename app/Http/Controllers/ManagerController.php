@@ -176,4 +176,13 @@ class ManagerController extends Controller {
 
     }
 
+    /**
+     * Show the data regarding the clients where the user is manager.
+     *
+     * @return View
+     */
+    public function showManager(): View {
+        return view('admin.manager.view');
+    }
+
 }

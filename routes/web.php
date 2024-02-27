@@ -66,6 +66,8 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::resource('/services', ServiceController::class);
     Route::resource('/clients', ClientController::class);
     Route::resource('/users', UserController::class);
+    Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+    Route::get('/users/{id}/manager', [ManagerController::class, 'showManager'])->name('manager.showManager');
     Route::resource('/roles', RoleController::class);
 
     Route::get('/stats', [StatisticsController::class, 'showStats'])->name('stats.show');
