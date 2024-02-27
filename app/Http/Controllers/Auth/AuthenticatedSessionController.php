@@ -44,6 +44,10 @@ class AuthenticatedSessionController extends Controller {
         if (is_object($user)) {
             $user->last_login_at = now();
             $user->save();
+
+            if ($user->deleted_at) {
+                die("User deactivated since: $user->deleted_at");
+            }
         }
 
         $result = Access::completeLogin($user);
