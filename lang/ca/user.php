@@ -9,4 +9,6 @@ return [
     'roles' => 'Rols',
     'roles_list' => 'Llista de rols',
     'guard' => 'Accés',
+    'user_updated' => 'S\'ha actualitzat l\'usuari correctament',
+    'user_noUpdated' => 'Usuari <strong>no</strong> actualitzat. No s\'han fet canvis',
 ];
