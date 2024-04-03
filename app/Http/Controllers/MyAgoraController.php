@@ -25,6 +25,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class MyAgoraController extends Controller {
 
+    public const QUOTA_NAME = 'Ampliació de quota';
+
     public function myagora(): RedirectResponse {
         return redirect()->route('myagora.instances');
     }
@@ -426,7 +428,7 @@ class MyAgoraController extends Controller {
             ->with('requestDetails', $requestDetails)
             ->render();
 
-        if ($option['option'] === "4:1") {
+        if ($requestDetails['name'] === $this::QUOTA_NAME) {
             $client_id = intval($request->get('clientID'));
             $configQuota = floatval(Util::getConfigParam('quota_usage_to_request')); // 0.75
             $myInstance = Instance::where('service_id', $requestIds[0])->where('client_id', $client_id)->first();
