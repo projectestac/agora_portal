@@ -13,7 +13,7 @@
 <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display: inline">
     @csrf
     @method('DELETE')
-    <button type="submit" class="btn btn-danger" title="{{ __('common.delete') }}" onclick="return confirm('Estàs segur que vols eliminar aquest usuari?');">
+    <button type="submit" class="btn btn-danger" title="{{ __('common.delete') }}" onclick="return confirm('{{ __('user.deleteUser_confirm') }}');">
         <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
     </button>
 </form>
