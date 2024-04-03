@@ -9,6 +9,7 @@ use App\Models\Role;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\HtmlString;
 use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
 
 class UserController extends Controller {
     public function __construct() {
@@ -68,15 +69,21 @@ class UserController extends Controller {
         $user->email = $validated['email'];
         $user->save();
 
+        $beforeRoles = $user->roles->pluck('name')->toArray();
+
         if ($request->has('roles')) {
             $user->syncRoles($request->input('roles'));
         }
+
+        $afterRoles = $user->roles->pluck('name')->toArray();
+
+        $rolesUpdated = !empty(array_diff($beforeRoles, $afterRoles));
 
         $afterUpdate = $user->toArray();
 
         $isUpdated = !empty(array_diff_assoc($beforeUpdate, $afterUpdate));
 
-        if ($isUpdated) {
+        if ($isUpdated || $rolesUpdated) {
             $type = 'success';
             $message = __('user.user_updated');
         }else{
@@ -90,6 +97,10 @@ class UserController extends Controller {
      * Remove the specified resource from storage.
      */
     public function destroy(User $user) {
+        $user->syncRoles([]);
+        $user->deleted_at = Carbon::now();
+        $user->save();
+        return redirect()->back();
     }
 
     public function getUsers(Request $request): JsonResponse {
