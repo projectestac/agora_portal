@@ -6,6 +6,7 @@ use App\Helpers\Access;
 use App\Helpers\Cache;
 use App\Http\Requests\StoreManagerRequest;
 use App\Http\Requests\UpdateManagerRequest;
+use App\Models\Client;
 use App\Models\Log;
 use App\Models\Manager;
 use App\Models\User;
@@ -105,6 +106,8 @@ class ManagerController extends Controller {
      * Show the form for editing the specified resource.
      */
     public function edit(Manager $manager) {
+        $client = Client::find($manager->client_id);
+        $user = User::find($manager->user_id);
     }
 
     /**
