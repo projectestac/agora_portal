@@ -11,4 +11,5 @@ return [
     'guard' => 'Accés',
     'user_updated' => 'S\'ha actualitzat l\'usuari correctament',
     'user_noUpdated' => 'Usuari <strong>no</strong> actualitzat. No s\'han fet canvis',
+    'deleteUser_confirm' => 'Estàs segur que vols eliminar aquest usuari?',
 ];
