@@ -39,4 +39,5 @@ return [
     'invalid_file_extension' => 'Per a la pujada de fitxers, aquesta extensió no està permesa',
     'file_size_exceeded' => 'Per a la pujada de fitxers, aquest fitxer es massa gran',
     'deleted_file' => 'El fitxer <strong>:file</strong> s\'ha eliminat correctament del directori <strong>:path</strong>.',
+    'ask_for_more_quota' => 'Sol·licitar augment de quota',
 ];

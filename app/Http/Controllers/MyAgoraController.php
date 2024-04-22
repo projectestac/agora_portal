@@ -65,13 +65,16 @@ class MyAgoraController extends Controller {
             $newDNS = explode('$$', $data['message'])[1];
         }
 
+        $configQuota = floatval(Util::getConfigParam('quota_usage_to_request'));
+
         return view('myagora.instance')
             ->with('instances', $instances)
             ->with('currentClient', $currentClient)
             ->with('availableServices', $availableServices)
             ->with('error', $error ?? '')
             ->with('currentDNS', $currentDNS)
-            ->with('newDNS', $newDNS ?? '');
+            ->with('newDNS', $newDNS ?? '')
+            ->with('configQuota', $configQuota);
 
     }
 
@@ -109,7 +112,8 @@ class MyAgoraController extends Controller {
         // The quota information in the cache can be out of date. Using getQuota() it is ensured that is updated.
         $quota = Quota::getQuota($currentInstance['id']);
         $percent = round($quota['used_quota'] / $quota['quota'] * 100);
-
+        $ratio = round($quota['used_quota'] / $quota['quota'], 4);
+        $configQuota = floatval(Util::getConfigParam('quota_usage_to_request'));
         $files = Util::getFiles(Util::getAgoraVar('moodledata') .
             Config::get('app.agora.moodle2.userprefix') . $currentInstance['db_id'] .
             Config::get('app.agora.moodle2.repository_files'));
@@ -121,7 +125,9 @@ class MyAgoraController extends Controller {
             ->with('quota', Util::formatBytes($quota['quota'], 2))
             ->with('percent', $percent)
             ->with('instanceId', $currentInstance['id'])
-            ->with('files', $files);
+            ->with('files', $files)
+            ->with('ratio', $ratio)
+            ->with('configQuota', $configQuota);
 
     }
 
