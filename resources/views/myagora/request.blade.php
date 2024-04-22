@@ -50,7 +50,7 @@
                             method: 'GET',
                             data: {
                                 option: $(this).val(),
-                                clientID: '{{ $currentClient['id'] }}'
+                                clientId: '{{ $currentClient['id'] }}'
                             },
                             success: function (response) {
                                 $('#request-user-messages').html(response.html);

@@ -115,7 +115,7 @@ class MyAgoraController extends Controller {
         $quota = Quota::getQuota($currentInstance['id']);
         $percent = round($quota['used_quota'] / $quota['quota'] * 100);
         $ratio = round($quota['used_quota'] / $quota['quota'], 4);
-        $configQuota = floatval(Util::getConfigParam('quota_usage_to_request'));
+        $configQuota = (float)Util::getConfigParam('quota_usage_to_request');
         $files = Util::getFiles(Util::getAgoraVar('moodledata') .
             Config::get('app.agora.moodle2.userprefix') . $currentInstance['db_id'] .
             Config::get('app.agora.moodle2.repository_files'));
@@ -437,22 +437,20 @@ class MyAgoraController extends Controller {
             ->render();
 
         if ($requestDetails['name'] === $this::QUOTA_NAME) {
-            $clientId = (int)$request->get('clientID');
-            $quotaPercentLimit = (float)Util::getConfigParam('quota_usage_to_request'); // 0.75
-            $quotaFreeLimit = (float)Util::getConfigParam('quota_free_to_request'); // 3
 
-            $myInstance = Instance::where('service_id', $requestIds[0])->where('client_id', $clientId)->first();
-            $quotaPercentUsed = round($myInstance->used_quota / $myInstance->quota, 4);
-            $quotaRemaining = round(($myInstance->quota - $myInstance->used_quota) / (1024 * 1024 * 1024), 4);
-//dump($quotaPercentUsed , $quotaPercentLimit, $quotaRemaining,$quotaFreeLimit);
-            if (($quotaPercentUsed < $quotaPercentLimit) && ($quotaRemaining > $quotaFreeLimit)) {
+            $clientId = (int)$request->get('clientId');
+            $instance = Instance::where('service_id', $requestIds[0])->where('client_id', $clientId)->first();
+            $canRequestQuota = Quota::canRequestQuota($instance);
+
+            if (!$canRequestQuota) {
                 $content = '<div class="alert alert-danger">' .
                     __('request.quota_usage_message', [
-                        'percentage' => $quotaPercentLimit * 100,
-                        'size' => $quotaFreeLimit,
+                        'percentage' => (float)Util::getConfigParam('quota_usage_to_request') * 100,
+                        'size' => Util::getConfigParam('quota_free_to_request'),
                         ]) .
                     '</div>';
             }
+
         }
 
         return response()->json(['html' => $content]);
