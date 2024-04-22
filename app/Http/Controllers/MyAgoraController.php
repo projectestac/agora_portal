@@ -25,6 +25,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class MyAgoraController extends Controller {
 
+
+    // Must fit the value in the database.
     public const QUOTA_NAME = 'Ampliació de quota';
 
     public function myagora(): RedirectResponse {
@@ -435,13 +437,21 @@ class MyAgoraController extends Controller {
             ->render();
 
         if ($requestDetails['name'] === $this::QUOTA_NAME) {
-            $client_id = intval($request->get('clientID'));
-            $configQuota = floatval(Util::getConfigParam('quota_usage_to_request')); // 0.75
-            $myInstance = Instance::where('service_id', $requestIds[0])->where('client_id', $client_id)->first();
-            $ratio = round($myInstance->used_quota / $myInstance->quota, 4);
+            $clientId = (int)$request->get('clientID');
+            $quotaPercentLimit = (float)Util::getConfigParam('quota_usage_to_request'); // 0.75
+            $quotaFreeLimit = (float)Util::getConfigParam('quota_free_to_request'); // 3
 
-            if ($ratio < $configQuota) {
-                $content = '<div class="alert alert-danger">'.__('request.underQuota', ['quotaLimit'=>$configQuota*100]).'</div>';
+            $myInstance = Instance::where('service_id', $requestIds[0])->where('client_id', $clientId)->first();
+            $quotaPercentUsed = round($myInstance->used_quota / $myInstance->quota, 4);
+            $quotaRemaining = round(($myInstance->quota - $myInstance->used_quota) / (1024 * 1024 * 1024), 4);
+//dump($quotaPercentUsed , $quotaPercentLimit, $quotaRemaining,$quotaFreeLimit);
+            if (($quotaPercentUsed < $quotaPercentLimit) && ($quotaRemaining > $quotaFreeLimit)) {
+                $content = '<div class="alert alert-danger">' .
+                    __('request.quota_usage_message', [
+                        'percentage' => $quotaPercentLimit * 100,
+                        'size' => $quotaFreeLimit,
+                        ]) .
+                    '</div>';
             }
         }
 

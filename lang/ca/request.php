@@ -27,5 +27,6 @@ return [
     'request_status_changed' => 'Ha canviat l\'estat de la sol·licitud de :request_name del servei :service_name, de :old_status a :new_status.',
     'send_email_on_change' => 'Notifica el centre i els gestors en cas de canvi d\'estat',
     'request_updated' => 'S\'ha actualitzat la sol·licitud',
-    'underQuota' => 'No es pot sol·licitar una ampliació fins que no s\'hagi superat el :quotaLimit% d\'espai disponible',
+    'quota_usage_message' => 'No es pot sol·licitar una ampliació fins que no s\'hagi superat el :percentage% d\'ocupació i quedin menys de :size GB lliures.',
+    'ask_for_more_quota' => 'Sol·licita més quota',
 ];

@@ -11,11 +11,11 @@
         </div>
     </div>
     <div class="pull-left">
-        &nbsp;&nbsp;( {{ $usedQuota }} / {{ $quota }})
-        <a href="{{ route('myagora.quota.recalc', ['id' => $instanceId]) }}">{{ __('common.update') }}</a>
+        &nbsp;&nbsp;({{ $usedQuota }} / {{ $quota }})
+        &nbsp;&nbsp;<a href="{{ route('myagora.quota.recalc', ['id' => $instanceId]) }}">{{ __('common.update') }}</a>
         @if($ratio > $configQuota)
-            <a>|</a>
-            <a href="{{ route('myagora.requests') }}">{{ __('file.ask_for_more_quota') }}</a>
+            &nbsp;&nbsp;
+            <a href="{{ route('myagora.requests') }}">{{ __('request.ask_for_more_quota') }}</a>
         @endif
     </div>
 </div>
