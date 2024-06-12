@@ -439,7 +439,10 @@ class MyAgoraController extends Controller {
         if ($requestDetails['name'] === $this::QUOTA_NAME) {
 
             $clientId = (int)$request->get('clientId');
-            $instance = Instance::where('service_id', $requestIds[0])->where('client_id', $clientId)->first();
+            $instance = Instance::where('service_id', $requestIds[0])
+                ->where('client_id', $clientId)
+                ->where('status', 'active')
+                ->first();
             $canRequestQuota = Quota::canRequestQuota($instance);
 
             if (!$canRequestQuota) {
