@@ -29,7 +29,7 @@
                             <strong>{{ __('service.description') }}</strong>: {{ $service['description'] }}
                         </div>
                         @if (!empty($models))
-                            <div class="margin-1"><strong>{{ __('model.select_model') }}</strong>:</div>
+                            <div class="margin-1"><strong>{{ __('modeltype.select_model') }}</strong>:</div>
                             <div class="margin-1 margin-left-2">
                                 @foreach($models as $model)
                                     <input type="radio" id="{{ $model['id'] }}" name="model_type_id" value="{{ $model['id'] }}"/>
