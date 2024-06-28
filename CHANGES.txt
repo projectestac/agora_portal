@@ -4,6 +4,11 @@ More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/agora_portal
 
 
+Changes 24.07.01
+---------------------------------------------------------------------------------------
+- Request: Only check active instances to decide if a manager can request a quota increase
+
+
 Changes 24.04.30
 ---------------------------------------------------------------------------------------
 - Requests: Only allow to request increase of quota if the conditions are met
