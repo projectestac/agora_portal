@@ -20,6 +20,10 @@ class StoreModelTypeRequest extends FormRequest {
      */
     public function rules(): array {
         return [
+            'service_id' => [
+                'required',
+                'integer',
+            ],
             'description' => [
                 'required',
                 'string',
