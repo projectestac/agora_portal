@@ -144,7 +144,7 @@ class InstanceController extends Controller {
         // to be created and populated.
         if ($instance->db_id === 0 && $newDbId > 0) {
             $log = $this->activateInstance($instance, $newDbId, $statusFinal);
-            if (isset($log['errors'])) {
+            if (isset($log['error'])) {
                 return redirect()->route('instances.index')->with('error', $log['errors']);
             }
             $messages = $log['messages'];
