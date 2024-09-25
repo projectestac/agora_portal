@@ -4,6 +4,12 @@ More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/agora_portal
 
 
+Changes 24.09.26
+---------------------------------------------------------------------------------------
+- Instance: Fixed error when creating instance and the dump files are missing
+- ModelType: Fixed error when saving new model types
+
+
 Changes 24.07.01
 ---------------------------------------------------------------------------------------
 - Request: Only check active instances to decide if a manager can request a quota increase
