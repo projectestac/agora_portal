@@ -73,8 +73,8 @@
 
     // Encode query in base64 before submitting the form to avoid blockages from firewalls.
     $('#saveQueryForm').submit(function () {
-        let queryPlain = $('#sqlQueryModalAdd').val();
-        let queryEncoded = btoa(queryPlain);
+        const queryPlain = $('#sqlQueryModalAdd').val();
+        const queryEncoded = encodeURIComponent(queryPlain);
         $('#sqlQueryModalAddEncoded').val(queryEncoded);
         $('#sqlQueryModalAdd').val(''); // Clear the textarea to avoid sending the query in plain text.
     });
