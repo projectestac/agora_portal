@@ -56,7 +56,7 @@ class QueryController extends Controller {
     public function store(StoreQueryRequest $request): RedirectResponse {
         $query = new Query([
             'service_id' => $request->input('serviceSelModal'),
-            'query' => base64_decode($request->input('sqlQueryModalAddEncoded')),
+            'query' => urldecode($request->input('sqlQueryModalAddEncoded')),
             'description' => $request->input('descriptionModalAdd'),
             'type' => $request->input('queryTypeModalAdd'),
         ]);
@@ -98,7 +98,7 @@ class QueryController extends Controller {
      */
     public function update(UpdateQueryRequest $request, Query $query): RedirectResponse {
         $query->service_id = $request->input('serviceSelModalEdit');
-        $query->query = base64_decode($request->input('sqlQueryModalEditEncoded'));
+        $query->query = urldecode($request->input('sqlQueryModalEditEncoded'));
         $query->description = $request->input('descriptionModalEdit');
         $query->type = $request->input('queryTypeModalEdit');
 
@@ -179,7 +179,7 @@ class QueryController extends Controller {
         $serviceName = $validatedData['serviceName'];
         $image = $validatedData['image'];
 
-        $sqlQuery = trim(base64_decode($sqlQueryEncoded));
+        $sqlQuery = trim(urldecode($sqlQueryEncoded));
         $isSelect = Str::startsWith(Str::lower($sqlQuery), 'select');
 
         $request->session()->put('query', $sqlQuery);
