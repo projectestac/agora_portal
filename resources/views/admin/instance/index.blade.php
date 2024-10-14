@@ -10,6 +10,31 @@
 
         @include('components.messages')
 
+        <div class="row">
+            <div class="col-md-4">
+                <label for="service-filter">{{ __('service.service') }} :</label>
+                <select id="service-filter" class="form-control">
+                    <option value="">- {{ __('common.all') }} -</option>
+                    <option value="4">Moodle</option>
+                    <option value="5">Nodes</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="status-filter">{{ __('common.status') }} :</label>
+                <select id="status-filter" class="form-control">
+                    <option value="">- {{ __('common.all') }} -</option>
+                    <option value="pending">{{ __('instance.status_pending') }}</option>
+                    <option value="active">{{ __('instance.status_active') }}</option>
+                    <option value="inactive">{{ __('instance.status_inactive') }}</option>
+                    <option value="denied">{{ __('instance.status_denied') }}</option>
+                    <option value="withdrawn">{{ __('instance.status_withdrawn') }}</option>
+                    <option value="blocked">{{ __('instance.status_blocked') }}</option>
+                </select>
+            </div>
+        </div>
+
+        <br>
+
         <table class="table table-striped" id="instance-list">
             <thead>
             <tr>
@@ -29,7 +54,7 @@
 
         <script>
             $(function () {
-                $('#instance-list').DataTable({
+                var table = $('#instance-list').DataTable({
                     processing: true,
                     serverSide: true,
                     language: {
@@ -37,7 +62,13 @@
                     },
                     lengthMenu: [10, 25, 50, 100, 250],
                     pageLength: 25,
-                    ajax: '{{ route('instances.list') }}',
+                    ajax: {
+                        url: '{{ route('instances.list') }}',
+                        data: function (d) {
+                            d.service = $('#service-filter').val();
+                            d.status = $('#status-filter').val();
+                        }
+                    },
                     columns: [
                         {data: 'id', name: 'id'},
                         {data: 'client_name', name: 'client_name'},
@@ -50,6 +81,10 @@
                         {data: 'updated_at', name: 'updated_at'},
                         {data: 'actions', name: 'actions', orderable: false, searchable: false}
                     ]
+                });
+
+                $('#service-filter, #status-filter').on('change', function () {
+                    table.ajax.reload();
                 });
             });
         </script>
