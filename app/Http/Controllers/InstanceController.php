@@ -36,7 +36,14 @@ class InstanceController extends Controller {
     }
 
     public function index(): View {
-        return view('admin.instance.index');
+
+        $services = Service::select(['id', 'name'])->where('status', 'active')->get();
+        $statusList = $this->getStatusList();
+
+        return view('admin.instance.index')
+            ->with('services', $services)
+            ->with('statusList', $statusList);
+
     }
 
     public function create(Request $request): View {
@@ -258,6 +265,9 @@ class InstanceController extends Controller {
         $orderColumn = 'instances.' . $columns[$order['column']]['data'] ?? 'instances.updated_at';
         $orderDirection = $order['dir'] ?? 'desc';
 
+        $serviceId = $request->input('service') ?? 0;
+        $status = $request->input('status') ?? 0;
+
         if ($orderColumn === 'instances.client_name') {
             $orderColumn = 'clients.name';
         }
@@ -290,13 +300,20 @@ class InstanceController extends Controller {
                 ->orWhere('locations.name', 'LIKE', '%' . $searchValue . '%')
                 ->orWhere('client_types.name', 'LIKE', '%' . $searchValue . '%')
                 ->orWhere('services.name', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('instances.status', 'LIKE', '%' . $searchValue . '%')
                 ->orWhere('instances.db_id', 'LIKE', '%' . $searchValue . '%')
                 ->orWhere('instances.observations', 'LIKE', '%' . $searchValue . '%')
                 ->orWhere('instances.annotations', 'LIKE', '%' . $searchValue . '%')
                 ->orWhere('instances.updated_at', 'LIKE', '%' . $searchValue . '%')
                 ->orWhere('instances.created_at', 'LIKE', '%' . $searchValue . '%')
                 ->orWhere('instances.requested_at', 'LIKE', '%' . $searchValue . '%');
+        }
+
+        if ($serviceId !== 0) {
+            $instances = $instances->having('instances.service_id', $serviceId);
+        }
+
+        if ($status !== 0) {
+            $instances = $instances->having('instances.status', $status);
         }
 
         return DataTables::make($instances)
