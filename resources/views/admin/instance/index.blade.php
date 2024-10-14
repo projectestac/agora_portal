@@ -10,6 +10,27 @@
 
         @include('components.messages')
 
+        <div class="row">
+            <div class="col-md-2">
+                <select id="service-filter" class="form-control">
+                    <option value="">{{ __('service.service') }}</option>
+                    @foreach($services as $service)
+                        <option value="{{ $service->id }}">{{ $service->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select id="status-filter" class="form-control">
+                    <option value="">{{ __('common.status') }}</option>
+                    @foreach($statusList as $key => $status)
+                        <option value="{{ $key }}">{{ $status }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        <br>
+
         <table class="table table-striped" id="instance-list">
             <thead>
             <tr>
@@ -29,7 +50,7 @@
 
         <script>
             $(function () {
-                $('#instance-list').DataTable({
+                var table = $('#instance-list').DataTable({
                     processing: true,
                     serverSide: true,
                     language: {
@@ -37,7 +58,13 @@
                     },
                     lengthMenu: [10, 25, 50, 100, 250],
                     pageLength: 25,
-                    ajax: '{{ route('instances.list') }}',
+                    ajax: {
+                        url: '{{ route('instances.list') }}',
+                        data: function (d) {
+                            d.service = $('#service-filter').val();
+                            d.status = $('#status-filter').val();
+                        }
+                    },
                     columns: [
                         {data: 'id', name: 'id'},
                         {data: 'client_name', name: 'client_name'},
@@ -50,6 +77,10 @@
                         {data: 'updated_at', name: 'updated_at'},
                         {data: 'actions', name: 'actions', orderable: false, searchable: false}
                     ]
+                });
+
+                $('#service-filter, #status-filter').on('change', function () {
+                    table.ajax.reload();
                 });
             });
         </script>
