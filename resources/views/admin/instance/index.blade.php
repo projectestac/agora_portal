@@ -12,11 +12,12 @@
 
         <div class="row">
             <div class="col-md-4">
-                <label for="service-filter">{{ __('service.service') }} :</label>
-                <select id="service-filter" class="form-control">
+                <label for="service_id-filter">{{ __('service.service') }} :</label>
+                <select id="service_id-filter" class="form-control">
                     <option value="">- {{ __('common.all') }} -</option>
-                    <option value="4">Moodle</option>
-                    <option value="5">Nodes</option>
+                    @foreach($services as $service)
+                        <option value="{{ $service->id }}">{{ $service->name }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="col-md-4">
@@ -30,6 +31,13 @@
                     <option value="withdrawn">{{ __('instance.status_withdrawn') }}</option>
                     <option value="blocked">{{ __('instance.status_blocked') }}</option>
                 </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <label>&nbsp;</label>
+                <br>
+                <button id="reset-filters" class="btn btn-danger">
+                    {{ __('instance.clear_filters') }}
+                </button>
             </div>
         </div>
 
@@ -65,7 +73,7 @@
                     ajax: {
                         url: '{{ route('instances.list') }}',
                         data: function (d) {
-                            d.service = $('#service-filter').val();
+                            d.service_id = $('#service_id-filter').val();
                             d.status = $('#status-filter').val();
                         }
                     },
@@ -83,7 +91,13 @@
                     ]
                 });
 
-                $('#service-filter, #status-filter').on('change', function () {
+                $('#service_id-filter, #status-filter').on('change', function () {
+                    table.ajax.reload();
+                });
+
+                $('#reset-filters').on('click', function() {
+                    $('#service_id-filter').val('');
+                    $('#status-filter').val('');
                     table.ajax.reload();
                 });
             });

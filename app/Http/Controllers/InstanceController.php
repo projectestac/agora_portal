@@ -36,7 +36,9 @@ class InstanceController extends Controller {
     }
 
     public function index(): View {
-        return view('admin.instance.index');
+        $services = \App\Models\Service::all();
+
+        return view('admin.instance.index', ['services' => $services]);
     }
 
     public function create(Request $request): View {
@@ -299,8 +301,8 @@ class InstanceController extends Controller {
                 ->orWhere('instances.requested_at', 'LIKE', '%' . $searchValue . '%');
         }
 
-        if ($request->has('service') && $request->service != '') {
-            $instances = $instances->where('service_id', $request->service);
+        if ($request->has('service_id') && $request->service_id != '') {
+            $instances = $instances->where('service_id', $request->service_id);
         }
 
         if ($request->has('status') && $request->status != '') {
