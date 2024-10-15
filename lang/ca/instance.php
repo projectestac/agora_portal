@@ -17,6 +17,7 @@ return [
     'status_denied' => 'Denegada',
     'status_withdrawn' => 'Donada de baixa',
     'status_blocked' => 'Bloquejada',
+    'clear_filters' => 'Esborra els filtres',
     'observations' => 'Observacions (visibles pels gestors)',
     'annotations' => 'Anotacions (visibles pels administradors)',
     'send_email_on_change' => 'Envia un missatge al centre i als gestors en cas de canvi d\'estat',
