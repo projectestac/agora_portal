@@ -284,42 +284,24 @@ class InstanceController extends Controller {
             ->join('services', 'instances.service_id', '=', 'services.id');
 
         // PORQUE NO FUNCIONA ?? SQL producida ejecutada en la base de datos funciona perfectamente
-        // if (!empty($searchValue)) {
-        //     $instances = $instances->where(function($query) use ($searchValue) {
-        //         $query->where('clients.name', 'LIKE', '%' . $searchValue . '%')
-        //                 ->orWhere('clients.code', 'LIKE', '%' . $searchValue . '%')
-        //                 ->orWhere('clients.dns', 'LIKE', '%' . $searchValue . '%')
-        //                 ->orWhere('clients.old_dns', 'LIKE', '%' . $searchValue . '%')
-        //                 ->orWhere('clients.city', 'LIKE', '%' . $searchValue . '%')
-        //                 ->orWhere('locations.name', 'LIKE', '%' . $searchValue . '%')
-        //                 ->orWhere('client_types.name', 'LIKE', '%' . $searchValue . '%')
-        //                 ->orWhere('services.name', 'LIKE', '%' . $searchValue . '%')
-        //                 ->orWhere('instances.status', 'LIKE', '%' . $searchValue . '%')
-        //                 ->orWhere('instances.db_id', 'LIKE', '%' . $searchValue . '%')
-        //                 ->orWhere('instances.observations', 'LIKE', '%' . $searchValue . '%')
-        //                 ->orWhere('instances.annotations', 'LIKE', '%' . $searchValue . '%')
-        //                 ->orWhere('instances.updated_at', 'LIKE', '%' . $searchValue . '%')
-        //                 ->orWhere('instances.created_at', 'LIKE', '%' . $searchValue . '%')
-        //                 ->orWhere('instances.requested_at', 'LIKE', '%' . $searchValue . '%');
-        //     });
-        // }
-
         if (!empty($searchValue)) {
-            $instances = $instances->where('clients.name', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('clients.code', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('clients.dns', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('clients.old_dns', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('clients.city', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('locations.name', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('client_types.name', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('services.name', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('instances.status', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('instances.db_id', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('instances.observations', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('instances.annotations', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('instances.updated_at', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('instances.created_at', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('instances.requested_at', 'LIKE', '%' . $searchValue . '%');
+            $instances = $instances->where(function($query) use ($searchValue) {
+                $query->where('clients.name', 'LIKE', '%' . $searchValue . '%')
+                        ->orWhere('clients.code', 'LIKE', '%' . $searchValue . '%')
+                        ->orWhere('clients.dns', 'LIKE', '%' . $searchValue . '%')
+                        ->orWhere('clients.old_dns', 'LIKE', '%' . $searchValue . '%')
+                        ->orWhere('clients.city', 'LIKE', '%' . $searchValue . '%')
+                        ->orWhere('locations.name', 'LIKE', '%' . $searchValue . '%')
+                        ->orWhere('client_types.name', 'LIKE', '%' . $searchValue . '%')
+                        ->orWhere('services.name', 'LIKE', '%' . $searchValue . '%')
+                        ->orWhere('instances.status', 'LIKE', '%' . $searchValue . '%')
+                        ->orWhere('instances.db_id', 'LIKE', '%' . $searchValue . '%')
+                        ->orWhere('instances.observations', 'LIKE', '%' . $searchValue . '%')
+                        ->orWhere('instances.annotations', 'LIKE', '%' . $searchValue . '%')
+                        ->orWhere('instances.updated_at', 'LIKE', '%' . $searchValue . '%')
+                        ->orWhere('instances.created_at', 'LIKE', '%' . $searchValue . '%')
+                        ->orWhere('instances.requested_at', 'LIKE', '%' . $searchValue . '%');
+            });
         }
 
         if ($request->has('service_id') && $request->service_id != '') {
@@ -330,7 +312,7 @@ class InstanceController extends Controller {
             $instances = $instances->where('instances.status', $request->status);
         }
 
-        return DataTables::make($instances)
+        return DataTables::make($instances->get())
             ->rawColumns(['id'])
             ->addColumn('client_name', function ($instance) {
                 return new HtmlString('<a href="' . route('myagora.instances', ['code' => $instance->client->code]) . '">' .
