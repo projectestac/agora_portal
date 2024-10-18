@@ -4,6 +4,12 @@ More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/agora_portal
 
 
+Changes 24.10.22
+---------------------------------------------------------------------------------------
+- Helpers: Fix error when data received from WS is incorrect
+- Query: Added support for non-ASCII characters to batch queries
+
+
 Changes 24.09.26
 ---------------------------------------------------------------------------------------
 - Instance: Fixed error when creating instance and the dump files are missing
