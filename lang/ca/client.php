@@ -28,7 +28,9 @@ return [
     'status_active' => 'Actiu',
     'status_inactive' => 'Inactiu',
     'no_ws' => 'No s\'ha pogut obtenir automàticament la informació del centre. Aquest error no és greu, però si persisteix durant dies, poseu-vos en contacte amb el SAU.',
+    'incorrect_data_length_in_ws' => 'No s\'ha pogut obtenir informació actualitzada del nom propi del centre (la longitud de les dades rebudes no és correcta).',
     'no_client_in_ws' => 'El codi de centre :code no figura a la base de dades de centres de la XTEC. Poseu-vos en contacte amb el SAU.',
+    'incorrect_data_in_ws' => 'No s\'ha pogut obtenir informació actualitzada del nom propi del centre (les dades rebudes no són vàlides).',
     'client_has_no_nompropi' => 'El vostre centre no té nom propi. Sense nom propi no es pot demanar l\'alta al servei Agora. Poseu-vos en contacte amb el SAU.',
     'nompropi_has_changed_1' => 'El nom propi del vostre centre ha canviat, però els serveis d\'Àgora encara utilitzen el nom propi antic. L\'actual és <strong>:currentDNS</strong> i el nom nou és <strong>:newDNS</strong>.',
     'nompropi_has_changed_2' => 'No cal que feu el canvi de nom propi ara, però si el voleu fer, heu de tenir en compte que pot afectar a alguns enllaços interns, tant en el cas del Moodle com en el del Nodes, i no es pot

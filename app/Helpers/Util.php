@@ -336,6 +336,7 @@ class Util {
      * @author Toni Ginard
      */
     public function getSchoolFromWS(string $uname): array {
+
         global $agora;
 
         // Build the URL.
@@ -359,9 +360,17 @@ class Util {
             ];
         }
 
+        // Error #2: Basic check of the data received.
+        if (strlen($buffer) > 500) {
+            return [
+                'error' => 1,
+                'message' => __('client.incorrect_data_length_in_ws'),
+            ];
+        }
+
         $clientData = utf8_encode(trim($buffer));
 
-        // Error #2: Client is not registered in master clients table.
+        // Error #3: Client is not registered in master clients table.
         if (str_contains($clientData, 'ERROR')) {
             return [
                 'error' => 1,
@@ -371,7 +380,15 @@ class Util {
 
         $clientDataArray = explode('$$', $clientData);
 
-        // Error #3: Client has no "nom propi".
+        // Error #4: Data received is not correct.
+        if (!isset($clientDataArray[1])) {
+            return [
+                'error' => 1,
+                'message' => __('client.incorrect_data_in_ws'),
+            ];
+        }
+
+        // Error #5: Client has no "nom propi".
         if ($clientDataArray[1] === '0') {
             $results['error'] = 1;
             $results['message'] = __('client.client_has_no_nompropi');
@@ -382,6 +399,7 @@ class Util {
         }
 
         return $results;
+
     }
 
 }
