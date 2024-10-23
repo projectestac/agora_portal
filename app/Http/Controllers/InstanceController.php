@@ -645,7 +645,7 @@ class InstanceController extends Controller {
             'action' => 'script_enable_service',
             'priority' => 'high',
             'params' => [
-                'password' => md5($password),
+                'password' => password_hash($password, PASSWORD_BCRYPT),
                 'xtecadminPassword' => Util::getConfigParam('xtecadmin_hash'),
                 'clientName' => $instance->client->name,
                 'clientCode' => $instance->client->code,
