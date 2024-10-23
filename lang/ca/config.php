@@ -16,7 +16,7 @@ return [
     'nodes_create_db' => 'En fer una alta de Nodes, intenta crear la base de dades MySQL si no existeix',
     'min_db_id' => 'Número de la base de dades més baixa que es pot crear (db_id)',
     'comma_separated_emails' => 'Adreces de correu electrònic separades per comes',
-    'xtecadmin_hash_help' => 'Si la longitud del text introduït és de 32 caràcters, es desarà sense encriptar. En cas contrari, s\'encriptarà en md5. En tot cas, s\'actualitzarà el valor.',
+    'xtecadmin_hash_help' => 'Si la longitud del text introduït és de 60 caràcters, es desarà sense encriptar. En cas contrari, s\'encriptarà en bcrypt. En tot cas, s\'actualitzarà el valor.',
     'max_file_size_for_large_upload_help' => 'Aquesta mida màxima aplica a tots els usuaris que no són administradors. Els administradors poden pujar fitxers de qualsevol mida (en el text informatiu apareix un 0 que significa "sense límit").',
     'min_db_id_help' => 'Aquest paràmetre permet començar a assignar els "usus" a partir d\'un valor determinat de manera que no s\'omplin els buits a la seqüència de ID.',
     'config_updated' => 'S\'ha actualitzat la configuració',
