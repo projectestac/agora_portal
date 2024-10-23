@@ -46,7 +46,7 @@ class ConfigController extends Controller {
         ];
 
         // Encrypt password if needed.
-        $params['xtecadmin_hash'] = (strlen($params['xtecadmin_hash']) === 32) ? $params['xtecadmin_hash'] : md5($params['xtecadmin_hash']);
+        $params['xtecadmin_hash'] = (strlen($params['xtecadmin_hash']) === 60) ? $params['xtecadmin_hash'] : password_hash($params['xtecadmin_hash'], PASSWORD_BCRYPT);
 
         // Divide quota usage values by 100.
         $params['quota_usage_to_request'] /= 100;
