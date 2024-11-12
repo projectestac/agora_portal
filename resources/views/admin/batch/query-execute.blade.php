@@ -21,7 +21,7 @@
                 </div>
             </div>
             <div class="panel-body">
-                {{ base64_decode(addslashes($sqlQueryEncoded)) }}
+                {{ urldecode($sqlQueryEncoded) }}
             </div>
         </div>
 
