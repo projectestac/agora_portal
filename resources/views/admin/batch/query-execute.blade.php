@@ -26,7 +26,7 @@
         </div>
 
         {{-- Summary table --}}
-        @if (($numRows === 1) && ($serviceName !== 'portal'))
+        @if ($serviceName !== 'portal' && $showSummary)
             <div class="panel panel-default">
                 <div class="panel-heading">
                     {{ __('batch.execution_summary') }}
@@ -70,8 +70,8 @@
                         <tbody>
                         @foreach($globalResults as $result)
                             <tr>
-                                <td>{{ $result['database'] }}</td>
-                                <td>{{ $result['clientName'] }}</td>
+                                <td><a href="#{{ $result['database'] }} - {{ $result['clientName'] }}">{{ $result['database'] }}</a></td>
+                                <td><a href="/portal/myagora/instances?code={{ $result['clientCode'] }}" target="_blank">{{ $result['clientName'] }}</a></td>
                                 <td>{{ $result['result'] }}</td>
                             </tr>
                         @endforeach
