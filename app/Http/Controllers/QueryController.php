@@ -229,7 +229,7 @@ class QueryController extends Controller {
                 break;
         }
 
-        $instances = Instance::select('db_id', 'db_host', 'clients.name as client_name')
+        $instances = Instance::select('db_id', 'db_host', 'clients.name as client_name', 'clients.code as client_code')
             ->join('clients', 'instances.client_id', '=', 'clients.id')
             ->where('instances.service_id', $serviceSel)
             ->whereIn('instances.client_id', $clientsSel)
@@ -253,24 +253,36 @@ class QueryController extends Controller {
 
             // Execute query
             if ($isSelect) {
-                $execResult = DB::connection($serviceNameLower)->select($sqlQuery);
+                try {
+                    $execResult = DB::connection($serviceNameLower)->select($sqlQuery);
+                }
+
+                catch (\Exception $e) {
+                    $execResult = $e->getMessage();
+                }
             } else {
-                $execResult = DB::connection($serviceNameLower)->statement($sqlQuery);
+                try {
+                    $execResult = DB::connection($serviceNameLower)->affectingStatement($sqlQuery) . ' ' . __('common.affected_rows');
+                } catch (\Exception $e) {
+                    $execResult = $e->getMessage();
+                }
             }
 
             [$fullResult, $attributes, $result, $numRows] = $this->processQueryResults($execResult, $dbName, $instance['client_name']);
             $fullResults[] = $fullResult;
 
-            if ($numRows === 1) {
-                $summary[$result] = isset($summary[$result]) ? ++$summary[$result] : 1;
-            }
+            $summary[$result] = isset($summary[$result]) ? ++$summary[$result] : 1;
 
             $globalResults[$dbName] = [
                 'database' => $dbName,
                 'clientName' => $instance['client_name'],
+                'clientCode' => $instance['client_code'],
                 'result' => $result,
             ];
         }
+
+        // If there are no results or the number of columns is less than 2, the summary will be shown, if not, it doesn't make sense to show it.
+        $showSummary = count($fullResults[0]) == 0 || (count($fullResults[0]) > 0 && $fullResults[0][array_key_first($fullResults[0])] < 2);
 
         return view('admin.batch.query-execute')
             ->with('sqlQueryEncoded', $sqlQueryEncoded)
@@ -280,8 +292,8 @@ class QueryController extends Controller {
             ->with('fullResults', $fullResults)
             ->with('attributes', $attributes)
             ->with('summary', $summary)
-            ->with('numRows', $numRows);
-
+            ->with('numRows', $numRows)
+            ->with('showSummary', $showSummary);
     }
 
     private function processQueryResults(mixed $execResult, string $dbName, string $clientName): array {
@@ -292,6 +304,10 @@ class QueryController extends Controller {
         if ($execResult === true) {
             $execResult = 'OK';
             $numRows = 1;
+        }
+
+        else {
+            $numRows = 0;
         }
 
         if (is_array($execResult)) {
