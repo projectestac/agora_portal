@@ -19,7 +19,8 @@ class ProcessOperation implements ShouldQueue {
     public array $result = [];
     public bool $success = false;
 
-    public const TIMEOUT = 1800; // Half an hour.
+    public int $timeout = 1800; // Half an hour. This variable is for laravel internals.
+    public const TIMEOUT = 1800; // Half an hour. This variable is used in the handle() function.
 
     public function __construct($data) {
         $this->data = $data;
@@ -45,8 +46,14 @@ class ProcessOperation implements ShouldQueue {
 
         if (is_array($params) && count($params) > 0) {
             foreach ($params as $key => $value) {
-                $value = str_replace(["\r", "\n"], '<br/>', $value);
-                $paramsCommand .= ' --' . $key . '="' . html_entity_decode($value) . '"';
+                // The fields 'password' and 'xtecadminPassword' contain characters $ which
+                // are considered as variables in bash. To avoid this, we use single quotes.
+                if (str_contains($key, 'assword')) {
+                    $paramsCommand .= ' --' . $key . '=\'' . $value . '\'';
+                } else {
+                    $value = str_replace(["\r", "\n"], '<br/>', $value);
+                    $paramsCommand .= ' --' . $key . '="' . html_entity_decode($value) . '"';
+                }
             }
         }
 
