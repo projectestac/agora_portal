@@ -48,14 +48,14 @@
                         @foreach($data as $item)
                             <tr>
                                 <td>{{ $item['id'] }}</td>
-                                <td>{{ $item['operationData']['action'] }}</td>
+                                <td>{{ $item['operation_data']['action'] }}</td>
                                 <td>{{ $item['queue'] }}</td>
-                                <td>{{ $item['operationData']['instance_name'] }}</td>
-                                <td>{{ $item['operationData']['priority'] }}</td>
+                                <td>{{ $item['operation_data']['instance_name'] }}</td>
+                                <td>{{ $item['operation_data']['priority'] }}</td>
                                 <td>
-                                    <img src="{{ secure_asset('images/' . mb_strtolower($item['operationData']['service_name'] . '.gif')) }}"
-                                         alt="{{ $item['operationData']['service_name'] }}"
-                                         title="{{ $item['operationData']['service_name'] }}"
+                                    <img src="{{ secure_asset('images/' . mb_strtolower($item['operation_data']['service_name'] . '.gif')) }}"
+                                         alt="{{ $item['operation_data']['service_name'] }}"
+                                         title="{{ $item['operation_data']['service_name'] }}"
                                     >
                                 </td>
                                 <td>{{ $item['failed_at'] }}</td>
