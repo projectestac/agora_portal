@@ -4,6 +4,15 @@ More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/agora_portal
 
 
+Changes 24.11.19
+---------------------------------------------------------------------------------------
+- Config: Move from md5 to bcrypt as an encryption method for initial passwords
+- Instances: Added dropdown menus to filter by service and instance state in instance list
+- Instances: Fixed error message not being shown to users
+- Jobs: Add specific treatment for bcrypt passwords
+- Query: Added support for non-ASCII characters to batch queries (II)
+
+
 Changes 24.10.22
 ---------------------------------------------------------------------------------------
 - Helpers: Fix error when data received from WS is incorrect
