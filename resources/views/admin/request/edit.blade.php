@@ -35,14 +35,25 @@
                     <div class="form-group">
                         <label class="col-sm-4 control-label clear">{{ __('client.name') }}</label>
                         <div class="col-sm-8">
-                            {{ $request->client->name }}
+                            <a href="/portal/clients/{{ $request->client->id }}/edit" target="_blank">{{ $request->client->name }}</a>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-4 control-label clear">{{ __('common.url') }}</label>
+                        <label class="col-sm-4 control-label clear">{{ __('instance.instance') }}</label>
                         <div class="col-sm-8">
-                            <a href="{{ $instanceUrl }}" target="_blank">{{ $instanceUrl }}</a>
+                            <a href="/portal/instances/{{ $instanceId }}/edit" target="_blank" class="btn btn-primary" title="{{ __('common.edit') }}">
+                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label clear">{{ __('common.dashboard') }}</label>
+                        <div class="col-sm-8">
+                            <a href="/portal/myagora/instances?code={{ $request->client->code }}" target="_blank">
+                                {{ $request->client->code }}
+                            </a>
                         </div>
                     </div>
 
