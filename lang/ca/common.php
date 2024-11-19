@@ -54,4 +54,5 @@ return [
     'table' => 'Taula',
     'chart' => 'Gràfic',
     'disk_usage' => 'Ús de disc',
+    'dashboard' => 'Tauler del centre',
 ];
