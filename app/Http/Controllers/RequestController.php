@@ -113,6 +113,7 @@ class RequestController extends Controller {
         return view('admin.request.edit')
             ->with('request', $request)
             ->with('instanceUrl', $instanceUrl)
+            ->with('instanceId', $instance->id)
             ->with('statusList', $this->getStatusList());
     }
 
