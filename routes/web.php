@@ -85,8 +85,14 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::get('/batch/queue/success', [QueueController::class, 'getSuccess'])->name('queue.success');
     Route::get('/batch/queue/fail', [QueueController::class, 'getFail'])->name('queue.fail');
     Route::delete('/batch/queue/{id}', [QueueController::class, 'destroy'])->name('queue.destroy');
+
     Route::get('/batch/instance/create', [BatchController::class, 'instanceCreate'])->name('batch.instance.create');
     Route::post('/batch/instance', [BatchController::class, 'instanceStore'])->name('batch.instance.store');
+
+    Route::get('/batch/instances', [BatchController::class, 'instancesList'])->name('batch.instances.list');
+    Route::get('/batch/instances/data', [BatchController::class, 'getInstancesData'])->name('batch.instances.data');
+    Route::post('/batch/instances/update-status', [BatchController::class, 'updateStatus'])->name('batch.instances.updateStatus');
+
     Route::get('/files/{path?}', [DirectoryController::class, 'index'])->name('files.index');
     Route::get('/files/download/{path}', [DirectoryController::class, 'download'])->name('files.download');
     Route::post('/files/upload/{currentPath}', [DirectoryController::class, 'upload'])->name('files.upload');
