@@ -9,6 +9,7 @@ use App\Models\Instance;
 use App\Models\ModelType;
 use App\Models\Service;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -162,6 +163,39 @@ class BatchController extends Controller {
         return redirect()->route('batch.instance.create')
             ->with('success', $messagesString)
             ->withErrors($errors);
+    }
+
+    public function instancesList(): View {
+
+        $instanceController = new InstanceController();
+        $statusList = $instanceController->getStatusList();
+
+        return view('admin.batch.instances')
+            ->with('statusList', $statusList);
+
+    }
+
+    public function getInstancesData(): JsonResponse {
+
+        return datatables()
+            ->of(Instance::query())
+            ->addColumn('checkbox', function ($instance) {
+                return '<input type="checkbox" data-id="' . $instance->id . '">';
+            })
+            ->rawColumns(['checkbox'])
+            ->make(true);
+
+    }
+
+    public function updateStatus(Request $request): JsonResponse {
+
+        $ids = $request->input('ids');
+        $status = $request->input('status');
+
+        Instance::whereIn('id', $ids)->update(['status' => $status]);
+
+        return response()->json(['message' => __('status.updated_successfully')]);
+
     }
 
 }
