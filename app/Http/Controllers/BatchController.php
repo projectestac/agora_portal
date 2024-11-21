@@ -164,4 +164,32 @@ class BatchController extends Controller {
             ->withErrors($errors);
     }
 
+    public function instancesList(Request $request): View {
+        $instanceController = new InstanceController();
+        $statusList = $instanceController->getStatusList();
+
+        return view('admin.batch.instances')
+               ->with('statusList', $statusList);
+    }
+
+    public function getInstancesData(Request $request)
+    {
+        return datatables()
+            ->of(Instance::query())
+            ->addColumn('checkbox', function ($instance) {
+                return '<input type="checkbox" data-id="'.$instance->id.'">';
+            })
+            ->rawColumns(['checkbox'])
+            ->make(true);
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $ids = $request->input('ids');
+        $status = $request->input('status');
+
+        Instance::whereIn('id', $ids)->update(['status' => $status]);
+
+        return response()->json(['message' => __('status.updated_successfully')]);
+    }
 }
