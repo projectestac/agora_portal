@@ -10,6 +10,18 @@
 
     @include('components.messages')
 
+    <div class="mt-3" style="display: flex; margin-bottom: 20px">
+        <select id="new-status" class="form-control" style="width: auto; margin-right: 10px">
+            <option value="">{{ __('common.status') }}</option>
+            @foreach($statusList as $key => $status)
+                <option value="{{ $key }}">{{ $status }}</option>
+            @endforeach
+        </select>
+        <button id="apply-changes" class="btn btn-primary mt-2">
+            {{ __('common.change_statuses') }}
+        </button>
+    </div>
+
     <table id="instances-table" class="table table-bordered table-hover">
         <thead>
             <tr>
@@ -26,18 +38,6 @@
             </tr>
         </thead>
     </table>
-
-    <div class="mt-3">
-        <select id="new-status" class="form-control">
-            <option value="">{{ __('common.status') }}</option>
-            @foreach($statusList as $key => $status)
-                <option value="{{ $key }}">{{ $status }}</option>
-            @endforeach
-        </select>
-        <button id="apply-changes" class="btn btn-primary mt-2">
-            {{ __('common.change_statuses') }}
-        </button>
-    </div>
 </div>
 
 <div id="confirmation-modal" class="modal fade" tabindex="-1" role="dialog">
@@ -109,7 +109,6 @@
                         table.ajax.reload();
                         $('#confirmation-modal').modal('hide');
                         $('#select-all').prop('checked', false);
-                        console.log(response.message);
                     },
                     error: function() {
                         console.log('{{ __('common.error_occurred') }}');
