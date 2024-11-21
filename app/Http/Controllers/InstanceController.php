@@ -322,6 +322,12 @@ class InstanceController extends Controller {
                 return new HtmlString('<a href="' . route('myagora.instances', ['code' => $instance->client->code]) . '">' .
                     $instance->client->name . '</a><br/>' . $instance->client->dns . ' - ' . $instance->client->code);
             })
+            ->addColumn('client_code', function ($instance) {
+                return new HtmlString($instance->client->code);
+            })
+            ->addColumn('client_dns', function ($instance) {
+                return new HtmlString($instance->client->dns);
+            })
             ->addColumn('type', function ($instance) {
                 return new HtmlString($instance->client->type->name . '<br/>' .
                     $instance->modelType->description);
@@ -352,6 +358,10 @@ class InstanceController extends Controller {
             ->addColumn('actions', static function ($instance) {
                 return view('admin.instance.action', ['instance' => $instance]);
             })
+            ->addColumn('checkbox', function ($instance) {
+                return '<input type="checkbox" data-id="'.$instance->id.'">';
+            })
+            ->rawColumns(['checkbox'])
             ->make();
 
     }

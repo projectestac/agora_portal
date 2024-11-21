@@ -54,6 +54,9 @@ return [
     'table' => 'Taula',
     'chart' => 'Gràfic',
     'disk_usage' => 'Ús de disc',
+    'confirm_changes' => 'Confirma els canvis',
+    'are_you_sure_to_change_statuses' => 'Esteu segur/a de voler canviar l\'estat de les instàncies seleccionades?',
+    'change_statuses' => 'Canvia els estats',
     'dashboard' => 'Tauler del centre',
     'affected_rows' => 'Fila/es afectada/es',
 ];
