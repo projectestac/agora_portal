@@ -201,4 +201,28 @@ class OperationController extends Controller {
             ->with('success', __('batch.operation_queued'));
     }
 
+    /**
+     * Create a new job ProcessOperation and dispatch it. Recover the data from the inputs.
+     *
+     * @param Request $request
+     * @throws JsonException
+     * @return RedirectResponse
+     */
+    public function enqueueFromInputs(Request $request): RedirectResponse {
+        $form = $request->all();
+
+        ProcessOperation::dispatch([
+            'action' => $form['action'],
+            'priority' => $form['priority'],
+            'params' => json_decode($form['params'], true, 512, JSON_THROW_ON_ERROR),
+            'service_name' => $form['service_name'],
+            'instance_id' => $form['instance_id'],
+            'instance_name' => $form['instance_name'],
+            'instance_dns' => $form['instance_dns'],
+        ]);
+
+        return redirect()->route('queue.success')
+            ->with('success', __('batch.operation_queued'));
+    }
+
 }
