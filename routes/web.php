@@ -76,10 +76,13 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::get('/batch/query', [BatchController::class, 'query'])->name('batch.query');
     Route::post('/batch/query/confirm', [QueryController::class, 'confirmQuery'])->name('batch.query.confirm');
     Route::post('/batch/query/exec', [QueryController::class, 'executeQuery'])->name('batch.query.exec');
+
     Route::get('/batch/operation', [BatchController::class, 'operation'])->name('operation');
     Route::get('/batch/operation/{action}', [OperationController::class, 'getOperationHtml'])->name('batch.operation');
     Route::post('/batch/operation/{action}/confirm', [OperationController::class, 'confirmOperation'])->name('batch.operation.confirm');
     Route::post('/batch/operation/enqueue', [OperationController::class, 'enqueue'])->name('batch.operation.program');
+    Route::post('/batch/operation/enqueueFromInputs', [OperationController::class, 'enqueueFromInputs'])->name('batch.operation.enqueueFromInputs');
+
     Route::get('/batch/queue', [BatchController::class, 'queue'])->name('queue');
     Route::get('/batch/queue/pending', [QueueController::class, 'getPending'])->name('queue.pending');
     Route::get('/batch/queue/success', [QueueController::class, 'getSuccess'])->name('queue.success');
