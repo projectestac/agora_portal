@@ -229,13 +229,16 @@ class QueryController extends Controller {
                 break;
         }
 
-        $instances = Instance::select('db_id', 'db_host', 'clients.name as client_name', 'clients.code as client_code')
-            ->join('clients', 'instances.client_id', '=', 'clients.id')
-            ->where('instances.service_id', $serviceSel)
-            ->whereIn('instances.client_id', $clientsSel)
-            ->where('instances.status', 'active')
-            ->orderBy('instances.id')
-            ->get()->toArray();
+        $instances = Instance::select('instances.db_id', 'instances.db_host', 'clients.name as client_name', 'clients.code as client_code', 'clients.dns as client_dns',
+            \DB::raw("CASE WHEN services.name = 'Moodle' THEN 1 ELSE 0 END as isMoodle")
+        )
+        ->join('clients', 'instances.client_id', '=', 'clients.id')
+        ->join('services', 'instances.service_id', '=', 'services.id')
+        ->where('instances.service_id', $serviceSel)
+        ->whereIn('instances.client_id', $clientsSel)
+        ->where('instances.status', 'active')
+        ->orderBy('instances.id')
+        ->get()->toArray();
 
         config(["database.connections.$serviceNameLower.password" => $userPassword]);
         $userPrefix = config("app.agora.$serviceKey.userprefix");
@@ -277,6 +280,8 @@ class QueryController extends Controller {
                 'database' => $dbName,
                 'clientName' => $instance['client_name'],
                 'clientCode' => $instance['client_code'],
+                'clientDNS' => $instance['client_dns'],
+                'isMoodle' => $instance['isMoodle'],
                 'result' => $result,
             ];
         }

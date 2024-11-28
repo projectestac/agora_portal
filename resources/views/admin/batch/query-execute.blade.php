@@ -83,9 +83,12 @@
                         </thead>
                         <tbody>
                         @foreach($globalResults as $result)
+                            <?php
+                                $clientURL = $result['clientDNS'] . ($result['isMoodle'] == 1 ? '/moodle/' : '');
+                            ?>
                             <tr>
                                 <td><a href="#{{ $result['database'] }} - {{ $result['clientName'] }}">{{ $result['database'] }}</a></td>
-                                <td><a href="/portal/myagora/instances?code={{ $result['clientCode'] }}" target="_blank">{{ $result['clientName'] }}</a></td>
+                                <td><a href="/{{ $clientURL }}" target="_blank">{{ $result['clientName'] }}</a></td>
                                 <td>{{ $result['result'] }}</td>
                             </tr>
                         @endforeach
