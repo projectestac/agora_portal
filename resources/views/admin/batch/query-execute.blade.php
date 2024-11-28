@@ -40,6 +40,20 @@
                         </tr>
                         </thead>
                         <tbody>
+
+                        <?php
+                        // Ordenar el arreglo asociativo $summary por sus claves, usando una función personalizada
+                        uksort($summary, function ($a, $b) use ($summary) {
+                            // Si los valores de las claves $a y $b son iguales
+                            if ($summary[$b] === $summary[$a]) {
+                                // Comparar las claves alfabéticamente en orden ascendente
+                                return strcmp($a, $b);
+                            }
+                            // Si los valores son diferentes, ordenar por los valores en orden descendente
+                            return $summary[$b] - $summary[$a];
+                        });
+                        ?>
+
                         @foreach($summary as $result => $numOcurrences)
                             <tr>
                                 <td>{{ $result }}</td>
@@ -69,9 +83,12 @@
                         </thead>
                         <tbody>
                         @foreach($globalResults as $result)
+                            <?php
+                                $clientURL = $result['clientDNS'] . '/' . $result['serviceSlug'];
+                            ?>
                             <tr>
                                 <td><a href="#{{ $result['database'] }} - {{ $result['clientName'] }}">{{ $result['database'] }}</a></td>
-                                <td><a href="/portal/myagora/instances?code={{ $result['clientCode'] }}" target="_blank">{{ $result['clientName'] }}</a></td>
+                                <td><a href="/{{ $clientURL }}" target="_blank">{{ $result['clientName'] }}</a></td>
                                 <td>{{ $result['result'] }}</td>
                             </tr>
                         @endforeach
