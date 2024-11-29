@@ -67,6 +67,9 @@
                                             <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
                                         </button>
                                     </div>
+                                    <div class="btn-group" role="group" style="margin-left: 15px;">
+                                        @include('admin.batch.query-form-enqueue')
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach
@@ -93,6 +96,8 @@
                                 </div>
                             </div>
                         </div>
+
+                        @include('admin.batch.query-modal-enqueue')
                     @endforeach
                 @endif
             </div>
