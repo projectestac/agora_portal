@@ -70,29 +70,6 @@
                                 <td>{{ $item['created_at'] }}</td>
                                 <td>{{ $item['updated_at'] }}</td>
                                 <td>
-                                    <div class="btn-group" role="group" style="margin-right: 15px;">
-                                        <form id="enqueue-form-{{ $item['id'] }}"
-                                              action="{{ route('batch.operation.enqueueFromInputs') }}"
-                                              method="POST">
-                                            @csrf
-
-                                            <input type="hidden" name="action" value="{{ $item['operation_data']['action'] }}">
-                                            <input type="hidden" name="priority" value="{{ $item['operation_data']['priority'] }}">
-                                            <input type="hidden" name="params"
-                                                   value="{{ json_encode($item['operation_data']['params'], JSON_THROW_ON_ERROR) }}">
-                                            <input type="hidden" name="service_name" value="{{ $item['operation_data']['service_name'] }}">
-                                            <input type="hidden" name="instance_id" value="{{ $item['operation_data']['instance_id'] }}">
-                                            <input type="hidden" name="instance_name" value="{{ $item['operation_data']['instance_name'] }}">
-                                            <input type="hidden" name="instance_dns" value="{{ $item['operation_data']['instance_dns'] }}">
-
-                                            <div class="row form-inline clear text-center">
-                                                <button type="button" class="btn btn-info" title="{{ __('batch.run_again') }}"
-                                                        data-toggle="modal" data-target="#confirmationModal_{{ $item['id'] }}">
-                                                    <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
                                     <div class="btn-group" role="group">
                                         <button class="btn btn-info" title="{{ __('batch.params') }}"
                                                 data-toggle="modal"
@@ -106,6 +83,9 @@
                                                 data-target="#modal_result_{{ $item['id'] }}">
                                             <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
                                         </button>
+                                    </div>
+                                    <div class="btn-group" role="group" style="margin-left: 15px;">
+                                        @include('admin.batch.query-form-enqueue')
                                     </div>
                                 </td>
                             </tr>
@@ -175,36 +155,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="modal fade" id="confirmationModal_{{ $item['id'] }}" tabindex="-1"
-                             aria-labelledby="confirmationModalTitle_{{ $item['id'] }}" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="panel-info">
-                                        <div class="panel-heading">
-                                            {{ __('batch.confirm_execution') }}
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('common.close') }}">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="panel-body">
-                                        {{ __('batch.confirm_run_action_again') }}
-                                    </div>
-                                    <div class="panel-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('common.cancel') }}</button>
-                                        <button type="button" class="btn btn-primary" onclick="submitEnqueueForm('{{ $item['id'] }}')">
-                                            {{ __('batch.confirm_execution') }}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <script>
-                            function submitEnqueueForm(itemId) {
-                                document.getElementById('enqueue-form-' + itemId).submit();
-                            }
-                        </script>
+                        @include('admin.batch.query-modal-enqueue')
                     @endforeach
                 @endif
             </div>
