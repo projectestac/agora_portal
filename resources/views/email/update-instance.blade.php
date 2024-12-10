@@ -6,6 +6,7 @@
 
     $URL = Util::getInstanceUrl($instance);
     $domain = Illuminate\Support\Facades\Config::get('app.agora.server.server') . '/';
+    $support = 'https://educaciodigital.cat';
     $forumMoodle = 'https://educaciodigital.cat/moodle/moodle/mod/forum/view.php?id=181';
     $forumNodes = 'https://educaciodigital.cat/moodle/moodle/mod/forum/view.php?id=1721';
     $forumMoodleOrg = 'https://moodle.org/course/view.php?id=39';
@@ -59,7 +60,7 @@
     @endif
 
     <p>
-        Des del <a href="{{ route('home') }}">portal de suport d'Àgora</a> s'informarà de les novetats
+        Des del <a href="{{ $support }}">portal de suport d'Àgora</a> s'informarà de les novetats
         relacionades amb el projecte (versions noves, notícies...). Esperem que els serveis que us
         ofereix Àgora us siguin d'utilitat.
     </p>
