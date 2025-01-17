@@ -577,7 +577,7 @@ class InstanceController extends Controller {
                 try {
                     DB::connection($serviceNameLower)->statement($currentSQL);
                 } catch (Throwable $e) {
-                    return ['error' => __('instance.query_failed', ['query' => $currentSQL, 'error' => $e->getMessage()])];
+                    return ['errors' => __('instance.query_failed', ['query' => $currentSQL, 'error' => $e->getMessage()])];
                 }
                 // Reset temp variable to empty
                 $currentSQL = '';
