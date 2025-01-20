@@ -11,7 +11,7 @@
     $forumNodes = 'https://educaciodigital.cat/moodle/moodle/mod/forum/view.php?id=1721';
     $forumMoodleOrg = 'https://moodle.org/course/view.php?id=39';
     $ateneu = 'https://ateneu.xtec.cat/wikiform/wikiexport/cmd/tac/moodle2/index';
-    $guideNodes = 'https://agora.xtec.cat/nodes/guia-rapida/';
+    $guideNodes = 'https://projectes.xtec.cat/digital/serveis-digitals/nodes/guia-de-nodes/';
 @endphp
 
 @if ($instance->status === Instance::STATUS_ACTIVE)
