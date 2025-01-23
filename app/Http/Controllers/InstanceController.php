@@ -219,7 +219,7 @@ class InstanceController extends Controller {
             Instance::STATUS_ACTIVE => 'success',
             Instance::STATUS_INACTIVE => 'primary',
             Instance::STATUS_DENIED => 'danger',
-            Instance::STATUS_WITHDRAWN => 'dark',
+            Instance::STATUS_WITHDRAWN => 'danger',
             Instance::STATUS_BLOCKED => 'danger',
             default => 'primary',
         };
