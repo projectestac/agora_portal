@@ -123,4 +123,29 @@ class QueueController extends Controller {
 
     }
 
+    public function execute(int $id): RedirectResponse {
+
+        $job = DB::table('jobs')->find($id);
+
+        if (!$job) {
+            return redirect()->back()->with('error', __('batch.queue_operation_not_found'));
+        }
+
+        try {
+
+            $payLoad = json_decode($job->payload, false, 512, JSON_THROW_ON_ERROR);
+            $operationData = unserialize($payLoad->data->command, ['allowed_classes' => [ProcessOperation::class]]);
+
+            // Execute the operation synchronously.
+            ProcessOperation::dispatchSync((array)$operationData->data);
+
+            // Remove the job from the queue.
+            DB::table('jobs')->where('id', $id)->delete();
+            return redirect()->back()->with('success', __('batch.queue_operation_executed'));
+
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', __('batch.queue_execution_failed'));
+        }
+    }
+
 }
