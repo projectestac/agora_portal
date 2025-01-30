@@ -64,7 +64,17 @@
                                 </td>
                                 <td>{{ $item['created_at'] }}</td>
                                 <td>
-                                    <form class="form-inline" method="POST"
+                                    <form class="form-inline" style="display: inline-block" method="GET"
+                                          action="{{ route('queue.execute', $item['id']) }}"
+                                          id="execute_operation_{{ $item['id'] }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-primary"
+                                                title="{{ __('batch.execute_queue_operation', ['id' => $item['id']]) }}"
+                                                onclick="confirmExecute({{ $item['id'] }});">
+                                            <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
+                                        </button>
+                                    </form>
+                                    <form class="form-inline" style="display: inline-block" method="POST"
                                           action="{{ route('queue.destroy', $item['id']) }}"
                                           id="delete_operation_{{ $item['id'] }}">
                                         @csrf
@@ -99,6 +109,13 @@
                 event.preventDefault();
                 if (confirm('{{ __('batch.remove_queue_operation_confirm') }}')) {
                     document.getElementById('delete_operation_' + id).submit();
+                }
+            }
+
+            function confirmExecute(id) {
+                event.preventDefault();
+                if (confirm('{{ __('batch.execute_queue_operation_confirm') }}')) {
+                    document.getElementById('execute_operation_' + id).submit();
                 }
             }
         </script>
