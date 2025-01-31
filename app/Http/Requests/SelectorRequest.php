@@ -21,7 +21,7 @@ class SelectorRequest extends FormRequest {
                 'in:clientname,dbid,clientcode,dns',
             ],
             'search' => [
-                'in:code,clientname,town,dns,dbid',
+                'in:code,clientname,city,dns,dbid',
             ],
             'texttosearch' => [
                 'nullable',

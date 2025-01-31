@@ -89,8 +89,8 @@ class SelectorController extends Controller {
                 case 'clientname':
                     $query->where('clients.name', 'like', '%' . $textToSearch . '%');
                     break;
-                case 'town':
-                    $query->where('clients.town', 'like', '%' . $textToSearch . '%');
+                case 'city':
+                    $query->where('clients.city', 'like', '%' . $textToSearch . '%');
                     break;
                 case 'dns':
                     $query->where('clients.dns', 'like', '%' . $textToSearch . '%');
