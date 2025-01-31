@@ -47,7 +47,7 @@
                             <select class="form-control" id="search" name="search">
                                 <option value="code">{{ __('client.code') }}</option>
                                 <option value="clientname">{{ __('client.name') }}</option>
-                                <option value="town">{{ __('common.town') }}</option>
+                                <option value="city">{{ __('common.town') }}</option>
                                 <option value="dns">{{ __('client.dns') }}</option>
                                 <option value="dbid">{{ __('instance.db_id') }}</option>
                             </select>
