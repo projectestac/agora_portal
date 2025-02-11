@@ -110,17 +110,29 @@
                     <table class="table table-striped">
                         <thead>
                         <tr>
-                            @foreach($attributes as $attribute)
-                                <th>{{ $attribute }}</th>
-                            @endforeach
+                            {{-- If the attributes are not empty, use them as headers --}}
+                            @if(!empty($attributes))
+                                @foreach($attributes as $attribute)
+                                    <th>{{ $attribute }}</th>
+                                @endforeach
+                            {{-- Otherwise, use the first attribute of the first result as header --}}
+                            @else
+                                <th>{{ array_keys(get_object_vars($results[0]))[0] }}</th>
+                            @endif
                         </tr>
                         </thead>
                         <tbody>
                         @foreach($results as $result)
                             <tr>
-                                @foreach($attributes as $attribute)
-                                    <td>{{ $result->$attribute }}</td>
-                                @endforeach
+                                {{-- If the attributes are not empty, use them as values --}}
+                                @if(!empty($attributes))
+                                    @foreach($attributes as $attribute)
+                                        <td>{{ $result->$attribute }}</td>
+                                    @endforeach
+                                {{-- Otherwise, use the first attribute of the first result as value --}}
+                                @else
+                                    <td>{{ $result->{array_keys(get_object_vars($result))[0]} }}</td>
+                                @endif
                             </tr>
                         @endforeach
                         </tbody>
