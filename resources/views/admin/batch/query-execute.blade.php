@@ -26,7 +26,7 @@
         </div>
 
         {{-- Summary table --}}
-        @if ($serviceName !== 'portal' && $showSummary)
+        @if ($serviceName !== 'Portal' && ($showSummary ?? false))
             <div class="panel panel-default">
                 <div class="panel-heading">
                     {{ __('batch.execution_summary') }}
@@ -67,36 +67,39 @@
         @endif
 
         {{-- Results table --}}
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                {{ __('batch.execution_results') }}
-            </div>
-            <div class="panel-body">
-                @if (is_array($globalResults))
-                    <table class="table table-striped">
-                        <thead>
-                        <tr>
-                            <th>{{ __('common.database') }}</th>
-                            <th>{{ __('client.client') }}</th>
-                            <th>{{ __('batch.result_or_num_results') }}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($globalResults as $result)
-                            <?php
-                                $clientURL = $result['clientDNS'] . '/' . $result['serviceSlug'];
-                            ?>
+        {{-- Doesn't make sense to show the results table for the Portal service --}}
+        @if ($serviceName !== 'Portal')
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    {{ __('batch.execution_results') }}
+                </div>
+                <div class="panel-body">
+                    @if (is_array($globalResults))
+                        <table class="table table-striped">
+                            <thead>
                             <tr>
-                                <td><a href="#{{ $result['database'] }} - {{ $result['clientName'] }}">{{ $result['database'] }}</a></td>
-                                <td><a href="/{{ $clientURL }}" target="_blank">{{ $result['clientName'] }}</a></td>
-                                <td>{{ $result['result'] }}</td>
+                                <th>{{ __('common.database') }}</th>
+                                <th>{{ __('client.client') }}</th>
+                                <th>{{ __('batch.result_or_num_results') }}</th>
                             </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                @endif
+                            </thead>
+                            <tbody>
+                            @foreach($globalResults as $result)
+                                <?php
+                                    $clientURL = $result['clientDNS'] . '/' . $result['serviceSlug'];
+                                ?>
+                                <tr>
+                                    <td><a href="#{{ $result['database'] }} - {{ $result['clientName'] }}">{{ $result['database'] }}</a></td>
+                                    <td><a href="/{{ $clientURL }}" target="_blank">{{ $result['clientName'] }}</a></td>
+                                    <td>{{ $result['result'] }}</td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    @endif
+                </div>
             </div>
-        </div>
+        @endif
 
     {{-- Build one table for each database --}}
     @if(!empty($fullResults))
