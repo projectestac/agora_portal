@@ -88,8 +88,8 @@ class ModelTypeSeeder extends Seeder
                 'service_id' => 5,
                 'short_code' => 'pro',
                 'description' => 'Maqueta Projectes',
-                'url' => 'http://pwc-int.educacio.intranet/agora/masterpro/',
-                'db' => 'usu3',
+                'url' => 'https://projectes-pre.educaciodigital.cat/masterpro/',
+                'db' => 'usu19',
             ],
         ];
 
