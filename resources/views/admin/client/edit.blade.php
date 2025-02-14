@@ -22,6 +22,27 @@
             </div>
 
             <div class="form-group">
+                <label class="col-sm-4 control-label clear" for="address">{{ __('client.address') }}</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="address" name="address" value="{{ old('address', $client->address) }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-4 control-label clear" for="city">{{ __('client.city') }}</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="city" name="city" value="{{ old('city', $client->city) }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-4 control-label clear" for="postal_code">{{ __('client.postal_code') }}</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="postal_code" name="postal_code" value="{{ old('postal_code', $client->postal_code) }}">
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label class="col-sm-4 control-label clear" for="code">{{ __('client.code') }}</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" id="code" name="code" value="{{ old('code', $client->code) }}">
