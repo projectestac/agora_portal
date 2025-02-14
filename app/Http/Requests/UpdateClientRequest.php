@@ -58,6 +58,21 @@ class UpdateClientRequest extends FormRequest {
                 'required',
                 'in:yes,no',
             ],
+            'address' => [
+                'nullable',
+                'string',
+                'max:200',
+            ],
+            'city' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+            'postal_code' => [
+                'nullable',
+                'string',
+                'max:5',
+            ],
         ];
     }
 }
