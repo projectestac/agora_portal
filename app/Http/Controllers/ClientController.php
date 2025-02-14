@@ -57,6 +57,9 @@ class ClientController extends Controller {
         $locationId = $request->input('location');
         $clientTypeId = $request->input('client_type');
         $visible = $request->input('visible');
+        $address = $request->input('address');
+        $city = $request->input('city');
+        $postalCode = $request->input('postal_code');
 
         $client = new Client([
             'name' => $name,
@@ -67,6 +70,9 @@ class ClientController extends Controller {
             'location_id' => $locationId,
             'type_id' => $clientTypeId,
             'visible' => $visible,
+            'address' => $address ?? '',
+            'city' => $city ?? '',
+            'postal_code' => $postalCode ?? '00000',
         ]);
 
         try {
@@ -91,6 +97,9 @@ class ClientController extends Controller {
                 'name' => $client->name,
                 'code' => $client->code,
                 'dns' => $client->dns,
+                'address' => $client->address,
+                'city' => $client->city,
+                'postal_code' => $client->postal_code,
             ]),
             'created_at' => now(),
             'updated_at' => now(),
@@ -124,7 +133,6 @@ class ClientController extends Controller {
      * Update the specified resource in storage.
      */
     public function update(UpdateClientRequest $request, Client $client) {
-
         $client->name = $request->input('name');
         $client->code = $request->input('code');
         $client->dns = $request->input('dns');
@@ -133,6 +141,9 @@ class ClientController extends Controller {
         $client->location_id = $request->input('location');
         $client->type_id = $request->input('client_type');
         $client->visible = $request->input('visible');
+        $client->address = $request->input('address') ?? '';
+        $client->city = $request->input('city') ?? '';
+        $client->postal_code = $request->input('postal_code') ?? '00000';
 
         try {
             $client->save();
@@ -157,6 +168,9 @@ class ClientController extends Controller {
                 'name' => $client->name,
                 'code' => $client->code,
                 'dns' => $client->dns,
+                'address' => $client->address,
+                'city' => $client->city,
+                'postal_code' => $client->postal_code,
             ]),
             'created_at' => now(),
             'updated_at' => now(),
