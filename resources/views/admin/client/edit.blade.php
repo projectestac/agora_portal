@@ -15,21 +15,21 @@
             @method('PUT')
 
             <div class="form-group">
-                <label class="col-sm-4 control-label clear" for="name">{{ __('client.name') }}</label>
+                <label class="col-sm-4 control-label clear" for="name">{{ __('client.name') }} *</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $client->name) }}">
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="col-sm-4 control-label clear" for="code">{{ __('client.code') }}</label>
+                <label class="col-sm-4 control-label clear" for="code">{{ __('client.code') }} *</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" id="code" name="code" value="{{ old('code', $client->code) }}">
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="col-sm-4 control-label clear" for="dns">{{ __('client.dns') }}</label>
+                <label class="col-sm-4 control-label clear" for="dns">{{ __('client.dns') }} *</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" id="dns" name="dns" value="{{ old('dns', $client->dns) }}">
                 </div>
@@ -43,7 +43,7 @@
             </div>
 
             <div class="form-group">
-                <label class="col-sm-4 control-label clear" for="status">{{ __('common.status') }}</label>
+                <label class="col-sm-4 control-label clear" for="status">{{ __('common.status') }} *</label>
                 <div class="col-sm-8">
                     <select class="form-control" id="status" name="status">
                         <option value="active" {{ old('status', $client->status) === 'active' ? 'selected' : '' }}>
@@ -57,7 +57,7 @@
             </div>
 
             <div class="form-group">
-                <label class="col-sm-4 control-label clear" for="location">{{ __('config.location') }}</label>
+                <label class="col-sm-4 control-label clear" for="location">{{ __('config.location') }} *</label>
                 <div class="col-sm-8">
                     <select class="form-control" id="location" name="location">
                         @foreach($locations as $location)
@@ -70,7 +70,7 @@
             </div>
 
             <div class="form-group">
-                <label class="col-sm-4 control-label clear" for="client_type">{{ __('client.client_type') }}</label>
+                <label class="col-sm-4 control-label clear" for="client_type">{{ __('client.client_type') }} *</label>
                 <div class="col-sm-8">
                     <select class="form-control" id="client_type" name="client_type">
                         @foreach($types as $type)
@@ -83,7 +83,28 @@
             </div>
 
             <div class="form-group">
-                <label class="col-sm-4 control-label clear" for="visible">{{ __('client.visible') }}</label>
+                <label class="col-sm-4 control-label clear" for="address">{{ __('client.address') }}</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="address" name="address" value="{{ old('address', $client->address) }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-4 control-label clear" for="city">{{ __('client.city') }}</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="city" name="city" value="{{ old('city', $client->city) }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-4 control-label clear" for="postal_code">{{ __('client.postal_code') }}</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="postal_code" name="postal_code" value="{{ old('postal_code', $client->postal_code) }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-4 control-label clear" for="visible">{{ __('client.visible') }} *</label>
                 <div class="col-sm-8">
                     <select class="form-control" id="visible" name="visible">
                         <option value="yes" {{ old('visible', $client->visible) === 'yes' ? 'selected' : '' }}>{{ __('common.yes') }}</option>
