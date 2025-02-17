@@ -320,12 +320,9 @@ class QueryController extends Controller {
 
             if ($numRows === 0) {
                 $execResult = 0;
-            } elseif ($numRows === 1) {
-                // In this case, there is only one row, so it is not necessary to get the name of the database field. The
-                // $result variable will contain the value of the field.
-                $attribute = get_object_vars(reset($execResult));
-                $execResult = reset($attribute);
-            } elseif ($numRows > 1) {
+            }
+
+            else {
                 // If $fullResults is not empty, the template will iterate over it to show a table for each instance. The
                 // name of the database fields is kept in the $attributes variable and the $result variable will contain
                 // the number of records returned by the query.
