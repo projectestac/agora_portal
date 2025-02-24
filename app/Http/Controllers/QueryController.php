@@ -286,8 +286,13 @@ class QueryController extends Controller {
             ];
         }
 
-        // If there are no results or the number of columns is less than 2, the summary will be shown, if not, it doesn't make sense to show it.
-        $showSummary = count($fullResults[0]) === 0 || (count($fullResults[0]) > 0 && $fullResults[0][array_key_first($fullResults[0])] < 2);
+        // More clear with words
+        $noResults = count($fullResults[0]) === 0;
+        $lessThanTwoResults = count($fullResults[0]) > 0 && $fullResults[0][array_key_first($fullResults[0])] < 2;
+        $serviceIsNodesOrMoodle = $serviceName === 'Nodes' || $serviceName === 'Moodle';
+
+        // Show summary if there are no results OR if there are less than two results OR if there are more than two results and the service is Nodes or Moodle
+        $showSummary = $noResults || $lessThanTwoResults || (!$lessThanTwoResults && $serviceIsNodesOrMoodle);
 
         return view('admin.batch.query-execute')
             ->with('sqlQueryEncoded', $sqlQueryEncoded)
