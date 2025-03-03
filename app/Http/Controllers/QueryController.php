@@ -203,8 +203,12 @@ class QueryController extends Controller {
             $globalResults[env('DB_DATABASE')] = [
                 'database' => env('DB_DATABASE'),
                 'clientName' => 'Portal',
+                'clientDNS' => 'Portal',
+                'serviceSlug' => '',
                 'result' => $result,
             ];
+
+            $showResults = empty($fullResults);
 
             return view('admin.batch.query-execute')
                 ->with('sqlQueryEncoded', $sqlQueryEncoded)
@@ -213,7 +217,9 @@ class QueryController extends Controller {
                 ->with('globalResults', $globalResults)
                 ->with('fullResults', [$fullResults])
                 ->with('attributes', $attributes)
-                ->with('numRows', -1);
+                ->with('numRows', -1)
+                ->with('showSummary', false)
+                ->with('showResults', $showResults);
         }
 
         $userName = '';
@@ -259,7 +265,6 @@ class QueryController extends Controller {
                 try {
                     $execResult = DB::connection($serviceNameLower)->select($sqlQuery);
                 }
-
                 catch (\Exception $e) {
                     $execResult = $e->getMessage();
                 }
@@ -273,7 +278,6 @@ class QueryController extends Controller {
 
             [$fullResult, $attributes, $result, $numRows] = $this->processQueryResults($execResult, $dbName, $instance['client_name']);
             $fullResults[] = $fullResult;
-
             $summary[$result] = isset($summary[$result]) ? ++$summary[$result] : 1;
 
             $globalResults[$dbName] = [
@@ -286,9 +290,6 @@ class QueryController extends Controller {
             ];
         }
 
-        // If there are no results or the number of columns is less than 2, the summary will be shown, if not, it doesn't make sense to show it.
-        $showSummary = count($fullResults[0]) === 0 || (count($fullResults[0]) > 0 && $fullResults[0][array_key_first($fullResults[0])] < 2);
-
         return view('admin.batch.query-execute')
             ->with('sqlQueryEncoded', $sqlQueryEncoded)
             ->with('serviceName', $serviceName)
@@ -298,7 +299,8 @@ class QueryController extends Controller {
             ->with('attributes', $attributes)
             ->with('summary', $summary)
             ->with('numRows', $numRows)
-            ->with('showSummary', $showSummary);
+            ->with('showSummary', true)
+            ->with('showResults', true);
     }
 
     private function processQueryResults(mixed $execResult, string $dbName, string $clientName): array {
@@ -309,9 +311,7 @@ class QueryController extends Controller {
         if ($execResult === true) {
             $execResult = 'OK';
             $numRows = 1;
-        }
-
-        else {
+        } else {
             $numRows = 0;
         }
 
