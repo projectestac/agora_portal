@@ -58,15 +58,25 @@ class UserController extends Controller {
      * Update the specified resource in storage.
      */
     public function update(Request $request, User $user) {
+        // Validate the fields: name, email, and password (if provided).
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255'
+            'email' => 'required|email|max:255',
+            'password' => 'nullable|string|confirmed', // Password is nullable, confirmed
         ]);
 
         $beforeUpdate = $user->toArray();
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
+
+        // Check if a new password is provided and if so, update it
+        if ($request->filled('password')) {
+            // The password and password_confirmation are already validated by 'confirmed' rule
+            $user->password = bcrypt($validated['password']); // Hash the new password before saving
+        }
+
+        // Save the updated user
         $user->save();
 
         $beforeRoles = $user->roles->pluck('name')->toArray();
@@ -86,10 +96,12 @@ class UserController extends Controller {
         if ($isUpdated || $rolesUpdated) {
             $type = 'success';
             $message = __('user.user_updated');
-        }else{
+        } else {
             $type = 'error';
             $message = __('user.user_noUpdated');
         }
+
+        // Redirect back with a success or error message
         return redirect()->back()->with($type, $message);
     }
 
