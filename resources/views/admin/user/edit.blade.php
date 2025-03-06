@@ -10,7 +10,7 @@
 
         @include('components.messages')
 
-        <form class="form-horizontal" action="{{ route('users.update', ['user' => $user]) }}" method="POST">
+        <form class="form-horizontal" action="{{ route('users.update', ['id' => $user->id]) }}" method="POST">
             @csrf
             @method('PUT')
 
@@ -31,7 +31,7 @@
             <div class="form-group">
                 <label class="col-sm-4 control-label clear" for="role">{{ __('user.roles') }}</label>
                 <div class="col-sm-8">
-                    <select name="roles[]" multiple style="height:14vh;">
+                    <select name="roles[]" class="form-control" multiple style="height:14vh;">
                         @foreach ($roles as $id => $role)
                             <option value="{{ $role }}" {{ in_array($role, $assignedRoles) ? 'selected' : '' }}>
                                 {{ ucfirst($role) }}
