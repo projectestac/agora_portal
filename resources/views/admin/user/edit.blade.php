@@ -43,6 +43,20 @@
             </div>
 
             <div class="form-group">
+                <label class="col-sm-4 control-label clear" for="password">{{ __('user.password') }}</label>
+                <div class="col-sm-8">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="{{ __('user.enter_new_password') }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-4 control-label clear" for="password_confirmation">{{ __('user.confirm_password') }}</label>
+                <div class="col-sm-8">
+                    <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="{{ __('user.confirm_new_password') }}">
+                </div>
+            </div>
+
+            <div class="form-group">
                 <div class="text-center">
                     <button type="submit" class="btn btn-success">{{ __('common.save') }}</button>
                 </div>
