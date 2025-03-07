@@ -14,7 +14,7 @@
         // dd($clients);
         ?>
 
-        <form class="form-horizontal" action="{{ route('managers.update', ['manager' => $manager]) }}" method="POST">
+        <form class="form-horizontal" action="{{ route('manager.update', ['manager' => $manager->id]) }}" method="POST">
             @csrf
             @method('PUT')
 

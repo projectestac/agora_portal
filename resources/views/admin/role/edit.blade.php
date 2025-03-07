@@ -6,7 +6,7 @@
     </div>
 
     <div class="content manager">
-        <h3>{{ __('roles.edit_role') }}</h3>
+        <h3>{{ __('role.edit_role') }}</h3>
 
         @include('components.messages')
 
@@ -15,14 +15,14 @@
             @method('PUT')
 
             <div class="form-group">
-                <label class="col-sm-4 control-label clear" for="name">{{ __('roles.role_name') }}</label>
+                <label class="col-sm-4 control-label clear" for="name">{{ __('role.role_name') }}</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" id="name" name="name" value="{{ $role->name }}" required>
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="col-sm-4 control-label clear" for="guard_name">{{ __('roles.guard_name') }}</label>
+                <label class="col-sm-4 control-label clear" for="guard_name">{{ __('role.guard_name') }}</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" id="guard_name" name="guard_name" value="{{ $role->guard_name }}" required>
                 </div>
@@ -30,7 +30,7 @@
 
             <div class="form-group">
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary">{{ __('roles.update') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('role.update') }}</button>
                 </div>
             </div>
 

@@ -119,7 +119,16 @@ class ManagerController extends Controller {
      * Update the specified resource in storage.
      */
     public function update(UpdateManagerRequest $request, Manager $manager) {
+        $validatedData = $request->validated();
+
+        $manager->update([
+            'client_id' => $validatedData['client_id'],
+            'user_id' => $validatedData['user_id'],
+        ]);
+
+        return redirect()->route('managers.index')->with('success', __('manager.updated_successfully'));
     }
+
 
     /**
      * Remove the specified resource from storage.
