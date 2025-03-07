@@ -34,19 +34,30 @@ class RoleController extends Controller {
     /**
      * Display the specified resource.
      */
-    public function show(Role $role) {
+    public function show($id)
+    {
+        $role = Role::findOrFail($id);
+        return view('admin.role.show', compact('role'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Role $role) {
+    public function edit($id)
+    {
+        $role = Role::findOrFail($id);
+        return view('admin.role.edit', compact('role'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id) {
+    public function update(Request $request, $id)
+    {
+        $role = Role::findOrFail($id);
+        $role->update($request->only('name', 'guard_name'));
+
+        return redirect()->route('admin.role.index')->with('success', 'Rôle mis à jour avec succès.');
     }
 
     /**
