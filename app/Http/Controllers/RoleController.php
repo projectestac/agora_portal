@@ -57,7 +57,7 @@ class RoleController extends Controller {
         $role = Role::findOrFail($id);
         $role->update($request->only('name', 'guard_name'));
 
-        return redirect()->route('admin.role.index')->with('success', 'Rôle mis à jour avec succès.');
+        return redirect()->route('roles.index')->with('success', __('role.updated_successfully'));
     }
 
     /**

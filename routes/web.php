@@ -72,6 +72,8 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::get('role/{role}/edit', [RoleController::class, 'edit'])->name('role.edit');
     Route::put('role/{role}', [RoleController::class, 'update'])->name('role.update');
 
+    Route::put('manager/{manager}', [ManagerController::class, 'update'])->name('manager.update');
+
     Route::get('/stats', [StatisticsController::class, 'showStats'])->name('stats.show');
     Route::get('/stats/{service}/{periodicity}', [StatisticsController::class, 'showTabStats'])->name('stats.showTabStats');
     Route::get('/stats/export/{service}/{periodicity}', [StatisticsController::class, 'exportTabStats'])->name('stats.exportTabStats');
