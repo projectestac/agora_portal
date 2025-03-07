@@ -50,14 +50,6 @@
                                 <a href="{{ route('model-types.edit', $modelType->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
                                     <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                                 </a>
-
-                                {{--
-                                <form action="{{ route('model-types.destroy', $modelType->id) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" onclick="return confirm('{{ __('common.confirm_deletion') }}')">{{ __('common.delete') }}</button>
-                                </form>
-                                --}}
                             </td>
                         </tr>
 

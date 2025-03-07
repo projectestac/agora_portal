@@ -45,11 +45,10 @@
                                     <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                                 </a>
 
-                                <form action="{{ route('request-types.destroy', $requestType->id) }}" onsubmit="return confirm('{{ __('common.confirm_deletion') }}')" method="POST" style="display: inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
-                              </form>
+                                @include('components.confirm-delete-modal', [
+                                    'id' => $requestType->id,
+                                    'route' => route('request-types.destroy', $requestType->id)
+                                ])
                             </td>
                         </tr>
 

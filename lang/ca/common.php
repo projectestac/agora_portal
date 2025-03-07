@@ -9,6 +9,7 @@ return [
     'actions' => 'Accions',
     'show' => 'Mostra',
     'edit' => 'Edita',
+    'warning_delete' => 'Atenció!',
     'delete' => 'Esborra',
     'confirm_deletion' => 'Esteu segur/a de voler esborrar aquest element?',
     'deletion_success' => 'L\'element ha estat esborrat amb èxit',

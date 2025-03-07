@@ -1,9 +1,11 @@
 <?php
 
 return [
+    'id' => 'ID',
     'manager' => 'Gestor',
     'managers' => 'Gestors',
-    'manager_list' => 'Gestors del centre :name',
+    'manager_list' => 'Llista de gestors',
+    'new_manager' => 'Nou gestor',
     'no_managers' => 'No s\'ha designat cap gestor',
     'add_manager' => 'Afegeix un gestor',
     'add_manager_text' => 'Nom d\'usuari o adreça XTEC del nou gestor',
@@ -14,11 +16,18 @@ return [
     'manager_removed' => 'S\'ha esborrat el gestor.',
     'manager_removed_detail' => 'S\'ha esborrat el gestor amb nom d\'usuari :username.',
     'manager_already_exists' => 'Aquest gestor ja estava assignat.',
+    'updated_successfully' => 'S\'ha actualitzat el gestor correctament.',
+    'edit_manager' => 'Edita el gestor',
+    'client' => 'Client',
+    'user' => 'Usuari',
+    'type_user' => 'Escriu el nom d\'usuari...',
+    'type_client' => 'Escriu el nom del client...',
     'max_managers' => 'El nombre màxim permès de gestors és :number. No es poden afegir més gestors.',
     'username_required' => 'Cal que indiqueu el nom d\'usuari o l\'adreça XTEC del nou gestor.',
     'username_string' => 'El text introduït ha de ser una cadena de caràcters.',
     'username_max' => 'El text introduït no pot tenir més de 17 caràcters.',
     'username_regex' => 'El text introduït no es correspon amb un nom d\'usuari XTEC ni amb una adreça de correu XTEC.',
     'clients_cannot_be_managers' => 'Els codis de centre no poden ser gestors.',
+    'client_id_required' => 'Cal que indiqueu el client.',
     'remove_manager_confirm' => 'Confirmeu que voleu que l\'usuari deixi de ser gestor/a?',
 ];
