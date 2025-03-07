@@ -106,8 +106,13 @@ class ManagerController extends Controller {
      * Show the form for editing the specified resource.
      */
     public function edit(Manager $manager) {
-        $client = Client::find($manager->client_id);
-        $user = User::find($manager->user_id);
+        $clients = Client::all();
+        $users = User::all();
+
+        return view('admin.manager.edit')
+            ->with('manager', $manager)
+            ->with('clients', $clients)
+            ->with('users', $users);
     }
 
     /**
