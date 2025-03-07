@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Role;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\HtmlString;
@@ -28,12 +29,26 @@ class UserController extends Controller {
      * Show the form for creating a new resource.
      */
     public function create() {
+        return view('admin.user.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request) {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = User::create([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'password' => Hash::make($validatedData['password']),
+        ]);
+
+        return redirect()->route('users.index')->with('success', __('user.user_created'));
     }
 
     /**
@@ -110,6 +125,12 @@ class UserController extends Controller {
      * Remove the specified resource from storage.
      */
     public function destroy(User $user) {
+        // Check if the user is referenced in the managers table
+        $managerExists = DB::table('managers')->where('user_id', $user->id)->exists();
+
+        if ($managerExists) {
+            return redirect()->route('users.index')->with('error', __('user.cannot_delete_user_has_managers'));
+        }
         $user->syncRoles([]);
         $user->deleted_at = Carbon::now();
         $user->save();

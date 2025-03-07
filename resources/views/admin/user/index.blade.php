@@ -9,15 +9,23 @@
         <h3>{{ __('user.users_list') }}</h3>
         @include('components.messages')
 
+        <div class="row">
+            <div class="col-md-6">
+                <a href="{{ route('users.create') }}" class="btn btn-primary">{{ __('user.add_user') }}</a>
+            </div>
+        </div>
+
+        <br>
+
         <table class="table table-striped" id="user-list">
             <thead>
-            <tr>
-                <th>{{ __('common.id') }}</th>
-                <th>{{ __('user.name') }}</th>
-                <th>{{ __('user.email') }}</th>
-                <th>{{ __('user.roles') }}</th>
-                <th style="text-align: right; padding-right: 50px;">{{ __('common.actions') }}</th>
-            </tr>
+                <tr>
+                    <th>{{ __('common.id') }}</th>
+                    <th>{{ __('user.name') }}</th>
+                    <th>{{ __('user.email') }}</th>
+                    <th>{{ __('user.roles') }}</th>
+                    <th>{{ __('common.actions') }}</th>
+                </tr>
             </thead>
         </table>
     </div>
@@ -39,12 +47,7 @@
                     {data: 'email', name: 'email'},
                     {data: 'roles', name: 'roles'},
                     {data: 'actions', name: 'actions', orderable: false, searchable: false}
-                ],
-                "createdRow": function (row, data, dataIndex) {
-                    if (data.deleted_at) {
-                        $(row).css('background-color', '#ffcccc');
-                    }
-                }
+                ]
             });
         });
     </script>
