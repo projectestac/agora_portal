@@ -31,10 +31,16 @@ class ManagerController extends Controller {
      * Show the form for creating a new resource.
      */
     public function create() {
+        $clients = Client::all();
+        $users = User::all();
+
+        return view('admin.manager.create')
+            ->with('clients', $clients)
+            ->with('users', $users);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage. (MyAgora)
      */
     public function store(StoreManagerRequest $request): RedirectResponse {
 
@@ -85,6 +91,63 @@ class ManagerController extends Controller {
 
         Log::insert([
             'client_id' => $currentClient['id'],
+            'user_id' => Auth::user()->id,
+            'action_type' => Log::ACTION_TYPE_ADD,
+            'action_description' => __('manager.manager_added_detail', ['username' => $manager->user->name]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', __('manager.manager_added'));
+
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function storeNew(StoreManagerRequest $request): RedirectResponse {
+        $client_id = $request->get('client_id');
+
+        if (is_null($client_id)) {
+            return redirect()->back()->withErrors(__('manager.client_id_required'));
+        }
+
+        $username = mb_strtolower($request->get('username'));
+        $email = $username . '@xtec.cat';
+
+        // Look for the user in the database.
+        $user = User::where('name', $username)->first();
+
+        // If the user does not exist, create it.
+        if (is_null($user)) {
+            $user = new User([
+                'name' => $username,
+                'email' => $email,
+                'password' => '',
+            ]);
+            $user->save();
+        }
+
+        if (Access::isClient($user)) {
+            return redirect()->back()->withErrors(__('manager.clients_cannot_be_managers'));
+        }
+
+        if (Manager::where('user_id', $user->id)->where('client_id', $client_id)->exists()) {
+            return redirect()->back()->withErrors(__('manager.manager_already_exists'));
+        }
+
+        // Add the register to table "managers".
+        $manager = new Manager([
+            'user_id' => $user->id,
+            'client_id' => $client_id,
+        ]);
+        $manager->save();
+
+        // Add the register to table "model_has_roles".
+        $this->setManagerPermissions($username);
+
+        Log::insert([
+            'client_id' => $client_id,
             'user_id' => Auth::user()->id,
             'action_type' => Log::ACTION_TYPE_ADD,
             'action_description' => __('manager.manager_added_detail', ['username' => $manager->user->name]),
