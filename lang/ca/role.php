@@ -7,5 +7,7 @@ return [
     'guard_name' => 'Nom de l\'accés',
     'update' => 'Desa',
     'updated_successfully' => 'S\'ha actualitzat el rol correctament.',
-    'confirm_delete' => 'Estàs segur que vols eliminar aquest rol?',
+    'warning_delete' => 'Atenció!',
+    'confirm_delete' => 'Estàs segur que vols eliminar el rol :role? Aquesta acció és irreversible.',
+    'delete_role' => 'Elimina el rol',
 ];

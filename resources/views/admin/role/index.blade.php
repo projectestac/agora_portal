@@ -35,15 +35,32 @@
                             <a href="{{ route('role.edit', $role->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
                                 <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                             </a>
-                        </td>
-                        <td>
-                            <form action="{{ route('role.destroy', $role->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('{{ __('role.confirm_delete') }}');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger" title="{{ __('common.delete') }}">
-                                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                </button>
-                            </form>
+
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal{{ $role->id }}">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            </button>
+
+                            <div class="modal fade" id="confirmDeleteModal{{ $role->id }}" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel{{ $role->id }}" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h2 class="modal-title text-danger" id="confirmDeleteModalLabel{{ $role->id }}">{{ __('role.warning_delete') }}</h2>
+                                        </div>
+                                        <div class="modal-body">
+                                            {!! __('role.confirm_delete', ['role' => '<strong>' . $role->name . '</strong>']) !!}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('common.cancel') }}</button>
+                                            <form action="{{ route('role.destroy', $role->id) }}" method="POST" style="display:inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger">{{ __('role.delete_role') }}</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </td>
                     </tr>
                 @endforeach
