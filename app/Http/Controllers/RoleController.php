@@ -23,12 +23,24 @@ class RoleController extends Controller {
      * Show the form for creating a new resource.
      */
     public function create() {
+        return view('admin.role.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request) {
+        $request->validate([
+            'name' => 'required|unique:roles,name',
+            'guard_name' => 'required',
+        ]);
+
+        $role = new Role();
+        $role->name = $request->name;
+        $role->guard_name = $request->guard_name;
+        $role->save();
+
+        return redirect()->route('roles.index')->with('success', __('role.created_successfully'));
     }
 
     /**
@@ -64,5 +76,7 @@ class RoleController extends Controller {
      * Remove the specified resource from storage.
      */
     public function destroy(Role $role) {
+        $role->delete();
+        return redirect()->route('roles.index')->with('success', __('role.deleted_successfully'));
     }
 }

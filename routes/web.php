@@ -71,6 +71,8 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::get('role/{role}', [RoleController::class, 'show'])->name('role.show');
     Route::get('role/{role}/edit', [RoleController::class, 'edit'])->name('role.edit');
     Route::put('role/{role}', [RoleController::class, 'update'])->name('role.update');
+    Route::delete('role/{role}', [RoleController::class, 'destroy'])->name('role.destroy');
+    Route::post('/roles/store', [RoleController::class, 'store'])->name('roles.store');
 
     Route::put('manager/{manager}', [ManagerController::class, 'update'])->name('manager.update');
     Route::post('/managers/store_new', [ManagerController::class, 'storeNew'])->name('managers.store_new');
