@@ -15,7 +15,7 @@ class RoleController extends Controller {
      * Display a listing of the resource.
      */
     public function index(): View {
-        $roles = \Spatie\Permission\Models\Role::paginate(25);
+        $roles = Role::withoutTrashed()->paginate(25);
         return view('admin.role.index')->with('roles', $roles);
     }
 
