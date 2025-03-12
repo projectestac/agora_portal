@@ -111,17 +111,20 @@
     @if (str_contains(request()->url(), 'users') || str_contains(request()->url(), 'roles') || str_contains(request()->url(), 'managers'))
         <ul class="nav navbar-nav secondary">
             <li>
-                <a href="{{ route('users.index') }}" @if (str_ends_with(request()->url(), 'users')) class="selected" @endif>
+                <a href="{{ route('users.index') }}"
+                   @if (request()->is('users') || request()->is('users/*')) class="selected" @endif>
                     {{ __('user.users') }}
                 </a>
             </li>
             <li>
-                <a href="{{ route('roles.index') }}" @if (str_ends_with(request()->url(), 'roles')) class="selected" @endif>
+                <a href="{{ route('roles.index') }}"
+                   @if (request()->is('roles') || request()->is('roles/*')) class="selected" @endif>
                     {{ __('user.roles') }}
                 </a>
             </li>
             <li>
-                <a href="{{ route('managers.index') }}" @if (str_ends_with(request()->url(), 'managers')) class="selected" @endif>
+                <a href="{{ route('managers.index') }}"
+                   @if (request()->is('managers') || request()->is('managers/*')) class="selected" @endif>
                     {{ __('manager.managers') }}
                 </a>
             </li>
