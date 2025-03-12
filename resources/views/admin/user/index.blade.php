@@ -7,17 +7,26 @@
 
     <div class="content users">
         <h3>{{ __('user.users_list') }}</h3>
-            <table class="table table-striped" id="user-list">
-                <thead>
-                    <tr>
-                        <th>{{ __('common.id') }}</th>
-                        <th>{{ __('user.name') }}</th>
-                        <th>{{ __('user.email') }}</th>
-                        <th>{{ __('user.roles') }}</th>
-                        <th>{{ __('common.actions') }}</th>
-                    </tr>
-                </thead>
-            </table>
+
+        <div class="row">
+            <div class="col-md-6">
+                <a href="{{ route('users.create') }}" class="btn btn-primary">{{ __('user.add_user') }}</a>
+            </div>
+        </div>
+
+        <br>
+
+        <table class="table table-striped" id="user-list">
+            <thead>
+                <tr>
+                    <th>{{ __('common.id') }}</th>
+                    <th>{{ __('user.name') }}</th>
+                    <th>{{ __('user.email') }}</th>
+                    <th>{{ __('user.roles') }}</th>
+                    <th>{{ __('common.actions') }}</th>
+                </tr>
+            </thead>
+        </table>
     </div>
 
     <script>
