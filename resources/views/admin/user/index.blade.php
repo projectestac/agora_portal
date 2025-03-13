@@ -16,6 +16,8 @@
 
         <br>
 
+        @include('components.messages')
+
         <table class="table table-striped" id="user-list">
             <thead>
                 <tr>

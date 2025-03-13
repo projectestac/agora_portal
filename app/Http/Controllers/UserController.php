@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use App\Models\Role;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\HtmlString;
@@ -105,7 +106,16 @@ class UserController extends Controller {
      * Remove the specified resource from storage.
      */
     public function destroy(User $user) {
+        // Check if the user is referenced in the managers table
+        $managerExists = DB::table('managers')->where('user_id', $user->id)->exists();
+
+        if ($managerExists) {
+            return redirect()->route('users.index')->with('error', __('user.cannot_delete_user_has_managers'));
+        }
+
+        // Delete the user if they are not referenced
         $user->delete();
+
         return redirect()->route('users.index')->with('success', __('user.user_deleted'));
     }
 
