@@ -15,4 +15,5 @@ return [
     'user_created' => 'S\'ha creat l\'usuari correctament',
     'user_updated' => 'S\'ha actualitzat l\'usuari correctament',
     'user_noUpdated' => 'Usuari <strong>no</strong> actualitzat. No s\'han fet canvis',
+    'user_deleted' => 'S\'ha eliminat l\'usuari correctament',
 ];
