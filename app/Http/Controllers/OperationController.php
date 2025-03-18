@@ -192,7 +192,8 @@ class OperationController extends Controller {
                 'instance_id' => $instance['id'],
                 'instance_name' => $instance['name'],
                 'instance_dns' => $instance['dns'],
-            ]);
+            ])
+                ->onQueue($data['priority']);
         }
 
         $request->session()->forget('batch');
@@ -219,7 +220,8 @@ class OperationController extends Controller {
             'instance_id' => $form['instance_id'],
             'instance_name' => $form['instance_name'],
             'instance_dns' => $form['instance_dns'],
-        ]);
+        ])
+            ->onQueue($form['priority']);
 
         return redirect()->route('queue.success')
             ->with('success', __('batch.operation_queued'));
