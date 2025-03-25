@@ -4,6 +4,16 @@ More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/agora_portal
 
 
+Changes 25.03.25
+---------------------------------------------------------------------------------------
+- Batch: Added massive change of state of instances
+- Client: Added fields address, city and postal code to CRUD
+- ModelTypeSeeder: Updated configuration data about masterpro model
+- Query: Improvements to mass query execution
+- Queue: Added "Execute now" feature to jobs in queue
+- Queue: Add priorities to job queue
+
+
 Changes 25.02.04
 ---------------------------------------------------------------------------------------
 - Instance: Changed CSS class for STATUS_WITHDRAWN
