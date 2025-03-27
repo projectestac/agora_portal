@@ -7,6 +7,17 @@
 
     <div class="content users">
         <h3>{{ __('user.roles_list') }}</h3>
+
+        <div class="row">
+            <div class="col-md-6">
+                <a href="{{ route('roles.create') }}" class="btn btn-primary">{{ __('role.add_role') }}</a>
+            </div>
+        </div>
+
+        <br>
+
+        @include('components.messages')
+
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -23,12 +34,15 @@
                         <td>{{ $role->name }}</td>
                         <td>{{ $role->guard_name }}</td>
                         <td>
-                            <a href="#" class="btn btn-info" title="{{ __('common.show') }}">
-                                <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
-                            </a>
-                            <a href="#" class="btn btn-primary" title="{{ __('common.edit') }}">
+                            <a href="{{ route('role.edit', $role->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
                                 <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                             </a>
+
+                            @include('components.confirm-delete-modal', [
+                                'id' => $role->id,
+                                'name' => $role->name,
+                                'route' => route('role.destroy', $role->id)
+                            ])
                         </td>
                     </tr>
                 @endforeach
