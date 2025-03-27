@@ -6,19 +6,30 @@
     </div>
 
     <div class="content users">
-        <h3>Llista de gestors</h3>
-            <table class="table table-striped" id="manager-list">
-                <thead>
-                    <tr>
-                        <th>{{ __('common.id') }}</th>
-                        <th>{{ __('user.user') }}</th>
-                        <th>{{ __('client.client') }}</th>
-                        <th>{{ __('manager.manager_added_date') }}</th>
-                        <th>{{ __('common.actions') }}</th>
+        <h3>{{ __('manager.manager_list') }}</h3>
 
-                    </tr>
-                </thead>
-            </table>
+        <div class="row">
+            <div class="col-md-6">
+                <a href="{{ route('managers.create') }}" class="btn btn-primary">{{ __('manager.add_manager') }}</a>
+            </div>
+        </div>
+
+        <br>
+
+        @include('components.messages')
+
+        <table class="table table-striped" id="manager-list">
+            <thead>
+                <tr>
+                    <th>{{ __('common.id') }}</th>
+                    <th>{{ __('user.user') }}</th>
+                    <th>{{ __('client.client') }}</th>
+                    <th>{{ __('manager.manager_added_date') }}</th>
+                    <th>{{ __('common.actions') }}</th>
+
+                </tr>
+            </thead>
+        </table>
     </div>
 
     <script>
