@@ -17,4 +17,8 @@ return [
     'user_noUpdated' => 'Usuari <strong>no</strong> actualitzat. No s\'han fet canvis',
     'user_deleted' => 'S\'ha eliminat l\'usuari correctament',
     'cannot_delete_user_has_managers' => 'No es pot eliminar l\'usuari perquè té gestors assign',
+    'deleteUser_confirm' => 'Estàs segur que vols eliminar aquest usuari?',
+    'enter_new_password' => 'Introdueix una nova contrasenya',
+    'confirm_password' => 'Confirma la contrasenya',
+    'confirm_new_password' => 'Confirma la nova contrasenya'
 ];

@@ -48,7 +48,12 @@
                     {data: 'email', name: 'email'},
                     {data: 'roles', name: 'roles'},
                     {data: 'actions', name: 'actions', orderable: false, searchable: false}
-                ]
+                ],
+                "createdRow": function(row, data, dataIndex) {
+                    if (data.deleted_at) {
+                        $(row).css('background-color', '#ffcccc');
+                    }
+                }
             });
         });
     </script>
