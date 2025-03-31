@@ -133,9 +133,7 @@ class UserController extends Controller {
         }
 
         // Delete the user if they are not referenced
-        $user->syncRoles([]);
-        $user->deleted_at = Carbon::now();
-        $user->save();
+        $user->delete();
 
         return redirect()->route('users.index')->with('success', __('user.user_deleted'));
     }
