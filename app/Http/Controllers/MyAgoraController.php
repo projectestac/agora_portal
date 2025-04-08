@@ -588,7 +588,8 @@ class MyAgoraController extends Controller {
             'instance_id' => $instance['id'],
             'instance_name' => $instance->client->name,
             'instance_dns' => $instance->client->dns,
-        ]);
+        ])
+            ->onQueue('high');
 
     }
 
@@ -608,7 +609,8 @@ class MyAgoraController extends Controller {
             'instance_id' => $instance['id'],
             'instance_name' => $instance->client->name,
             'instance_dns' => $instance->client->dns,
-        ]);
+        ])
+            ->onQueue('high');
 
     }
 
