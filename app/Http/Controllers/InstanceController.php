@@ -671,7 +671,8 @@ class InstanceController extends Controller {
             'instance_id' => $instanceId,
             'instance_name' => $instance->client->name,
             'instance_dns' => $instance->client->dns,
-        ]);
+        ])
+            ->onQueue('high');
 
         return ['success' => __('instance.operation_programmed')];
     }
