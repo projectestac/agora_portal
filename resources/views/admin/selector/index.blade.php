@@ -4,7 +4,7 @@
         <select class="form-control" id="serviceSel" name="serviceSel">
             @foreach($viewData['services'] as $service)
                 <option value="{{ $service['id'] }}"
-                        @if($service['selected']) selected="selected" @endif>
+                    @if(isset($serviceSel) && $serviceSel == $service['id']) selected="selected" @endif>
                     {{ $service['name'] }}
                 </option>
             @endforeach
