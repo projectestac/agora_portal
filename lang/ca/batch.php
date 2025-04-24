@@ -15,6 +15,7 @@ return [
     'sql_query' => 'Consulta SQL',
     'save_query' => 'Desa la consulta',
     'saved_queries' => 'Consultes desades',
+    'search_queries' => 'Escriviu per cercar consultes...',
     'update_query' => 'Actualitza la consulta',
     'run_query' => 'Executa la consulta',
     'modify_query' => 'Modifica la consulta',

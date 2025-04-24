@@ -481,11 +481,22 @@ COLOR5: #D0D0D0 #BBEEEE #87BDC1 #FFEDBA #B3CD7B #B3CADB
     border-right: 1px solid #ccc;
 }
 
+.query-item button.btn {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
 .query-description {
-    min-height: 50px;
+    min-height: 30px;
 }
 
 .query-query {
     font-size: 0.8em;
     color: #999;
+    word-wrap: break-word; /* To have automatic line breaks for long lines */
+}
+
+input#querySearch {
+    display: inline-block;
+    width: 96%;
 }

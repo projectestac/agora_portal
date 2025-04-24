@@ -23,18 +23,26 @@ class QueryController extends Controller {
         $allowedValues = ['all', 'select', 'insert', 'update', 'delete', 'alter', 'drop'];
         $type = $request->input('filter');
         $serviceId = $request->input('serviceId');
+        $search = $request->input('search');
 
         if (!in_array($type, $allowedValues, true)) {
             $type = 'all';
         }
 
-        if ($type === 'all') {
-            $queries = Query::where('service_id', $serviceId)->get();
-        } else {
-            $queries = Query::where('type', $type)
-                ->where('service_id', $serviceId)
-                ->get();
+        $queryBuilder = Query::where('service_id', $serviceId);
+
+        if ($type !== 'all') {
+            $queryBuilder->where('type', $type);
         }
+
+        if (!empty($search)) {
+            $queryBuilder->where(function ($q) use ($search) {
+                $q->where('query', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%');
+            });
+        }
+
+        $queries = $queryBuilder->get();
 
         $content = view('admin.batch.query-list-item')
             ->with('queries', $queries)
@@ -183,6 +191,7 @@ class QueryController extends Controller {
         $isSelect = Str::startsWith(Str::lower($sqlQuery), 'select');
 
         $request->session()->put('query', $sqlQuery);
+        $request->session()->put('serviceSel', $serviceSel);
 
         $serviceNameLower = Str::lower($serviceName);
         $globalResults = [];

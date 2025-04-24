@@ -28,10 +28,12 @@ class BatchController extends Controller {
         $selector = new SelectorController();
         $viewData = $selector->getSelector($request, 'Moodle');
         $query = $request->session()->get('query');
+        $serviceSel = $request->session()->get('serviceSel');
 
         return view('admin.batch.query')
             ->with('viewData', $viewData)
             ->with('query', $query)
+            ->with('serviceSel', $serviceSel)
             ->with('queryTypes', QueryController::getTypeList());
     }
 
