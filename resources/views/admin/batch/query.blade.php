@@ -23,11 +23,11 @@
 
                 <!-- Row of buttons -->
                 <div class="form-group">
-                    <span class="btn btn-warning" name="clear" onclick="document.getElementById('sqlQuery').value='';">
+                    <span class="btn btn-warning" onclick="document.getElementById('sqlQuery').value='';">
                         <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
                         {{ __('common.delete') }}
                     </span>
-                    <span class="btn btn-info" id="saveQuery" name="saveQuery"
+                    <span class="btn btn-info" id="saveQuery"
                           data-toggle="modal" data-target="#queryModalAdd">
                         <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
                         {{ __('batch.save_query') }}
@@ -60,10 +60,20 @@
                 <!-- List of stored queries -->
                 <div class="form-group">
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            {{ __('batch.saved_queries') }}
+                        <div id="storedQueriesHeader" class="panel-heading">
+                            {* The text here is injected by javascript function "updateStoredQueriesHeader" *}
                         </div>
                         <div class="panel-body">
+                            <div class="form-group d-flex">
+                                <input type="text" id="querySearch" class="form-control me-2"
+                                       placeholder="{{ __('batch.search_queries') }}"
+                                       oninput="searchQueries(this.value)"
+                                       onkeydown="if (event.key === 'Enter') event.preventDefault();" />
+                                <button type="button" class="btn btn-danger" onclick="clearQuerySearch()" title="{{ __('common.delete') }}">
+                                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                    <span class="sr-only">{{ __('common.delete') }}</span>
+                                </button>
+                            </div>
                             <ul class="nav nav-tabs">
                                 <li id="tab_all" role="presentation" class="active tab-item">
                                     <a href="#" class="btn" onclick="getQueries('all');">{{ __('batch.all') }}</a>
@@ -211,6 +221,40 @@
                 }
             }
 
+            // Search for queries in the list.
+            function searchQueries(keyword) {
+                let serviceId = $('#serviceSel').val();
+
+                $.ajax({
+                    url: '{{ route('queries.index') }}',
+                    method: 'GET',
+                    data: {
+                        search: keyword,
+                        serviceId: serviceId
+                    },
+                    success: function (response) {
+                        const hasResults = response.html.includes('div class="tab-content query-item"');
+
+                        if (hasResults) {
+                            $('#queryList').html(response.html);
+                        } else {
+                            $('#queryList').html(
+                                '<div class="alert alert-info text-center">No s\'han trobat consultes per a <strong>"' + $('<div>').text(keyword).html() + '"</strong>.</div>'
+                            );
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log('Error on AJAX call:', error);
+                    }
+                });
+            }
+
+            function clearQuerySearch() {
+                const input = document.getElementById('querySearch');
+                input.value = '';
+                searchQueries(''); // Trigger search with empty string to show all queries.
+            }
+
             // Encode query in base64 before submitting the form to avoid blockages from firewalls.
             $('#queryExecForm').submit(function () {
                 const queryPlain = $('#sqlQuery').val();
@@ -218,6 +262,17 @@
                 $('#sqlQueryEncoded').val(queryEncoded);
                 $('#sqlQuery').val(''); // Clear the textarea to avoid sending the query in plain text.
             });
+
+            // Add the selected service name to the header of the stored queries.
+            function updateStoredQueriesHeader() {
+                const selectedService = $('#serviceSel').find('option:selected').text();
+                $('#storedQueriesHeader').text('{{ __('batch.saved_queries') }} - ' + selectedService);
+            }
+            $(document).ready(function () {
+                updateStoredQueriesHeader(); // Executa en carregar la pàgina
+                $('#serviceSel').change(updateStoredQueriesHeader); // Executa en canviar
+            });
+
         </script>
     </div>
 @endsection
