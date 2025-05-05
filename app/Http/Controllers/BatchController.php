@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Util;
 use App\Http\Requests\StoreBatchInstanceRequest;
+use App\Http\Controllers\OperationController;
 use App\Models\Client;
 use App\Models\Instance;
 use App\Models\ModelType;
@@ -138,23 +139,53 @@ class BatchController extends Controller {
 
             $instanceController = new InstanceController();
             $newDbId = $instanceController->getNewOrUpdatedDbId($instance, Instance::STATUS_ACTIVE);
-            $log = $instanceController->activateInstance($instance, $newDbId, Instance::STATUS_ACTIVE);
+            // $log = $instanceController->activateInstance($instance, $newDbId, Instance::STATUS_ACTIVE);
 
-            if (isset($log['errors'])) {
-                $errors[] = $log['errors'];
-                $instance->delete();
-                continue;
-            }
+            // if (isset($log['errors'])) {
+            //     $errors[] = $log['errors'];
+            //     $instance->delete();
+            //     continue;
+            // }
+
+            $operationController = new OperationController();
+
+            $form = [
+                'action' => 'script_activate_instance',
+                'priority' => 'default',
+                'params' => json_encode([
+                    'instance_client_id'     => $instance->client_id,
+                    'instance_service_id'    => $instance->service_id,
+                    'instance_status'        => $instance->status,
+                    'instance_db_id'         => $instance->db_id,
+                    'instance_db_host'       => $instance->db_host,
+                    'instance_quota'         => $instance->quota,
+                    'instance_used_quota'    => $instance->used_quota,
+                    'instance_model_type_id' => $instance->model_type_id,
+                    'instance_contact_name'  => $instance->contact_name,
+                    'instance_observations'  => $instance->observations,
+                    'instance_requested_at'  => $instance->requested_at,
+                    'instance_updated_at'    => $instance->updated_at,
+                    'instance_created_at'    => $instance->created_at,
+                    'instance_id'            => $instance->id,
+                    'newDbId' => $newDbId,
+                ], JSON_THROW_ON_ERROR),
+                'service_name' => 'agora',
+                'instance_id' => $instance->id,
+                'instance_name' => $instance->name,
+                'instance_dns' => $instance->dns,
+            ];
+
+            $operationController->enqueueFromArray($form);
 
             $messages[] = __('batch.instance_created', [
                 'code' => $client->code,
-                'password' => $log['password'],
+                'password' => ''//$log['password'],
             ]);
 
             // Save the password in batch_log table.
             DB::table('batch_logs')->insert([
                 'instance_id' => $instance->id,
-                'password' => $log['password'],
+                'password' => '',//$log['password'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
