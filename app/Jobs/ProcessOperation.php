@@ -31,6 +31,8 @@ class ProcessOperation implements ShouldQueue {
      */
     public function handle(): bool {
 
+        error_log('handle ' . __FILE__ . ' ' . __LINE__);
+
         $action = $this->data['action'];
         $serviceName = $this->data['service_name'];
         $params = $this->data['params'];
@@ -58,6 +60,8 @@ class ProcessOperation implements ShouldQueue {
         }
 
         $command = 'nohup php ' . $file . $paramsCommand . ' > /dev/stdout 2>&1';
+
+        error_log('Executing command: ' . $command);
 
         $last = exec($command, $result);
         $this->job->result = $result;

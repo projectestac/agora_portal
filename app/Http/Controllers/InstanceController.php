@@ -367,6 +367,8 @@ class InstanceController extends Controller {
     }
 
     public function activateInstance(Instance $instance, int $newDbId, mixed $statusFinal): array|RedirectResponse {
+
+        error_log('activateInstance ' . __FILE__ . ' ' . __LINE__);
         // First of all, ensure that the required files are available.
         $checkFiles = $this->checkFiles($instance);
         if (!empty($checkFiles['errors'])) {

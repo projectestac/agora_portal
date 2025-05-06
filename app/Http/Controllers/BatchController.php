@@ -152,7 +152,7 @@ class BatchController extends Controller {
             $form = [
                 'action' => 'script_activate_instance',
                 'priority' => 'default',
-                'params' => json_encode([
+                'params' => [
                     'instance_client_id'     => $instance->client_id,
                     'instance_service_id'    => $instance->service_id,
                     'instance_status'        => $instance->status,
@@ -163,12 +163,12 @@ class BatchController extends Controller {
                     'instance_model_type_id' => $instance->model_type_id,
                     'instance_contact_name'  => $instance->contact_name,
                     'instance_observations'  => $instance->observations,
-                    'instance_requested_at'  => $instance->requested_at,
-                    'instance_updated_at'    => $instance->updated_at,
-                    'instance_created_at'    => $instance->created_at,
+                    // 'instance_requested_at'  => $instance->requested_at,
+                    // 'instance_updated_at'    => $instance->updated_at,
+                    // 'instance_created_at'    => $instance->created_at,
                     'instance_id'            => $instance->id,
                     'newDbId' => $newDbId,
-                ], JSON_THROW_ON_ERROR),
+                ],
                 'service_name' => 'agora',
                 'instance_id' => $instance->id,
                 'instance_name' => $instance->name,
@@ -176,6 +176,8 @@ class BatchController extends Controller {
             ];
 
             $operationController->enqueueFromArray($form);
+
+            error_log('Enqueued operation ' . __FILE__ . ' ' . __LINE__);
 
             $messages[] = __('batch.instance_created', [
                 'code' => $client->code,

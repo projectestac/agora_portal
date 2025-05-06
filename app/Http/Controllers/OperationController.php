@@ -196,6 +196,8 @@ class OperationController extends Controller {
                 ->onQueue($data['priority']);
         }
 
+        error_log('params: ' . print_r($data['params'], true));
+
         $request->session()->forget('batch');
 
         return redirect()->route('operation')
@@ -238,13 +240,16 @@ class OperationController extends Controller {
         ProcessOperation::dispatch([
             'action' => $form['action'],
             'priority' => $form['priority'],
-            'params' => json_decode($form['params'], true, 512, JSON_THROW_ON_ERROR),
+            'params' => $form['params'],
             'service_name' => $form['service_name'],
             'instance_id' => $form['instance_id'],
             'instance_name' => $form['instance_name'],
             'instance_dns' => $form['instance_dns'],
         ])
             ->onQueue($form['priority']);
+
+        error_log('Enqueued operation enqueueFromArray ' . __FILE__ . ' ' . __LINE__);
+        error_log('params: ' . print_r($form['params'], true));
 
         return redirect()->route('queue.success')
             ->with('success', __('batch.operation_queued'));
