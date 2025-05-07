@@ -176,4 +176,7 @@ class ManagerController extends Controller {
 
     }
 
+    public function wipFunction() {
+        dd('Manager - test');
+    }
 }
