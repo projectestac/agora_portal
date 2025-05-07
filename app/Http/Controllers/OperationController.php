@@ -248,9 +248,6 @@ class OperationController extends Controller {
         ])
             ->onQueue($form['priority']);
 
-        error_log('Enqueued operation enqueueFromArray ' . __FILE__ . ' ' . __LINE__);
-        error_log('params: ' . print_r($form['params'], true));
-
         return redirect()->route('queue.success')
             ->with('success', __('batch.operation_queued'));
     }

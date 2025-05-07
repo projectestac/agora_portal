@@ -139,19 +139,12 @@ class BatchController extends Controller {
 
             $instanceController = new InstanceController();
             $newDbId = $instanceController->getNewOrUpdatedDbId($instance, Instance::STATUS_ACTIVE);
-            // $log = $instanceController->activateInstance($instance, $newDbId, Instance::STATUS_ACTIVE);
-
-            // if (isset($log['errors'])) {
-            //     $errors[] = $log['errors'];
-            //     $instance->delete();
-            //     continue;
-            // }
 
             $operationController = new OperationController();
 
             $form = [
                 'action' => 'script_activate_instance',
-                'priority' => 'default',
+                'priority' => 'high',
                 'params' => [
                     'instance_client_id'     => $instance->client_id,
                     'instance_service_id'    => $instance->service_id,
@@ -163,21 +156,16 @@ class BatchController extends Controller {
                     'instance_model_type_id' => $instance->model_type_id,
                     'instance_contact_name'  => $instance->contact_name,
                     'instance_observations'  => $instance->observations,
-                    // 'instance_requested_at'  => $instance->requested_at,
-                    // 'instance_updated_at'    => $instance->updated_at,
-                    // 'instance_created_at'    => $instance->created_at,
                     'instance_id'            => $instance->id,
                     'newDbId' => $newDbId,
                 ],
-                'service_name' => 'agora',
+                'service_name' => $service->name,
                 'instance_id' => $instance->id,
-                'instance_name' => $instance->name,
-                'instance_dns' => $instance->dns,
+                'instance_name' => $client->name,
+                'instance_dns' => $client->dns,
             ];
 
             $operationController->enqueueFromArray($form);
-
-            error_log('Enqueued operation ' . __FILE__ . ' ' . __LINE__);
 
             $messages[] = __('batch.instance_created', [
                 'code' => $client->code,
