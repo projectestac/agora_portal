@@ -378,6 +378,10 @@ class InstanceController extends Controller {
             $messages[] = __('instance.dump_files_found');
         }
 
+        // TODO: testConnectionAndCreateDb() was called inside dumpDatabase() and needs to be called here too, but it
+        //       is necessary to add some of the code of dumpDatabase() to this function.
+        //$test = $this->testConnectionAndCreateDb($serviceNameLower, $dbName, $userName, $instance);
+/*
         $dumpDatabase = $this->dumpDatabase($instance, $newDbId, $checkFiles['success']['dbFile']);
 
         if (!empty($dumpDatabase['errors'])) {
@@ -397,9 +401,10 @@ class InstanceController extends Controller {
         if (isset($unzipFiles['success'])) {
             $messages[] = __('instance.unzip_success_short');
         }
+*/
 
         $password = Util::createRandomPass();
-        $programOperation = $this->programOperationEnable($instance, $newDbId, $password);
+        $programOperation = $this->programOperationEnable($instance, $newDbId, $password, $checkFiles['success']['dbFile'], $checkFiles['success']['dataFile']);
 
         if (!empty($programOperation['errors'])) {
             return ['errors' => $programOperation['errors']];
@@ -549,10 +554,10 @@ class InstanceController extends Controller {
             return ['errors' => $test['errors']];
         }
 
-        // Temporary variable, used to store current query.
+        // Temporary variable, used to store the current query.
         $currentSQL = '';
 
-        // Read in entire file.
+        // Read the entire file.
         $lines = file($dbFile);
 
         // Loop through each line.
@@ -649,7 +654,7 @@ class InstanceController extends Controller {
 
     }
 
-    private function programOperationEnable(Instance $instance, int $instanceId, string $password): array {
+    private function programOperationEnable(Instance $instance, int $instanceId, string $password, string $dbFile, string $dataFile): array {
 
         ProcessOperation::dispatch([
             'action' => 'script_enable_service',
@@ -665,6 +670,8 @@ class InstanceController extends Controller {
                 'clientPC' => $instance->client->postal_code,
                 'origin_url' => $instance->modelType->url,
                 'origin_bd' => $instance->modelType->db,
+                'dbFile' => $dbFile,
+                'dataFile' => $dataFile,
             ],
             'service_id' => $instance->service->id,
             'service_name' => $instance->service->name,
