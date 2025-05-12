@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Role;
 use Illuminate\Contracts\View\View;
@@ -28,14 +29,14 @@ class UserController extends Controller {
     /**
      * Show the form for creating a new resource.
      */
-    public function create() {
+    public function create(): View {
         return view('admin.user.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request) {
+    public function store(Request $request): RedirectResponse {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -54,7 +55,7 @@ class UserController extends Controller {
     /**
      * Display the specified resource.
      */
-    public function show(User $user) {
+    public function show(User $user): void {
     }
 
     /**
@@ -88,7 +89,7 @@ class UserController extends Controller {
 
         // Check if a new password is provided and if so, update it
         if ($request->filled('password')) {
-            // The password and password_confirmation are already validated by 'confirmed' rule
+            // 'Confirmed' rule already validates the password and password_confirmation
             $user->password = bcrypt($validated['password']); // Hash the new password before saving
         }
 
@@ -113,8 +114,8 @@ class UserController extends Controller {
             $type = 'success';
             $message = __('user.user_updated');
         } else {
-            $type = 'error';
-            $message = __('user.user_noUpdated');
+            $type = 'message';
+            $message = __('user.user_not_updated');
         }
 
         // Redirect back with a success or error message
@@ -124,16 +125,18 @@ class UserController extends Controller {
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user) {
-        // Check if the user is referenced in the managers table
+    public function destroy(User $user): RedirectResponse {
+        // Check if the user is referenced in the managers' table
         $managerExists = DB::table('managers')->where('user_id', $user->id)->exists();
 
         if ($managerExists) {
             return redirect()->route('users.index')->with('error', __('user.cannot_delete_user_has_managers'));
         }
+
         $user->syncRoles([]);
         $user->deleted_at = Carbon::now();
         $user->save();
+
         return redirect()->back();
     }
 

@@ -43,6 +43,7 @@
 
                             @include('components.confirm-delete-modal', [
                                 'id' => $clientType->id,
+                                'name' => $clientType->name,
                                 'route' => route('client-types.destroy', $clientType->id)
                             ])
                         </td>

@@ -30,7 +30,7 @@ class ManagerController extends Controller {
     /**
      * Show the form for creating a new resource.
      */
-    public function create() {
+    public function create(): View {
         $clients = Client::all();
         $users = User::all();
 
@@ -162,13 +162,13 @@ class ManagerController extends Controller {
     /**
      * Display the specified resource.
      */
-    public function show(Manager $manager) {
+    public function show(Manager $manager): void {
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Manager $manager) {
+    public function edit(Manager $manager): View {
         $clients = Client::all();
         $users = User::all();
 
@@ -181,7 +181,7 @@ class ManagerController extends Controller {
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateManagerRequest $request, Manager $manager) {
+    public function update(UpdateManagerRequest $request, Manager $manager): RedirectResponse {
         $validatedData = $request->validated();
 
         $manager->update([
@@ -191,7 +191,6 @@ class ManagerController extends Controller {
 
         return redirect()->route('managers.index')->with('success', __('manager.updated_successfully'));
     }
-
 
     /**
      * Remove the specified resource from storage.

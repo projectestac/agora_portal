@@ -4,25 +4,25 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
+
     /**
      * Run the migrations.
      */
-    public function up()
-    {
-        Schema::table('roles', function (Blueprint $table) {
-            $table->timestamp('deleted_at')->nullable(); // Si el migrate falla: ALTER TABLE roles ADD COLUMN deleted_at TIMESTAMP NULL;
+    public function up(): void {
+        Schema::table('roles', static function (Blueprint $table) {
+            // Equivalent query: ALTER TABLE roles ADD COLUMN deleted_at TIMESTAMP NULL;
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 
     /**
      * Reverse the migrations.
      */
-    public function down()
-    {
-        Schema::table('roles', function (Blueprint $table) {
+    public function down(): void {
+        Schema::table('roles', static function (Blueprint $table) {
             $table->dropColumn('deleted_at');
         });
     }
+
 };
