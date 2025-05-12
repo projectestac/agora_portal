@@ -25,7 +25,7 @@
                     <th>{{ __('user.user') }}</th>
                     <th>{{ __('client.client') }}</th>
                     <th>{{ __('manager.manager_added_date') }}</th>
-                    <th>{{ __('common.actions') }}</th>
+                    <th style="text-align: right; padding-right: 50px;">{{ __('common.actions') }}</th>
 
                 </tr>
             </thead>

@@ -6,6 +6,8 @@
         <h2>{{ __('login.local_login_page') }}</h2>
     </div>
 
+    @include('components.messages')
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')"/>
 
