@@ -18,13 +18,13 @@
 
         @include('components.messages')
 
-        <table class="table table-striped">
+        <table class="table table-striped" style="max-width: 1000px; margin: 0 auto;">
             <thead>
                 <tr>
                     <th>{{ __('common.id') }}</th>
                     <th>{{ __('common.name') }}</th>
                     <th>{{ __('user.guard') }}</th>
-                    <th>{{ __('common.actions') }}</th>
+                    <th style="text-align: right; padding-right: 50px;">{{ __('common.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -33,15 +33,15 @@
                         <td>{{ $role->id }}</td>
                         <td>{{ $role->name }}</td>
                         <td>{{ $role->guard_name }}</td>
-                        <td>
-                            <a href="{{ route('role.edit', $role->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
+                        <td style="text-align: right; margin-right: 20px;">
+                            <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
                                 <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                             </a>
 
                             @include('components.confirm-delete-modal', [
                                 'id' => $role->id,
                                 'name' => $role->name,
-                                'route' => route('role.destroy', $role->id)
+                                'route' => route('roles.destroy', $role->id)
                             ])
                         </td>
                     </tr>

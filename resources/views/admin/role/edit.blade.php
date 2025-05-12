@@ -10,7 +10,7 @@
 
         @include('components.messages')
 
-        <form class="form-horizontal" action="{{ route('role.update', ['role' => $role->id]) }}" method="POST">
+        <form class="form-horizontal" action="{{ route('roles.update', ['role' => $role->id]) }}" method="POST">
             @csrf
             @method('PUT')
 

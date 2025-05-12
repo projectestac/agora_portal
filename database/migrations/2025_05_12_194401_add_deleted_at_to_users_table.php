@@ -10,8 +10,7 @@ return new class extends Migration {
      * Run the migrations.
      */
     public function up(): void {
-        Schema::table('roles', static function (Blueprint $table) {
-            // Equivalent query: ALTER TABLE roles ADD COLUMN deleted_at TIMESTAMP NULL;
+        Schema::table('users', static function (Blueprint $table) {
             $table->timestamp('deleted_at')->nullable();
         });
     }
@@ -20,7 +19,7 @@ return new class extends Migration {
      * Reverse the migrations.
      */
     public function down(): void {
-        Schema::table('roles', static function (Blueprint $table) {
+        Schema::table('users', static function (Blueprint $table) {
             $table->dropColumn('deleted_at');
         });
     }

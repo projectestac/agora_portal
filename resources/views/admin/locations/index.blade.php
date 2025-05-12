@@ -41,6 +41,7 @@
 
                             @include('components.confirm-delete-modal', [
                                 'id' => $location->id,
+                                'name' => $location->name,
                                 'route' => route('locations.destroy', $location->id)
                             ])
                         </td>
