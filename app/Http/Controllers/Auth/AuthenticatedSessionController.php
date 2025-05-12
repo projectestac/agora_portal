@@ -46,7 +46,10 @@ class AuthenticatedSessionController extends Controller {
             $user->save();
 
             if ($user->deleted_at) {
-                die("User deactivated since: $user->deleted_at");
+                Auth::guard('web')->logout();
+                return redirect()
+                    ->intended('login')
+                    ->with('error', __('login.user_deactivated', ['date' => $user->deleted_at->format('d/m/Y H:i')]));
             }
         }
 

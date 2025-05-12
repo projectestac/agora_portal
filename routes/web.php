@@ -66,16 +66,13 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::resource('/services', ServiceController::class);
     Route::resource('/clients', ClientController::class);
     Route::resource('/users', UserController::class);
-    Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
-    Route::get('/users/{id}/manager', [ManagerController::class, 'showManager'])->name('manager.showManager');
     Route::resource('/roles', RoleController::class);
+    Route::resource('/config/model-types', ModelTypeController::class);
+    Route::resource('/config/request-types', RequestTypeController::class);
+    Route::resource('/config/locations', LocationController::class);
+    Route::resource('/config/client-types', ClientTypeController::class);
 
-    Route::get('role/{role}', [RoleController::class, 'show'])->name('role.show');
-    Route::get('role/{role}/edit', [RoleController::class, 'edit'])->name('role.edit');
-    Route::put('role/{role}', [RoleController::class, 'update'])->name('role.update');
-    Route::delete('role/{role}', [RoleController::class, 'destroy'])->name('role.destroy');
-    Route::post('/roles/store', [RoleController::class, 'store'])->name('roles.store');
-
+    Route::get('/users/{id}/manager', [ManagerController::class, 'showManager'])->name('manager.showManager');
     Route::put('manager/{manager}', [ManagerController::class, 'update'])->name('manager.update');
     Route::post('/managers/store_new', [ManagerController::class, 'storeNew'])->name('managers.store_new');
 
@@ -114,11 +111,6 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
 
     Route::get('/config', [ConfigController::class, 'edit'])->name('config.edit');
     Route::put('/config', [ConfigController::class, 'update'])->name('config.update');
-
-    Route::resource('/config/model-types', ModelTypeController::class);
-    Route::resource('/config/request-types', RequestTypeController::class);
-    Route::resource('/config/locations', LocationController::class);
-    Route::resource('/config/client-types', ClientTypeController::class);
 
     Route::get('/quotas/update', [InstanceController::class, 'updateQuotas'])->name('update.quotas');
 });

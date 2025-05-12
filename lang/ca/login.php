@@ -9,4 +9,5 @@ return [
     'email' => 'Correu electrònic',
     'password' => 'Contrasenya',
     'login_local' => 'Usuari local del portal',
+    'user_deactivated' => 'Usuari desactivat des de: :date',
 ];
