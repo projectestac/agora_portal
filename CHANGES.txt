@@ -4,6 +4,15 @@ More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/agora_portal
 
 
+Changes 25.05.19
+---------------------------------------------------------------------------------------
+- Managers: Improvements to CRUDs
+- Roles: Improvements to CRUDs
+- Users: Improvements to CRUDs
+- Batch: Added AJAX search i query list
+- Jobs: Program operations on queue 'high'
+
+
 Changes 25.03.25
 ---------------------------------------------------------------------------------------
 - Batch: Added massive change of state of instances
@@ -65,26 +74,26 @@ Changes 24.04.30
 
 Changes 24.03.19
 ---------------------------------------------------------------------------------------
-Clients: Fixed sorting in list of clients
-Clients: Improved load speed in the list of clients in the front page
-Clients: Moved search and order logic in list to server side
-Config: Added check to disable email notification on quotas update
-Config: Added param to disable the notification by email on quota update
-Files: Implemented navigation, upload, download and deletion in portal data directory
-Instances: Added colors to quota column
-Instances: Allow edition of model type in Instance edit page
-Location: Fixed ID for undefined location
-MyAgora: Files: Fixed download and delete of files with special chars in their names
-MyAgora: Files: Improved notification messages to users
-MyAgora: Services: Added link to client edition for administrators
-Managers: Changed order of columns in list
-Managers: Moved search and order logic in list to server side
-ModelType: Fixed validation of data from the edit form
-Quotas: Implemented notifications by e-mail for the events related to quota updates
-Quotas: Several fixes on quota update
-Statistics: Added pages to view, filter, plot and download the Àgora stats tables.
-Users: Moved search and order logic in list to server side
-Util: Fixed error when user doesn't exist
+- Clients: Fixed sorting in list of clients
+- Clients: Improved load speed in the list of clients in the front page
+- Clients: Moved search and order logic in list to server side
+- Config: Added check to disable email notification on quotas update
+- Config: Added param to disable the notification by email on quota update
+- Files: Implemented navigation, upload, download and deletion in portal data directory
+- Instances: Added colors to quota column
+- Instances: Allow edition of model type in Instance edit page
+- Location: Fixed ID for undefined location
+- MyAgora: Files: Fixed download and delete of files with special chars in their names
+- MyAgora: Files: Improved notification messages to users
+- MyAgora: Services: Added link to client edition for administrators
+- Managers: Changed order of columns in list
+- Managers: Moved search and order logic in list to server side
+- ModelType: Fixed validation of data from the edit form
+- Quotas: Implemented notifications by e-mail for the events related to quota updates
+- Quotas: Several fixes on quota update
+- Statistics: Added pages to view, filter, plot and download the Àgora stats tables.
+- Users: Moved search and order logic in list to server side
+- Util: Fixed error when user doesn't exist
 
 
 Changes 24.01.25
