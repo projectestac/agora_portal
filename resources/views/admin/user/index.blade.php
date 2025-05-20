@@ -24,6 +24,8 @@
                 <th>{{ __('user.name') }}</th>
                 <th>{{ __('user.email') }}</th>
                 <th>{{ __('user.roles') }}</th>
+                <th>{{ __('user.last_login_at') }}</th>
+                <th>{{ __('user.assigned_clients') }}</th>
                 <th style="text-align: right; padding-right: 50px;">{{ __('common.actions') }}</th>
             </tr>
             </thead>
@@ -46,6 +48,8 @@
                     {data: 'name', name: 'name'},
                     {data: 'email', name: 'email'},
                     {data: 'roles', name: 'roles'},
+                    {data: 'last_login_at', name: 'last_login_at'},
+                    {data: 'manages_clients', name: 'manages_clients'},
                     {data: 'actions', name: 'actions', orderable: false, searchable: false}
                 ],
                 "createdRow": function (row, data, dataIndex) {
