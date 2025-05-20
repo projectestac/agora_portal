@@ -72,7 +72,6 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
     Route::resource('/config/locations', LocationController::class);
     Route::resource('/config/client-types', ClientTypeController::class);
 
-    Route::get('/users/{id}/manager', [ManagerController::class, 'showManager'])->name('manager.showManager');
     Route::put('manager/{manager}', [ManagerController::class, 'update'])->name('manager.update');
     Route::post('/managers/store_new', [ManagerController::class, 'storeNew'])->name('managers.store_new');
 

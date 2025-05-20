@@ -57,6 +57,32 @@
             </div>
 
             <div class="form-group">
+                <label class="col-sm-4 control-label clear">{{ __('user.assigned_clients') }}</label>
+                <div class="col-sm-8">
+                    @if($managedClients->isNotEmpty())
+                        <ul class="list-group">
+                            @foreach($managedClients as $client)
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <strong>
+                                        <a href="{{ route('clients.edit', $client->id) }}" target="_blank">
+                                            {{ $client->name }}
+                                        </a>
+                                    </strong>
+                                    <span class="label label-info">
+                                        {{ $client->code ?? '—' }}
+                                    </span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <div class="alert alert-info mb-0">
+                            {{ __('user.no_assigned_clients') }}
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="form-group">
                 <div class="text-center">
                     <button type="submit" class="btn btn-success">{{ __('common.save') }}</button>
                 </div>

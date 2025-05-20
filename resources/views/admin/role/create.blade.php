@@ -20,12 +20,7 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label class="col-sm-4 control-label clear" for="guard_name">{{ __('role.guard_name') }}</label>
-                <div class="col-sm-8">
-                    <input type="text" name="guard_name" id="guard_name" class="form-control" value="{{ old('guard_name') }}" required>
-                </div>
-            </div>
+            <input type="hidden" name="guard_name" value="web">
 
             <div class="form-group">
                 <div class="text-center">
