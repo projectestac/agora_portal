@@ -58,6 +58,11 @@ class User extends Authenticatable {
         return $this->hasMany(Manager::class);
     }
 
+    public function managedClients()
+    {
+        return $this->belongsToMany(Client::class, 'managers', 'user_id', 'client_id');
+    }
+
     public function log(): HasMany {
         return $this->hasMany(Log::class);
     }
