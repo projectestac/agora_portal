@@ -64,11 +64,13 @@ class UserController extends Controller {
     public function edit(User $user): View {
         $roles = Role::pluck('name','id');
         $assignedRoles = $user->getRoleNames()->toArray();
+        $managedClients = $user->managedClients;
 
         return view('admin.user.edit')
             ->with('user', $user)
             ->with('roles', $roles)
-            ->with('assignedRoles', $assignedRoles);
+            ->with('assignedRoles', $assignedRoles)
+            ->with('managedClients', $managedClients);
     }
 
     /**
@@ -171,6 +173,27 @@ class UserController extends Controller {
                     ->implode('<br />');
 
                 return new HtmlString('<span>' . $rolesString . '</span>');
+            })
+            ->addColumn('last_login_at', function ($user) {
+                $lastLogin = $user->last_login_at
+                    ? Carbon::parse($user->last_login_at)->format('d/m/Y H:i')
+                    : 'N/A';
+                return new HtmlString('<span>' . $lastLogin . '</span>');
+            })
+            ->addColumn('manages_clients', function ($user) {
+                $clients = $user->managedClients()->get();
+
+                if ($clients->isEmpty()) {
+                    return new HtmlString('<span class="label label-info">' . __('common.none') . '</span>');
+                }
+
+                $badges = $clients->map(function ($client) {
+                    return '<span class="label label-success" style="margin-right: 4px;">
+                                <a href="' . route('clients.edit', $client->id) . '" target="_blank" style="color: white; text-decoration: none;">' . e($client->name) . '</a>
+                            </span>';
+                })->implode(' ');
+
+                return new HtmlString($badges);
             })
             ->addColumn('actions', fn($user) => view('admin.user.action', ['user' => $user]))
             ->rawColumns(['name', 'email', 'roles'])
