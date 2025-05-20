@@ -29,7 +29,7 @@
             </thead>
             <tbody>
                 @foreach ($roles as $role)
-                    <tr>
+                    <tr @if($role->deleted_at) style="background-color: #ffcccc;" @endif>
                         <td>{{ $role->id }}</td>
                         <td>{{ $role->name }}</td>
                         <td>{{ $role->guard_name }}</td>
@@ -38,18 +38,17 @@
                                 <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                             </a>
 
-                            @include('components.confirm-delete-modal', [
-                                'id' => $role->id,
-                                'name' => $role->name,
-                                'route' => route('roles.destroy', $role->id)
-                            ])
+                            @if (!$role->deleted_at)
+                                @include('components.confirm-delete-modal', [
+                                    'id' => $role->id,
+                                    'name' => $role->name,
+                                    'route' => route('roles.destroy', $role->id)
+                                ])
+                            @endif
                         </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
-        <div style="text-align:center;">
-            {{ $roles->links() }}
-        </div>
     </div>
 @endsection

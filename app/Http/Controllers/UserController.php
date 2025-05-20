@@ -64,11 +64,13 @@ class UserController extends Controller {
     public function edit(User $user): View {
         $roles = Role::pluck('name','id');
         $assignedRoles = $user->getRoleNames()->toArray();
+        $managedClients = $user->managedClients;
 
         return view('admin.user.edit')
             ->with('user', $user)
             ->with('roles', $roles)
-            ->with('assignedRoles', $assignedRoles);
+            ->with('assignedRoles', $assignedRoles)
+            ->with('managedClients', $managedClients);
     }
 
     /**
@@ -140,10 +142,11 @@ class UserController extends Controller {
         return redirect()->back();
     }
 
-    public function getUsers(Request $request): JsonResponse {
-
+    public function getUsers(Request $request): JsonResponse
+    {
         $search = $request->validate(['search.value' => 'string|max:50|nullable']);
         $searchValue = $search['search']['value'] ?? '';
+
         $users = User::select(['users.*']);
 
         if (!empty($searchValue)) {
@@ -172,10 +175,26 @@ class UserController extends Controller {
                 }
                 return new HtmlString('<span>' . $rolesString . '</span>');
             })
+            ->addColumn('last_login_at', function ($user) {
+                $lastLogin = $user->last_login_at
+                    ? Carbon::parse($user->last_login_at)->format('d/m/Y H:i')
+                    : 'N/A';
+                return new HtmlString('<span>' . $lastLogin . '</span>');
+            })
+            ->addColumn('manages_clients', function ($user) {
+                $clientCount = $user->managedClients()->count();
+                $hasClients = $clientCount > 0;
+                $label = $hasClients ? __('common.yes') : __('common.no');
+                $class = $hasClients ? 'success' : 'danger';
+
+                return new HtmlString(
+                    '<span class="label label-' . $class . '">' . $label . ($clientCount > 0 ? ' (' . $clientCount . ')' : '') . '</span>'
+                );
+            })
             ->addColumn('actions', static function ($user) {
                 return view('admin.user.action', ['user' => $user]);
             })
-            ->rawColumns(['id', 'name', 'email', 'roles'])
+            ->rawColumns(['id', 'name', 'email', 'roles', 'last_login_at', 'manages_clients'])
             ->make(true);
     }
 }

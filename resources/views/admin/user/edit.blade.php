@@ -50,6 +50,28 @@
             </div>
 
             <div class="form-group">
+                <label class="col-sm-4 control-label clear">{{ __('user.assigned_clients') }}</label>
+                <div class="col-sm-8">
+                    @if($managedClients->isNotEmpty())
+                        <ul class="list-group">
+                            @foreach($managedClients as $client)
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <strong>{{ $client->name }}</strong>
+                                    <span class="label label-info">
+                                        {{ $client->code ?? '—' }}
+                                    </span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <div class="alert alert-info mb-0">
+                            {{ __('user.no_assigned_clients') }}
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label class="col-sm-4 control-label clear" for="password_confirmation">{{ __('user.confirm_password') }}</label>
                 <div class="col-sm-8">
                     <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="{{ __('user.confirm_new_password') }}">
