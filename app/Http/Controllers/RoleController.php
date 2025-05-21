@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use App\Models\Role;
 use Illuminate\View\View;
 
@@ -78,5 +79,18 @@ class RoleController extends Controller {
     public function destroy(Role $role) {
         $role->delete();
         return redirect()->route('roles.index')->with('success', __('role.deleted_successfully'));
+    }
+
+    /**
+     * Restore the specified resource from storage.
+     */
+    public function restore(Request $request, $role_id): RedirectResponse
+    {
+        $role = Role::withTrashed()->findOrFail($role_id);
+
+        $role->deleted_at = null;
+        $role->save();
+
+        return redirect()->back();
     }
 }
