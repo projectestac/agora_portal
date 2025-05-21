@@ -65,8 +65,13 @@ Route::group(['middleware' => ['auth', 'permission:Administrate site']], static 
 
     Route::resource('/services', ServiceController::class);
     Route::resource('/clients', ClientController::class);
+
     Route::resource('/users', UserController::class);
+    Route::patch('/users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
+
     Route::resource('/roles', RoleController::class);
+    Route::patch('/roles/{role}/restore', [RoleController::class, 'restore'])->name('roles.restore');
+
     Route::resource('/config/model-types', ModelTypeController::class);
     Route::resource('/config/request-types', RequestTypeController::class);
     Route::resource('/config/locations', LocationController::class);

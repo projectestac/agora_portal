@@ -142,6 +142,17 @@ class UserController extends Controller {
         return redirect()->back();
     }
 
+    /**
+     * Restore the specified resource from storage.
+     */
+    public function restore(Request $request, User $user): RedirectResponse
+    {
+        $user->deleted_at = null;
+        $user->save();
+
+        return redirect()->back();
+    }
+
     public function getUsers(Request $request): JsonResponse
     {
         // Validate input once, using simpler and more direct access
