@@ -34,15 +34,21 @@
                         <td>{{ $role->name }}</td>
                         <td>{{ $role->guard_name }}</td>
                         <td style="text-align: right; margin-right: 20px;">
-                            <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
-                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                            </a>
 
                             @if (!$role->deleted_at)
+                                <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-primary" title="{{ __('common.edit') }}">
+                                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                                </a>
+
                                 @include('components.confirm-delete-modal', [
                                     'id' => $role->id,
                                     'name' => $role->name,
                                     'route' => route('roles.destroy', $role->id)
+                                ])
+                            @else
+                                @include('components.confirm-restore-modal', [
+                                    'id' => $role->id,
+                                    'restoreRoute' => route('roles.restore', $role->id)
                                 ])
                             @endif
                         </td>
