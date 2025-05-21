@@ -44,6 +44,7 @@ return [
     'error_occurred' => 'S\'ha produït un error',
     'yes' => 'Sí',
     'no' => 'No',
+    'none' => 'Cap',
     'all' => 'Tot',
     'prompt' => 'Missatge',
     'month' => 'Mes',

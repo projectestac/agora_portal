@@ -182,14 +182,19 @@ class UserController extends Controller {
                 return new HtmlString('<span>' . $lastLogin . '</span>');
             })
             ->addColumn('manages_clients', function ($user) {
-                $clientCount = $user->managedClients()->count();
-                $hasClients = $clientCount > 0;
-                $label = $hasClients ? __('common.yes') : __('common.no');
-                $class = $hasClients ? 'success' : 'danger';
+                $clients = $user->managedClients()->get();
 
-                return new HtmlString(
-                    '<span class="label label-' . $class . '">' . $label . ($clientCount > 0 ? ' (' . $clientCount . ')' : '') . '</span>'
-                );
+                if ($clients->isEmpty()) {
+                    return new HtmlString('<span class="label label-info">' . __('common.none') . '</span>');
+                }
+
+                $badges = $clients->map(function ($client) {
+                    return '<span class="label label-success" style="margin-right: 4px;">
+                                <a href="' . route('clients.edit', $client->id) . '" target="_blank" style="color: white; text-decoration: none;">' . e($client->name) . '</a>
+                            </span>';
+                })->implode(' ');
+
+                return new HtmlString($badges);
             })
             ->addColumn('actions', static function ($user) {
                 return view('admin.user.action', ['user' => $user]);
