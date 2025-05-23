@@ -17,6 +17,7 @@ use App\Models\Instance;
 use App\Models\Log;
 use App\Models\ModelType;
 use App\Models\Service;
+use App\Models\Location;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -35,15 +36,20 @@ class InstanceController extends Controller {
         $this->middleware('auth');
     }
 
-    public function index(): View {
-
+    public function index(): View
+    {
         $services = Service::select(['id', 'name'])->where('status', 'active')->get();
         $statusList = $this->getStatusList();
 
+        $types = ModelType::select(['id', 'description'])->orderBy('description')->get();
+
+        $locations = Location::select(['id', 'name'])->orderBy('name')->get();
+
         return view('admin.instance.index')
             ->with('services', $services)
-            ->with('statusList', $statusList);
-
+            ->with('statusList', $statusList)
+            ->with('types', $types)
+            ->with('locations', $locations);
     }
 
     public function create(Request $request): View {
@@ -267,6 +273,8 @@ class InstanceController extends Controller {
 
         $serviceId = $request->input('service') ?? 0;
         $status = $request->input('status') ?? 0;
+        $modelTypeId = $request->input('type') ?? 0;
+        $locationId = $request->input('location') ?? 0;
 
         if ($orderColumn === 'instances.client_name') {
             $orderColumn = 'clients.name';
@@ -284,7 +292,11 @@ class InstanceController extends Controller {
             $orderColumn = 'instances.updated_at';
         }
 
-        $instances = Instance::select(['instances.*', 'clients.name as client_name', 'client_types.name as type'])
+        $instances = Instance::select([
+                'instances.*',
+                'clients.name as client_name',
+                'client_types.name as type'
+            ])
             ->orderBy($orderColumn, $orderDirection)
             ->join('clients', 'instances.client_id', '=', 'clients.id')
             ->join('locations', 'clients.location_id', '=', 'locations.id')
@@ -292,29 +304,40 @@ class InstanceController extends Controller {
             ->join('services', 'instances.service_id', '=', 'services.id');
 
         if (!empty($searchValue)) {
-            $instances = $instances->where('clients.name', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('clients.code', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('clients.dns', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('clients.old_dns', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('clients.city', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('locations.name', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('client_types.name', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('services.name', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('instances.db_id', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('instances.observations', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('instances.annotations', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('instances.updated_at', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('instances.created_at', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('instances.requested_at', 'LIKE', '%' . $searchValue . '%');
+            $instances = $instances->where(function($query) use ($searchValue) {
+                $query->where('clients.name', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('clients.code', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('clients.dns', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('clients.old_dns', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('clients.city', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('locations.name', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('client_types.name', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('services.name', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('instances.db_id', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('instances.observations', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('instances.annotations', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('instances.updated_at', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('instances.created_at', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('instances.requested_at', 'LIKE', '%' . $searchValue . '%');
+            });
         }
 
         if ($serviceId !== 0) {
-            $instances = $instances->having('instances.service_id', $serviceId);
+            $instances = $instances->where('instances.service_id', $serviceId);
         }
 
         if ($status !== 0) {
-            $instances = $instances->having('instances.status', $status);
+            $instances = $instances->where('instances.status', $status);
         }
+
+        if ($modelTypeId !== 0) {
+            $instances = $instances->where('instances.model_type_id', $modelTypeId);
+        }
+
+        if ($locationId !== 0) {
+            $instances = $instances->where('clients.location_id', $locationId);
+        }
+
 
         return DataTables::make($instances)
             ->rawColumns(['id'])
