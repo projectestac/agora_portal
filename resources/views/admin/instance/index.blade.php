@@ -10,7 +10,7 @@
 
         @include('components.messages')
 
-        <div class="row">
+        <div class="row" id="filters-container">
             <div class="col-md-2">
                 <select id="service-filter" class="form-control">
                     <option value="">{{ __('service.service') }}</option>
@@ -43,6 +43,11 @@
                     @endforeach
                 </select>
             </div>
+
+            @include('components.reset-filters', [
+                'filtersContainerId' => 'filters-container',
+                'datatableId' => 'instance-list'
+            ])
         </div>
 
         <br>
