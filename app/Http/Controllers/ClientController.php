@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateClientRequest;
 use App\Models\Client;
 use App\Models\ClientType;
 use App\Models\Location;
+use App\Models\Service;
 use App\Models\Log;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -29,8 +30,12 @@ class ClientController extends Controller {
     /**
      * Display a listing of the resource.
      */
-    public function index(): View {
-        return view('admin.client.index');
+     public function index(): View {
+        $services = Service::all();
+
+        $statusList = $this->getStatusList();
+
+        return view('admin.client.index', compact('services', 'statusList'));
     }
 
     /**
@@ -192,6 +197,10 @@ class ClientController extends Controller {
         $search = $request->validate(['search.value' => 'string|max:50|nullable']);
         $searchValue = $search['search']['value'] ?? '';
 
+        $serviceFilter = $request->input('service');
+        $statusFilter = $request->input('status');
+        $visibleFilter = $request->input('visible');
+
         $columns = $request->input('columns');
         $order = $request->input('order')[0];
         $orderColumn = 'clients.' . $columns[$order['column']]['data'] ?? 'clients.updated_at';
@@ -215,12 +224,31 @@ class ClientController extends Controller {
             ->orderBy($orderColumn, $orderDirection);
 
         if (!empty($searchValue)) {
-            $clients = $clients->where('clients.code', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('clients.name', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('clients.dns', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('clients.old_dns', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('clients.city', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('services.name', 'LIKE', '%' . $searchValue . '%');
+            $clients = $clients->where(function ($query) use ($searchValue) {
+                $query->where('clients.code', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('clients.name', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('clients.dns', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('clients.old_dns', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('clients.city', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('services.name', 'LIKE', '%' . $searchValue . '%');
+            });
+        }
+
+        if (!empty($serviceFilter)) {
+            $clients = $clients->whereExists(function ($query) use ($serviceFilter) {
+                $query->selectRaw(1)
+                    ->from('instances')
+                    ->whereRaw('instances.client_id = clients.id')
+                    ->where('instances.service_id', $serviceFilter);
+            });
+        }
+
+        if (!empty($statusFilter)) {
+            $clients = $clients->where('clients.status', $statusFilter);
+        }
+
+        if ($visibleFilter !== null && $visibleFilter !== '') {
+            $clients = $clients->where('clients.visible', $visibleFilter);
         }
 
         $clients = $clients->get();
@@ -304,6 +332,13 @@ class ClientController extends Controller {
 
             })
             ->make();
+    }
+
+    public function getStatusList(): array {
+        return [
+            Client::STATUS_ACTIVE => __('client.status_active'),
+            Client::STATUS_INACTIVE => __('client.status_inactive'),
+        ];
     }
 
     public function search(Request $request): JsonResponse {
