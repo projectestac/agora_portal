@@ -9,6 +9,7 @@ return [
     'db_id' => 'Base de dades',
     'db_host' => 'Servidor de la base de dades',
     'no_instances' => 'No hi ha cap instància',
+    'location' => 'Servei territorial',
     'location_long' => 'Municipi i ST',
     'requester' => 'Sol·licitant',
     'status_pending' => 'Pendent',
