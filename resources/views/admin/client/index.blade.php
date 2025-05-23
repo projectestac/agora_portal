@@ -10,7 +10,7 @@
 
         @include('components.messages')
 
-        <div class="row mb-3">
+        <div class="row mb-3" id="filters-container">
             <div class="col-md-2">
                 <select id="service-filter" class="form-control">
                     <option value="">{{ __('service.service') }}</option>
@@ -34,6 +34,11 @@
                     <option value="no">{{ __('common.no') }}</option>
                 </select>
             </div>
+
+            @include('components.reset-filters', [
+                'filtersContainerId' => 'filters-container',
+                'datatableId' => 'client-list'
+            ])
         </div>
 
         <br />
