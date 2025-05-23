@@ -27,6 +27,22 @@
                     @endforeach
                 </select>
             </div>
+            <div class="col-md-2">
+                <select id="type-filter" class="form-control">
+                    <option value="">{{ __('common.type') }}</option>
+                    @foreach($types as $type)
+                        <option value="{{ $type->id }}">{{ $type->description }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select id="location-filter" class="form-control">
+                    <option value="">{{ __('instance.location') }}</option>
+                    @foreach($locations as $location)
+                        <option value="{{ $location->id }}">{{ $location->name }}</option>
+                    @endforeach
+                </select>
+            </div>
         </div>
 
         <br>
@@ -63,6 +79,8 @@
                         data: function (d) {
                             d.service = $('#service-filter').val();
                             d.status = $('#status-filter').val();
+                            d.type = $('#type-filter').val();
+                            d.location = $('#location-filter').val();
                         }
                     },
                     columns: [
@@ -79,7 +97,7 @@
                     ]
                 });
 
-                $('#service-filter, #status-filter').on('change', function () {
+                $('#service-filter, #status-filter, #type-filter, #location-filter').on('change', function () {
                     table.ajax.reload();
                 });
             });
