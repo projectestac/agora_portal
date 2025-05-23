@@ -61,4 +61,5 @@ return [
     'dashboard' => 'Tauler del centre',
     'affected_rows' => 'Fila/es afectada/es',
     'not_implemented_yet' => 'Funció no implementada encara',
+    'reset_filters' => 'Restaura els filtres',
 ];
