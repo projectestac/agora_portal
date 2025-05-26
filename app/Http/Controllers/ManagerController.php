@@ -228,32 +228,53 @@ class ManagerController extends Controller {
         $user->removeRole($managerRole);
     }
 
-    public function getManagers(Request $request): JsonResponse {
-
-        $manager = Manager::select(['managers.*', 'clients.code'])
+    public function getManagers(Request $request): JsonResponse
+    {
+        $query = Manager::with(['client', 'user'])
+            ->select('managers.*')
             ->leftJoin('clients', 'managers.user_id', '=', 'clients.id')
             ->leftJoin('users', 'managers.user_id', '=', 'users.id');
 
-        $manager = $manager->get();
-
-        return DataTables::make($manager)
-            ->rawColumns(['id', 'client_name', 'user_name', 'assigned'])
+        return DataTables::eloquent($query)
+            ->addColumn('id', fn($manager) => $manager->id)
             ->addColumn('client_name', function ($manager) {
-                return new HtmlString('<a href="' . route('myagora.instances', ['code' => $manager->client->code]) . '">' .
-                    $manager->client->name . '</a><br/>' . $manager->client->dns . ' - ' . $manager->client->code);
+                if (!$manager->client) return '';
+                return new HtmlString(
+                    '<a href="' . route('myagora.instances', ['code' => e($manager->client->code)]) . '">' .
+                    e($manager->client->name) . '</a><br/>' .
+                    e($manager->client->dns) . ' - ' . e($manager->client->code)
+                );
             })
             ->addColumn('user_name', function ($manager) {
-                return new HtmlString('<span>' . $manager->user->name . '</span>');
+                if (!$manager->user) return '';
+                return new HtmlString('<span>' . e($manager->user->name) . '</span>');
             })
             ->addColumn('assigned', function ($manager) {
                 return new HtmlString('<span>' . $manager->created_at->format('d/m/Y H:i') . '</span>');
             })
-            ->addColumn('actions', static function ($manager) {
-                return view('admin.manager.action', ['manager' => $manager]);
-            })
-            ->make(true);
+            ->addColumn('actions', fn($manager) => view('admin.manager.action', ['manager' => $manager]))
 
+            // 🔍 Enable search for virtual column 'client_name'
+            ->filterColumn('client_name', function ($query, $keyword) {
+                $query->whereHas('client', function ($q) use ($keyword) {
+                    $q->where('name', 'LIKE', "%{$keyword}%")
+                      ->orWhere('dns', 'LIKE', "%{$keyword}%")
+                      ->orWhere('code', 'LIKE', "%{$keyword}%");
+                });
+            })
+
+            // 🔍 Enable search for virtual column 'user_name'
+            ->filterColumn('user_name', function ($query, $keyword) {
+                $query->whereHas('user', function ($q) use ($keyword) {
+                    $q->where('name', 'LIKE', "%{$keyword}%")
+                      ->orWhere('email', 'LIKE', "%{$keyword}%");
+                });
+            })
+
+            ->rawColumns(['client_name', 'user_name', 'assigned'])
+            ->make(true);
     }
+
 
     /**
      * Show the data regarding the clients where the user is manager.
