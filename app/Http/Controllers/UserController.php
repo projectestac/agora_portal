@@ -140,42 +140,40 @@ class UserController extends Controller {
         return redirect()->back();
     }
 
-    public function getUsers(Request $request): JsonResponse {
+    public function getUsers(Request $request): JsonResponse
+    {
+        // Validate input once, using simpler and more direct access
+        $searchValue = $request->input('search.value', '');
 
-        $search = $request->validate(['search.value' => 'string|max:50|nullable']);
-        $searchValue = $search['search']['value'] ?? '';
-        $users = User::select(['users.*']);
+        // Eager load roles to reduce the number of queries when accessing them later
+        $query = User::with('roles')->select('users.*');
 
         if (!empty($searchValue)) {
-            $users = $users->where('name', 'LIKE', '%' . $searchValue . '%')
-                ->orWhere('email', 'LIKE', '%' . $searchValue . '%')
-                ->orWhereHas('roles', function ($query) use ($searchValue) {
-                    // https://laravel.com/docs/10.x/eloquent-relationships#querying-relationship-existence
-                    $query->where('name', 'LIKE', '%' . $searchValue . '%');
-                });
+            $query->where(function ($q) use ($searchValue) {
+                $q->where('name', 'LIKE', '%' . $searchValue . '%')
+                  ->orWhere('email', 'LIKE', '%' . $searchValue . '%')
+                  ->orWhereHas('roles', function ($roleQuery) use ($searchValue) {
+                      // Filter roles by name matching search value
+                      $roleQuery->where('name', 'LIKE', '%' . $searchValue . '%');
+                  });
+            });
         }
 
-        $users = $users->get();
-
-        return DataTables::make($users)
-            ->addColumn('name', function ($user) {
-                return new HtmlString('<span>' . $user->name . '</span>');
-            })
-            ->addColumn('email', function ($user) {
-                return new HtmlString('<span>' . $user->email . '</span>');
-            })
+        // Use DataTables query builder integration to avoid loading all results into memory
+        return DataTables::eloquent($query)
+            ->addColumn('id', fn($user) => $user->id)
+            ->addColumn('name', fn($user) => new HtmlString('<span>' . e($user->name) . '</span>'))
+            ->addColumn('email', fn($user) => new HtmlString('<span>' . e($user->email) . '</span>'))
             ->addColumn('roles', function ($user) {
-                $roles = $user->getRoleNames();
-                $rolesString = '';
-                foreach ($roles as $role) {
-                    $rolesString .= ucfirst($role) . '<br />';
-                }
+                // Avoid N+1 queries by eager loading roles, and use collection helpers
+                $rolesString = $user->roles->pluck('name')
+                    ->map(fn($role) => ucfirst($role))
+                    ->implode('<br />');
+
                 return new HtmlString('<span>' . $rolesString . '</span>');
             })
-            ->addColumn('actions', static function ($user) {
-                return view('admin.user.action', ['user' => $user]);
-            })
-            ->rawColumns(['id', 'name', 'email', 'roles'])
+            ->addColumn('actions', fn($user) => view('admin.user.action', ['user' => $user]))
+            ->rawColumns(['name', 'email', 'roles'])
             ->make(true);
     }
 }
