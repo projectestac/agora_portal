@@ -192,39 +192,42 @@ class ClientController extends Controller {
         //
     }
 
-    public function getClients(Request $request): JsonResponse {
-
+    public function getClients(Request $request): JsonResponse
+    {
+        // Validate the search input to prevent overly long queries
         $search = $request->validate(['search.value' => 'string|max:50|nullable']);
         $searchValue = $search['search']['value'] ?? '';
 
+        // Extract filters from the request
         $serviceFilter = $request->input('service');
         $statusFilter = $request->input('status');
         $visibleFilter = $request->input('visible');
 
+        // Extract sorting info
         $columns = $request->input('columns');
-        $order = $request->input('order')[0];
-        $orderColumn = 'clients.' . $columns[$order['column']]['data'] ?? 'clients.updated_at';
+        $order = $request->input('order')[0] ?? ['column' => 0, 'dir' => 'desc'];
+        $orderColumn = $columns[$order['column']]['data'] ?? 'updated_at';
         $orderDirection = $order['dir'] ?? 'desc';
-        $groupBy = 'clients.id';
 
-        if ($orderColumn === 'clients.services') {
-            $orderColumn = 'service_names';
-            $groupBy = 'service_names';
+        // Handle special cases for sorting on virtual columns
+        if ($orderColumn === 'services') {
+            $orderColumn = 'service_names'; // Virtual column created via GROUP_CONCAT
+        } elseif ($orderColumn === 'dates') {
+            $orderColumn = 'updated_at'; // Dates are sorted by last update
         }
 
-        if ($orderColumn === 'clients.dates') {
-            $orderColumn = 'clients.updated_at';
-        }
-
-        $clients = Client::select('clients.*')
-            ->selectRaw('GROUP_CONCAT(services.name) as service_names')
+        // Begin building the query
+        $query = Client::select('clients.*')
+            ->with(['instances.service']) // EAGER LOADING to prevent N+1 queries when accessing related services
             ->leftJoin('instances', 'clients.id', '=', 'instances.client_id')
             ->leftJoin('services', 'instances.service_id', '=', 'services.id')
-            ->groupBy('clients.id')
-            ->orderBy($orderColumn, $orderDirection);
+            ->selectRaw('GROUP_CONCAT(DISTINCT services.name) as service_names') // Aggregate service names for sorting/filtering
+            ->groupBy('clients.id') // Group by client to use aggregation
+            ->orderBy($orderColumn, $orderDirection); // Sort as requested
 
-        if (!empty($searchValue)) {
-            $clients = $clients->where(function ($query) use ($searchValue) {
+        // Add search filters
+        $query->when($searchValue, function ($q) use ($searchValue) {
+            $q->where(function ($query) use ($searchValue) {
                 $query->where('clients.code', 'LIKE', '%' . $searchValue . '%')
                     ->orWhere('clients.name', 'LIKE', '%' . $searchValue . '%')
                     ->orWhere('clients.dns', 'LIKE', '%' . $searchValue . '%')
@@ -232,53 +235,49 @@ class ClientController extends Controller {
                     ->orWhere('clients.city', 'LIKE', '%' . $searchValue . '%')
                     ->orWhere('services.name', 'LIKE', '%' . $searchValue . '%');
             });
-        }
+        });
 
-        if (!empty($serviceFilter)) {
-            $clients = $clients->whereExists(function ($query) use ($serviceFilter) {
-                $query->selectRaw(1)
+        // Apply service filter efficiently using EXISTS (subquery more performant than joins in filtering)
+        $query->when($serviceFilter, function ($q) use ($serviceFilter) {
+            $q->whereExists(function ($subQuery) use ($serviceFilter) {
+                $subQuery->selectRaw(1)
                     ->from('instances')
                     ->whereRaw('instances.client_id = clients.id')
                     ->where('instances.service_id', $serviceFilter);
             });
-        }
+        });
 
-        if (!empty($statusFilter)) {
-            $clients = $clients->where('clients.status', $statusFilter);
-        }
+        // Filter by status if provided
+        $query->when($statusFilter, fn($q) => $q->where('clients.status', $statusFilter));
 
-        if ($visibleFilter !== null && $visibleFilter !== '') {
-            $clients = $clients->where('clients.visible', $visibleFilter);
-        }
+        // Filter by visibility (can be 0/1 or nullable)
+        $query->when($visibleFilter !== null && $visibleFilter !== '', fn($q) => $q->where('clients.visible', $visibleFilter));
 
-        $clients = $clients->get();
-
-        return Datatables::make($clients)
+        // Use Datatables::of($query) instead of ->get() to leverage DataTables' server-side processing
+        return Datatables::of($query)
             ->addColumn('name', function ($client) {
-                return new HtmlString('<a href="' . route('myagora.instances', ['code' => $client->code]) . '">' .
-                    $client->name . '</a>');
+                return new HtmlString('<a href="' . route('myagora.instances', ['code' => $client->code]) . '">' . $client->name . '</a>');
             })
             ->addColumn('services', function ($client) {
-                $html = '';
-                foreach ($client->instances as $instance) {
-                    $url = Util::getInstanceUrl($instance);
-                    $html .= view('admin.client.service', [
-                        'url' => $url,
-                        'serviceName' => $instance->service->name,
-                        'clientName' => $instance->client->name,
-                    ])->render();
-                }
-                return new HtmlString($html);
+                // Since we eager-loaded instances.service, no extra queries here (avoids N+1)
+                return new HtmlString(
+                    collect($client->instances)->map(function ($instance) {
+                        return view('admin.client.service', [
+                            'url' => Util::getInstanceUrl($instance),
+                            'serviceName' => $instance->service->name,
+                            'clientName' => $instance->client->name,
+                        ])->render();
+                    })->implode('')
+                );
             })
-            ->addColumn('dates', function ($client) {
-                return new HtmlString('<strong>C:</strong> ' . $client->created_at->format('d/m/Y') . '<br/>' .
-                    '<strong>E:</strong> ' . $client->updated_at->format('d/m/Y'));
-            })
-            ->addColumn('actions', static function ($client) {
-                return view('admin.client.action', ['client' => $client]);
-            })
-            ->make();
-
+            ->addColumn('dates', fn($client) =>
+                new HtmlString('<strong>C:</strong> ' . $client->created_at->format('d/m/Y') .
+                    '<br/><strong>E:</strong> ' . $client->updated_at->format('d/m/Y'))
+            )
+            ->addColumn('actions', fn($client) =>
+                view('admin.client.action', ['client' => $client])
+            )
+            ->make(); // DataTables handles pagination, ordering, and filtering efficiently
     }
 
     // For public portal.
