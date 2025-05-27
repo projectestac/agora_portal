@@ -54,6 +54,7 @@ return [
     'year' => 'Any',
     'please_select_a_date' => 'Si us plau, seleccioneu una data',
     'no_results_found' => 'No s\'han trobat resultats',
+    'max_interval_error' => 'L\'interval de dates no pot ser superior a :days dies.',
     'moodle' => 'Moodle',
     'nodes' => 'Nodes',
     'table' => 'Taula',
@@ -66,4 +67,6 @@ return [
     'affected_rows' => 'Fila/es afectada/es',
     'not_implemented_yet' => 'Funció no implementada encara',
     'reset_filters' => 'Restaura els filtres',
+    'start_date' => 'Data d\'inici',
+    'end_date' => 'Data de fi',
 ];
