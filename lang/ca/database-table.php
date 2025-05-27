@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'id' => 'ID',
     'clientcode' => 'Codi',
     'clientDNS' => 'Nom propi',
     'yearmonth' => 'Any i mes',
