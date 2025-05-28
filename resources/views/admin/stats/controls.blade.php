@@ -1,4 +1,10 @@
 <div class="controls-container" style="margin: 10px 0;">
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <form id="stats-form" method="get" action="{{ $request->getBaseUrl() . '/stats/' . $service . '/' . $periodicity }}" class="form-inline">
         @csrf
 
@@ -17,6 +23,14 @@
                     <option value="{{ $year }}" {{ $year === request('year') ? 'selected' : '' }}>{{ $year }}</option>
                 @endforeach
             </select>
+
+        @elseif ($periodicity === 'daily')
+
+            <label for="start_date" class="visually-hidden">{{ __('common.start_date') }}</label>
+            <input name="start_date" type="date" class="form-control" value="{{ request('start_date') ?: '2024-01-01' }}">
+
+            <label for="end_date" class="visually-hidden">{{ __('common.end_date') }}</label>
+            <input name="end_date" type="date" class="form-control" value="{{ request('end_date') ?: date('Y-m-d') }}">
 
         @else
 
@@ -41,8 +55,29 @@
 
     <br>
 
-    <a href="{{ route('stats.exportTabStats', ['service' => $service, 'periodicity' => $periodicity]) }}" class="btn btn-success">
-        {{ __('stats.export_csv_button') }}
+    <a href="{{ route('stats.exportTabStats', ['service' => $service, 'periodicity' => $periodicity, 'filter_export' => 0]) }}" class="btn btn-success">
+        {{ __('stats.export_all_data') }}
     </a>
+
+    <form method="get" action="{{ route('stats.exportTabStats', ['service' => $service, 'periodicity' => $periodicity]) }}" style="display: inline-block;">
+
+        <input type="hidden" name="client_name" value="{{ request('client_name') }}">
+
+        @if($periodicity === 'monthly')
+            <input type="hidden" name="month" value="{{ request('month') }}">
+            <input type="hidden" name="year" value="{{ request('year') }}">
+        @elseif($periodicity === 'daily')
+            <input type="hidden" name="start_date" value="{{ request('start_date') }}">
+            <input type="hidden" name="end_date" value="{{ request('end_date') }}">
+        @else
+            <input type="hidden" name="date" value="{{ request('date') }}">
+        @endif
+
+        <button type="submit" name="filter_export" value="1" class="btn btn-warning">
+            {{ __('stats.export_filtered_data') }}
+        </button>
+
+    </form>
+
 
 </div>
