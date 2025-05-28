@@ -176,7 +176,7 @@ class StatisticsController extends Controller {
         // Build the query with the same filters as in showTabStats
         $query = DB::table($table);
 
-        if ($filter_export) { // If exporting filtered data
+        if ($filter_export === '1') { // If exporting filtered data
             if ($periodicity === 'monthly') {
                 $month = $request->input('month');
                 $year = $request->input('year');
