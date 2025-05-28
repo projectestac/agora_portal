@@ -26,6 +26,8 @@ return [
     'field_selector' => 'Selector de camp',
     'show_button' => 'Mostra',
     'export_csv_button' => 'Exporta a CSV (tot)',
+    'export_all_data' => 'Exportar totes les dades',
+    'export_filtered_data' => 'Exportar dades filtrades',
     'show_graph_button' => 'Mostra el gràfic',
     'chart_tutorial' => 'Podeu ocultar o mostrar un valor clicant a les etiquetes del gràfic.',
     'chart_unavailable' => 'No hi ha cap gràfic disponible',
