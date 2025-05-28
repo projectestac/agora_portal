@@ -5,6 +5,15 @@
         </div>
     @endif
 
+    @if(session('export_file_url'))
+        <div class="alert alert-success mt-3">
+            {{ __('stats.export_ready') }} :
+            <a href="{{ session('export_file_url') }}" class="btn btn-success" target="_blank">
+                {{ __('stats.download_file') }}
+            </a>
+        </div>
+    @endif
+
     <form id="stats-form" method="get" action="{{ $request->getBaseUrl() . '/stats/' . $service . '/' . $periodicity }}" class="form-inline">
         @csrf
 

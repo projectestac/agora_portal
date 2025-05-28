@@ -165,7 +165,8 @@ class StatisticsController extends Controller {
 
     }
 
-    public function exportTabStats(Request $request, string $service, string $periodicity): void {
+    public function exportTabStats(Request $request, string $service, string $periodicity)
+    {
         $table = $this->getTable($service, $periodicity);
 
         $client_name = $request->input('client_name');
@@ -212,54 +213,92 @@ class StatisticsController extends Controller {
                     $query->where('clientcode', $client_code);
                 }
             }
+
+            // Export filtered data directly to output (no file)
+            $data = $query->get();
+
+            $dateTime = new DateTime();
+            $formattedDateTime = $dateTime->format('dmY_His');
+
+            $csvFileName = 'stats_' . $service . '_' . $periodicity . '_' . $formattedDateTime . '.csv';
+
+            $headers = [
+                "Content-type" => "text/csv",
+                "Content-Disposition" => "attachment; filename=$csvFileName",
+                "Pragma" => "no-cache",
+                "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+                "Expires" => "0",
+            ];
+
+            // Send headers to force download
+            foreach ($headers as $header => $value) {
+                header("$header: $value");
+            }
+
+            $handle = fopen('php://output', 'wb');
+
+            if ($data->isEmpty()) {
+                // If no data, send an empty CSV with only the column headers (empty here)
+                $columnNames = [];
+            } else {
+                // Get column names from first data row
+                $columnNames = array_keys((array)$data->first());
+            }
+
+            // Translate column names for CSV header
+            $translatedColumnNames = array_map(static function ($columnName) {
+                return __('database-table.' . $columnName);
+            }, $columnNames);
+
+            // Write the CSV header row
+            fputcsv($handle, $translatedColumnNames);
+
+            // Write the data rows
+            foreach ($data as $row) {
+                fputcsv($handle, get_object_vars($row));
+            }
+
+            fclose($handle);
+            exit; // Stop further script execution after download
         }
+
         // Otherwise, export full data without filters
 
-        $data = $query->get();
-
+        // Create filename and path
         $dateTime = new DateTime();
         $formattedDateTime = $dateTime->format('dmY_His');
 
-        $csvFileName = 'stats_' . $service . '_' . $periodicity . '_' . $formattedDateTime . '.csv';
+        $filename = 'stats_' . $service . '_' . $periodicity . '_' . $formattedDateTime . '.csv';
+        $filepath = public_path('exports/' . $filename);
 
-        $headers = [
-            "Content-type" => "text/csv",
-            "Content-Disposition" => "attachment; filename=$csvFileName",
-            "Pragma" => "no-cache",
-            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-            "Expires" => "0",
-        ];
-
-        // Send headers to force download
-        foreach ($headers as $header => $value) {
-            header("$header: $value");
+        if (!file_exists(public_path('exports'))) {
+            mkdir(public_path('exports'), 0755, true);
         }
 
-        $handle = fopen('php://output', 'wb');
+        $handle = fopen($filepath, 'w');
 
-        if ($data->isEmpty()) {
-            // If no data, send an empty CSV with only the column headers (empty here)
-            $columnNames = [];
-        } else {
-            // Get column names from first data row
-            $columnNames = array_keys((array)$data->first());
-        }
+        // Use cursor to avoid memory exhaustion
+        $columnNames = \Schema::getColumnListing($table);
 
-        // Translate column names for CSV header
+        // Then translate columns
         $translatedColumnNames = array_map(static function ($columnName) {
             return __('database-table.' . $columnName);
         }, $columnNames);
 
-        // Write the CSV header row
         fputcsv($handle, $translatedColumnNames);
 
-        // Write the data rows
-        foreach ($data as $row) {
+        // Then stream all data
+        foreach ($query->cursor() as $row) {
             fputcsv($handle, get_object_vars($row));
         }
 
         fclose($handle);
-        exit; // Stop further script execution after download
+
+        // Generate public URL
+        $downloadUrl = asset('exports/' . $filename);
+
+        // Return back with link
+        return redirect()->back()->with('export_file_url', $downloadUrl);
     }
 
 }
