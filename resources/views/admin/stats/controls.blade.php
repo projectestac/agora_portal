@@ -55,12 +55,18 @@
 
     <br>
 
-    <a href="{{ route('stats.exportTabStats', ['service' => $service, 'periodicity' => $periodicity, 'filter_export' => 0]) }}" class="btn btn-success">
-        {{ __('stats.export_all_data') }}
-    </a>
+    {{-- Export all data --}}
+    <form method="get" action="{{ route('stats.exportTabStats', ['service' => $service, 'periodicity' => $periodicity]) }}" style="display: inline-block;">
+        <input type="hidden" name="filter_export" value="0">
+        <button type="submit" class="btn btn-success">
+            {{ __('stats.export_all_data') }}
+        </button>
+    </form>
 
+    {{-- Export filtered data --}}
     <form method="get" action="{{ route('stats.exportTabStats', ['service' => $service, 'periodicity' => $periodicity]) }}" style="display: inline-block;">
 
+        <input type="hidden" name="filter_export" value="1">
         <input type="hidden" name="client_name" value="{{ request('client_name') }}">
 
         @if($periodicity === 'monthly')
@@ -73,11 +79,11 @@
             <input type="hidden" name="date" value="{{ request('date') }}">
         @endif
 
-        <button type="submit" name="filter_export" value="1" class="btn btn-warning">
+        <button type="submit" class="btn btn-warning">
             {{ __('stats.export_filtered_data') }}
         </button>
-
     </form>
+
 
 
 </div>
