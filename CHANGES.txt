@@ -4,6 +4,17 @@ More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/agora_portal
 
 
+Changes 25.06.02
+---------------------------------------------------------------------------------------
+- Clients and Instances: Added a button to reset search filters
+- Clients: Improved performance in the list. Added filters by service, state, type and location
+- Clients: Improved performance in getClients
+- Managers: Improved performance in getManagers
+- Users and Roles: Added restore functionality
+- Users and Roles: Added fields to lists. Minor improvements
+- Users: Improved performance in getUsers
+
+
 Changes 25.05.19
 ---------------------------------------------------------------------------------------
 - Managers: Improvements to CRUDs
