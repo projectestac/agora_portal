@@ -99,11 +99,15 @@ class StatisticsController extends Controller {
 
             // Get the results.
             $results = DB::table($table)->where('yearmonth', $yearMonth);
+
+            // For the graphs, we need daily stats.
             $daily_stats = DB::select(
-                "SELECT SUBSTRING(date, 1, 8) AS day," . $columns . "
-                FROM agoraportal_" . ($service === 'moodle' ? 'moodle2' : 'nodes') . "_stats_day
-                WHERE SUBSTRING(date, 1, 6) = '" . $yearMonth . "' " . ($client_code !== NULL ? " AND clientcode LIKE '%$client_code%'" : '') . "
-                GROUP BY SUBSTRING(date, 1, 8)"
+                "SELECT date AS day, " . $columns . "
+                    FROM agoraportal_" . ($service === 'moodle' ? 'moodle2' : 'nodes') . "_stats_day
+                    WHERE date >= '" . $yearMonth . "01'
+                    AND date <= '" . $yearMonth . "31' "
+                    . ($client_code !== NULL ? " AND clientcode LIKE '%$client_code%'" : '') . "
+                    GROUP BY day"
             );
         } else if ($periodicity === 'daily') {
 
