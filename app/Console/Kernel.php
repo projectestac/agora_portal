@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('clean:stats-exports')->daily();
+        $schedule->command('logs:purge-old')->daily();
     }
 
     /**
