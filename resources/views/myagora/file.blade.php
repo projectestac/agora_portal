@@ -7,6 +7,8 @@
 
     <div class="content myagora">
 
+        @include('components.messages')
+
         @if(is_null($instanceId))
 
             <div class="alert alert-info">
@@ -22,8 +24,6 @@
 
             <div class="tab-content">
                 <div id="tab1" class="tab-pane fade in active">
-                    @include('components.messages')
-
                     <h3>{{ __('file.send_files_to_moodle') }}</h3>
                     <meta name="csrf-token" content="{{ csrf_token() }}">
 
