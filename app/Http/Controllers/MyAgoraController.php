@@ -496,10 +496,18 @@ class MyAgoraController extends Controller {
         }
 
         if (empty($currentClient)) {
-            $data = (new Util())->getSchoolFromWS(Auth::user()['name']);
+            $username = Auth::user()['name'];
 
-            if ($data['error'] === 1) {
-                $request->session()->flash('error', $data['message']);
+            if($username !== 'admin') {
+                $data = (new Util())->getSchoolFromWS($username);
+
+                if ($data['error'] === 1) {
+                    $request->session()->flash('error', $data['message']);
+                }
+            }
+
+            else {
+                $request->session()->flash('error', __('myagora.no_client_selected'));
             }
 
             return [];
