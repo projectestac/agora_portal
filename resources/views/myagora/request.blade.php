@@ -65,9 +65,11 @@
 
         @endif
 
-        <div class="pull-right">
+        @if (!empty($requests))
+            <div class="pull-right">
             {{ $requests->links('pagination::bootstrap-4') }}
-        </div>
+            </div>
+        @endif
 
         @if (!empty($requests))
             <table class="table table-responsive">
