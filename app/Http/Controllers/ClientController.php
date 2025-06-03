@@ -349,6 +349,23 @@ class ClientController extends Controller {
         return response()->json($clients);
     }
 
+    public function switch(Request $request)
+    {
+        $user = Auth::user();
+        $clientId = $request->input('client_id');
+
+        $isManager = \DB::table('managers')
+            ->where('user_id', $user->id)
+            ->where('client_id', $clientId)
+            ->exists();
+
+        $client = Client::findOrFail($clientId);
+
+        session(['currentClient' => $client->toArray()]);
+
+        return redirect()->back();
+    }
+
     public function createClientFromWS(mixed $data): void {
         // a8000001$$esc-tramuntana$$Escola Tramuntana$$c. Rosa dels Vents, 8$$Valldevent$$09999
         $data = explode('$$', $data);
