@@ -49,6 +49,8 @@ Route::resource('/queries', QueryController::class);
 // AJAX routes for datatables. Must be before the resource route.
 Route::get('/clients/list', [ClientController::class, 'getClients'])->name('clients.list');
 Route::get('/clients/active-list', [ClientController::class, 'getActiveClients'])->name('clients.active.list');
+Route::post('/clients/switch', [ClientController::class, 'switch'])->name('clients.switch');
+
 Route::get('/instances/list', [InstanceController::class, 'getInstances'])->name('instances.list');
 Route::get('/users/list', [UserController::class, 'getUsers'])->name('users.list');
 Route::get('/managers/list', [ManagerController::class, 'getManagers'])->name('managers.list');
