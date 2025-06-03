@@ -25,6 +25,7 @@ return [
     'updated_client' => 'L\'usuari :user ha actualitzat el client :name amb codi :code i nom propi :dns',
     'updated_client_short' => 'S\'ha actualitzat el client',
     'edit_client' => 'Edició del client',
+    'switch_client' => 'Canvia el client',
     'status_active' => 'Actiu',
     'status_inactive' => 'Inactiu',
     'no_ws' => 'No s\'ha pogut obtenir automàticament la informació del centre. Aquest error no és greu, però si persisteix durant dies, poseu-vos en contacte amb el SAU.',
