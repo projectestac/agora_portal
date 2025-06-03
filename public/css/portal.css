@@ -500,3 +500,16 @@ input#querySearch {
     display: inline-block;
     width: 96%;
 }
+
+li.client-switcher {
+    float: right;
+    margin-top: 8px;
+    margin-right: 8px;
+    font-size: large;
+    color: #59110A;
+}
+
+li.client-switcher:hover{
+    background-color: #eee !important;
+    color: #59110A !important;
+}
