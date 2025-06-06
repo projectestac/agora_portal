@@ -385,6 +385,7 @@ class InstanceController extends Controller {
                 return '<input type="checkbox" data-id="'.$instance->id.'">';
             })
             ->rawColumns(['checkbox'])
+                ->filter(function () {}) // Disable default filtering to avoid issues with an additional AND condition that never is observed
             ->make();
 
     }
