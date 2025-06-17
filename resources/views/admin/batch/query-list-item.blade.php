@@ -3,7 +3,8 @@
         <div class="tab-content query-item" id="query_{{ $query->id }}">
             <a href="#sqlQueryLink" onclick="querySelect({{ $query->id }})">
                 <div class="query-description" id="query_description_{{ $query->id }}">{{ $query->description }}</div>
-                <div class="query-query" id="query_query_{{ $query->id }}">{{ \Str::limit($query->query, 400) }}</div>
+                <div class="query-query" id="query_troncated_query_{{ $query->id }}">{{ \Str::limit($query->query, 400) }}</div>
+                <div style="display: none;" id="query_query_{{ $query->id }}">{{ $query->query }}</div>
             </a>
             <div class="text-right" role="group">
                 <button type="button" class="btn btn-info" onclick="editQuery({{ $query->id }})" title="{{ __('common.edit') }}">
