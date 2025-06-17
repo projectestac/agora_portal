@@ -197,38 +197,13 @@ class QueryController extends Controller {
         $globalResults = [];
         $fullResults = [];
         $summary = [];
-        $attributes = [];
+        $summaryAffectedRows = [];
+        $summaryInstances = [];
+        $resultPreviewList = [];
 
-        // Query executed to the Portal database.
+        // If the service is 'Portal', we execute the query directly on the Portal database.
         if ((int)$serviceSel === 0) {
-            if ($isSelect) {
-                $execResult = DB::select($sqlQuery);
-            } else {
-                $execResult = DB::statement($sqlQuery);
-            }
-
-            [$fullResults, $attributes, $result] = $this->processQueryResults($execResult, env('DB_DATABASE'), 'Portal');
-
-            $globalResults[env('DB_DATABASE')] = [
-                'database' => env('DB_DATABASE'),
-                'clientName' => 'Portal',
-                'clientDNS' => 'Portal',
-                'serviceSlug' => '',
-                'result' => $result,
-            ];
-
-            $showResults = empty($fullResults);
-
-            return view('admin.batch.query-execute')
-                ->with('sqlQueryEncoded', $sqlQueryEncoded)
-                ->with('serviceName', $serviceName)
-                ->with('image', $image)
-                ->with('globalResults', $globalResults)
-                ->with('fullResults', [$fullResults])
-                ->with('attributes', $attributes)
-                ->with('numRows', -1)
-                ->with('showSummary', false)
-                ->with('showResults', $showResults);
+            return $this->executeQuerySingleSite($sqlQuery, $isSelect, 'Portal', 'portal', $sqlQueryEncoded);
         }
 
         $userName = '';
@@ -258,36 +233,98 @@ class QueryController extends Controller {
         config(["database.connections.$serviceNameLower.password" => $userPassword]);
         $userPrefix = config("app.agora.$serviceKey.userprefix");
 
+        // If doing a select on several instances, we need to ensure that at least one instance has a unique column to summarize results.
+        // If doing a select query on various instances, we will summarize the results by a unique column.
+        // Needs to work even if some instances doesn't have the table.
+        $atLeastOneInstanceHasUniqueColumn = false;
+        $securedAttributes = [];
+
         foreach ($instances as $instance) {
             $dbName = $userPrefix . $instance['db_id'];
             $userName = ($serviceName === 'Nodes') ? $userName : $dbName;
 
-            config(["database.connections.$serviceNameLower.host" => $instance['db_host']]);
-            config(["database.connections.$serviceNameLower.database" => $dbName]);
-            config(["database.connections.$serviceNameLower.username" => $userName]);
+            config([
+                "database.connections.$serviceNameLower.host" => $instance['db_host'],
+                "database.connections.$serviceNameLower.database" => $dbName,
+                "database.connections.$serviceNameLower.username" => $userName,
+            ]);
 
-            // Force the change of the database connection. Otherwise, the query will be always be executed in the same database.
             DB::connection($serviceNameLower)->reconnect();
 
-            // Execute query
+            $resultStatus = ['success' => true, 'message' => __('batch.execution_success')];
+
             if ($isSelect) {
                 try {
                     $execResult = DB::connection($serviceNameLower)->select($sqlQuery);
-                }
-                catch (\Exception $e) {
-                    $execResult = $e->getMessage();
+                    $affectedRows = count($execResult);
+                } catch (\Exception $e) {
+                    $execResult = [];
+                    $resultStatus = ['success' => false, 'message' => __('batch.execution_error') . ': ' . $e->getMessage()];
+                    $affectedRows = 0;
                 }
             } else {
                 try {
-                    $execResult = DB::connection($serviceNameLower)->affectingStatement($sqlQuery) . ' ' . __('common.affected_rows');
+                    $affectedRows = DB::connection($serviceNameLower)->affectingStatement($sqlQuery);
+                    $execResult = []; // No result set for non-select queries
                 } catch (\Exception $e) {
                     $execResult = $e->getMessage();
+                    $resultStatus = ['success' => false, 'message' => __('batch.execution_error') . ': ' . $e->getMessage()];
+                    $affectedRows = 0;
                 }
             }
 
             [$fullResult, $attributes, $result, $numRows] = $this->processQueryResults($execResult, $dbName, $instance['client_name']);
             $fullResults[] = $fullResult;
-            $summary[$result] = isset($summary[$result]) ? ++$summary[$result] : 1;
+
+            if(count($attributes) === 1) {
+                $atLeastOneInstanceHasUniqueColumn = true;
+            }
+
+            // In case the next instance doesn't have the table, for example, we need to ensure that we have the list of attributes
+            if(count($attributes) > 1) {
+                $securedAttributes = $attributes;
+            }
+
+            if (is_array($execResult) && count($attributes) === 1) {
+                $seenValues = [];
+
+                foreach ($execResult as $row) {
+                    $value = $row->{$attributes[0]} ?? null;
+                    if ($value !== null) {
+                        $summary[$value] = isset($summary[$value]) ? $summary[$value] + 1 : 1;
+
+                        if (!isset($seenValues[$value])) {
+                            $summaryInstances[$value] = isset($summaryInstances[$value]) ? $summaryInstances[$value] + 1 : 1;
+                            $seenValues[$value] = true;
+                        }
+                    }
+                }
+            }
+
+            // Prepare the preview of the results
+            $previewValues = collect($execResult)
+                ->map(function ($row) use ($attributes) {
+                    // Limit the preview to the first 20 characters of each attribute
+                    // Join columns with ' | '
+                    return collect($attributes)->map(function ($attr) use ($row) {
+                        return Str::limit($row->$attr ?? '', 20, '...');
+                    })->implode(' | ');
+                })
+                ->implode(', ');
+
+            // Limit the global preview to 120 characters
+            $previewValues = Str::limit($previewValues, 120, '...');
+
+            $resultPreviewList[] = [
+                'database' => $dbName,
+                'clientName' => $instance['client_name'],
+                'preview' => $previewValues,
+                'clientDNS' => $instance['client_dns'],
+                'serviceSlug' => $instance['service_slug'],
+                'count' => is_countable($execResult) ? count($execResult) : 0,
+                'resultStatus' => $resultStatus,
+                'affectedRows' => $affectedRows,
+            ];
 
             $globalResults[$dbName] = [
                 'database' => $dbName,
@@ -297,19 +334,57 @@ class QueryController extends Controller {
                 'serviceSlug' => $instance['service_slug'],
                 'result' => $result,
             ];
+
+            if (!isset($summaryAffectedRows[$affectedRows])) {
+                $summaryAffectedRows[$affectedRows] = 0;
+            }
+
+            $summaryAffectedRows[$affectedRows]++;
         }
 
-        return view('admin.batch.query-execute')
+        return view('admin.batch.query-execute-multi-site')
             ->with('sqlQueryEncoded', $sqlQueryEncoded)
             ->with('serviceName', $serviceName)
             ->with('image', $image)
             ->with('globalResults', $globalResults)
             ->with('fullResults', $fullResults)
-            ->with('attributes', $attributes)
+            ->with('attributes', $securedAttributes)
             ->with('summary', $summary)
+            ->with('summaryAffectedRows', $summaryAffectedRows)
+            ->with('summaryInstances', $summaryInstances ?? [])
+            ->with('resultPreviewList', $resultPreviewList)
             ->with('numRows', $numRows)
-            ->with('showSummary', true)
-            ->with('showResults', true);
+            ->with('showSummary', $atLeastOneInstanceHasUniqueColumn)
+            ->with('showResults', true)
+            ->with('isSelect', $isSelect);
+    }
+
+    private function executeQuerySingleSite(string $sqlQuery, bool $isSelect, string $serviceName, string $image, string $sqlQueryEncoded): View
+    {
+        $execResult = $isSelect ? DB::select($sqlQuery) : DB::statement($sqlQuery);
+        [$fullResultsData, $attributes, $result] = $this->processQueryResults($execResult, env('DB_DATABASE'), 'Portal');
+
+        $globalResults[env('DB_DATABASE')] = [
+            'database' => env('DB_DATABASE'),
+            'clientName' => 'Portal',
+            'clientDNS' => 'Portal',
+            'serviceSlug' => '',
+            'result' => $result,
+        ];
+
+        return view('admin.batch.query-execute-single-site')
+            ->with('sqlQueryEncoded', $sqlQueryEncoded)
+            ->with('serviceName', $serviceName)
+            ->with('image', $image)
+            ->with('globalResults', $globalResults)
+            ->with('fullResults', [$fullResultsData])
+            ->with('resultPreviewList', [])
+            ->with('summary', [])
+            ->with('attributes', $attributes)
+            ->with('numRows', -1)
+            ->with('showSummary', false)
+            ->with('showResults', empty($fullResultsData))
+            ->with('isSelect', $isSelect);
     }
 
     private function processQueryResults(mixed $execResult, string $dbName, string $clientName): array {
@@ -330,10 +405,9 @@ class QueryController extends Controller {
             if ($numRows === 0) {
                 $execResult = 0;
             } elseif ($numRows === 1) {
-                // In this case, there is only one row, so it is not necessary to get the name of the database field. The
-                // $result variable will contain the value of the field.
-                $attribute = get_object_vars(reset($execResult));
-                $execResult = reset($attribute);
+                $fullResults[$dbName . ' - ' . $clientName] = $execResult;
+                $attributes = array_keys(get_object_vars(reset($execResult)));
+                $execResult = 1;
             } elseif ($numRows > 1) {
                 // If $fullResults is not empty, the template will iterate over it to show a table for each instance. The
                 // name of the database fields is kept in the $attributes variable and the $result variable will contain
