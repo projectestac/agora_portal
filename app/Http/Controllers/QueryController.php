@@ -198,17 +198,13 @@ class QueryController extends Controller {
         $fullResults = [];
         $summary = [];
         $attributes = [];
+        $resultPreviewList = [];
 
-        // Query executed to the Portal database.
+        // If the service is 'Portal', we execute the query directly on the Portal database.
         if ((int)$serviceSel === 0) {
-            if ($isSelect) {
-                $execResult = DB::select($sqlQuery);
-            } else {
-                $execResult = DB::statement($sqlQuery);
-            }
+            $execResult = $isSelect ? DB::select($sqlQuery) : DB::statement($sqlQuery);
 
-            [$fullResults, $attributes, $result] = $this->processQueryResults($execResult, env('DB_DATABASE'), 'Portal');
-
+            [$fullResultsData, $attributes, $result] = $this->processQueryResults($execResult, env('DB_DATABASE'), 'Portal');
             $globalResults[env('DB_DATABASE')] = [
                 'database' => env('DB_DATABASE'),
                 'clientName' => 'Portal',
@@ -217,18 +213,18 @@ class QueryController extends Controller {
                 'result' => $result,
             ];
 
-            $showResults = empty($fullResults);
-
             return view('admin.batch.query-execute')
                 ->with('sqlQueryEncoded', $sqlQueryEncoded)
                 ->with('serviceName', $serviceName)
                 ->with('image', $image)
                 ->with('globalResults', $globalResults)
-                ->with('fullResults', [$fullResults])
+                ->with('fullResults', [$fullResultsData])
+                ->with('resultPreviewList', [])
+                ->with('summary', [])
                 ->with('attributes', $attributes)
                 ->with('numRows', -1)
                 ->with('showSummary', false)
-                ->with('showResults', $showResults);
+                ->with('showResults', empty($fullResultsData));
         }
 
         $userName = '';
@@ -262,32 +258,63 @@ class QueryController extends Controller {
             $dbName = $userPrefix . $instance['db_id'];
             $userName = ($serviceName === 'Nodes') ? $userName : $dbName;
 
-            config(["database.connections.$serviceNameLower.host" => $instance['db_host']]);
-            config(["database.connections.$serviceNameLower.database" => $dbName]);
-            config(["database.connections.$serviceNameLower.username" => $userName]);
+            config([
+                "database.connections.$serviceNameLower.host" => $instance['db_host'],
+                "database.connections.$serviceNameLower.database" => $dbName,
+                "database.connections.$serviceNameLower.username" => $userName,
+            ]);
 
-            // Force the change of the database connection. Otherwise, the query will be always be executed in the same database.
             DB::connection($serviceNameLower)->reconnect();
 
-            // Execute query
+            $affectedRows = null;
+            $resultStatus = 'Éxito';
+
             if ($isSelect) {
                 try {
                     $execResult = DB::connection($serviceNameLower)->select($sqlQuery);
-                }
-                catch (\Exception $e) {
-                    $execResult = $e->getMessage();
+                    $affectedRows = count($execResult);
+                } catch (\Exception $e) {
+                    $execResult = [];
+                    $resultStatus = 'Fallo';
+                    $affectedRows = 0;
                 }
             } else {
                 try {
-                    $execResult = DB::connection($serviceNameLower)->affectingStatement($sqlQuery) . ' ' . __('common.affected_rows');
+                    $affectedRows = DB::connection($serviceNameLower)->affectingStatement($sqlQuery);
+                    $execResult = []; // No result set for non-select queries
                 } catch (\Exception $e) {
                     $execResult = $e->getMessage();
+                    $resultStatus = 'Fallo';
+                    $affectedRows = 0;
                 }
             }
 
             [$fullResult, $attributes, $result, $numRows] = $this->processQueryResults($execResult, $dbName, $instance['client_name']);
             $fullResults[] = $fullResult;
-            $summary[$result] = isset($summary[$result]) ? ++$summary[$result] : 1;
+
+            if (count($attributes) === 1 && is_array($execResult)) {
+                foreach ($execResult as $row) {
+                    $value = $row->{$attributes[0]} ?? null;
+                    if ($value !== null) {
+                        $summary[$value] = isset($summary[$value]) ? $summary[$value] + 1 : 1;
+                    }
+                }
+            }
+
+            $previewValues = collect($execResult)->pluck($attributes[0] ?? '')->map(function ($item) {
+                return Str::limit($item, 50);
+            })->implode(', ');
+
+            $resultPreviewList[] = [
+                'database' => $dbName,
+                'clientName' => $instance['client_name'],
+                'preview' => $previewValues,
+                'clientDNS' => $instance['client_dns'],
+                'serviceSlug' => $instance['service_slug'],
+                'count' => is_countable($execResult) ? count($execResult) : 0,
+                'resultStatus' => $resultStatus,
+                'affectedRows' => $affectedRows,
+            ];
 
             $globalResults[$dbName] = [
                 'database' => $dbName,
@@ -307,10 +334,13 @@ class QueryController extends Controller {
             ->with('fullResults', $fullResults)
             ->with('attributes', $attributes)
             ->with('summary', $summary)
+            ->with('resultPreviewList', $resultPreviewList)
             ->with('numRows', $numRows)
-            ->with('showSummary', true)
-            ->with('showResults', true);
+            ->with('showSummary', count($attributes) === 1)
+            ->with('showResults', true)
+            ->with('isSelect', $isSelect);
     }
+
 
     private function processQueryResults(mixed $execResult, string $dbName, string $clientName): array {
 
@@ -330,10 +360,9 @@ class QueryController extends Controller {
             if ($numRows === 0) {
                 $execResult = 0;
             } elseif ($numRows === 1) {
-                // In this case, there is only one row, so it is not necessary to get the name of the database field. The
-                // $result variable will contain the value of the field.
-                $attribute = get_object_vars(reset($execResult));
-                $execResult = reset($attribute);
+                $fullResults[$dbName . ' - ' . $clientName] = $execResult;
+                $attributes = array_keys(get_object_vars(reset($execResult)));
+                $execResult = 1;
             } elseif ($numRows > 1) {
                 // If $fullResults is not empty, the template will iterate over it to show a table for each instance. The
                 // name of the database fields is kept in the $attributes variable and the $result variable will contain
