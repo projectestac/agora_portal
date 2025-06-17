@@ -267,7 +267,7 @@ class QueryController extends Controller {
             DB::connection($serviceNameLower)->reconnect();
 
             $affectedRows = null;
-            $resultStatus = 'Éxito';
+            $resultStatus = ['success' => true, 'message' => __('batch.execution_success')];
 
             if ($isSelect) {
                 try {
@@ -275,7 +275,7 @@ class QueryController extends Controller {
                     $affectedRows = count($execResult);
                 } catch (\Exception $e) {
                     $execResult = [];
-                    $resultStatus = 'Fallo';
+                    $resultStatus = ['success' => false, 'message' => __('batch.execution_error') . ': ' . $e->getMessage()];
                     $affectedRows = 0;
                 }
             } else {
@@ -284,7 +284,7 @@ class QueryController extends Controller {
                     $execResult = []; // No result set for non-select queries
                 } catch (\Exception $e) {
                     $execResult = $e->getMessage();
-                    $resultStatus = 'Fallo';
+                    $resultStatus = ['success' => false, 'message' => __('batch.execution_error') . ': ' . $e->getMessage()];
                     $affectedRows = 0;
                 }
             }
@@ -301,9 +301,20 @@ class QueryController extends Controller {
                 }
             }
 
-            $previewValues = collect($execResult)->pluck($attributes[0] ?? '')->map(function ($item) {
-                return Str::limit($item, 50);
-            })->implode(', ');
+            // Prepare the preview of the results
+            $previewValues = collect($execResult)
+                ->map(function ($row) use ($attributes) {
+                    // Limit the preview to the first 20 characters of each attribute
+                    $values = collect($attributes)->map(function ($attr) use ($row) {
+                        return Str::limit($row->$attr ?? '', 20, '...');
+                    })->implode(' | '); // Join columns with ' | '
+
+                    return $values;
+                })
+                ->implode(', ');
+
+            // Limit the global preview to 120 characters
+            $previewValues = Str::limit($previewValues, 120, '...');
 
             $resultPreviewList[] = [
                 'database' => $dbName,

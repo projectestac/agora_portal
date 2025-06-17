@@ -13,7 +13,7 @@
     <div class="panel panel-info">
         <div class="panel-heading">
             <img src="{{ secure_asset('images/' .  $image . '.gif') }}" alt="{{ $serviceName }}" title="{{ $serviceName }}"/>
-            {{ __('batch.query_executed') }}
+            {{ trans_choice('batch.query_executed', count($resultPreviewList)) }}
             <div class="pull-right">
                 <a href="{{ route('batch.query') }}" class="btn btn-info">
                     {{ __('batch.modify_query') }}
@@ -108,11 +108,12 @@
                             @foreach($resultPreviewList as $instanceResult)
                                     <?php
                                         $clientURL = $instanceResult['clientDNS'] . '/' . $instanceResult['serviceSlug'];
+                                        $resultStatus = $instanceResult['resultStatus'];
                                     ?>
-                                <tr>
+                                <tr style="background-color: {{ $resultStatus['success'] ? '#ddefdd' : '#f9dbdb'}}">
                                     <td><a href="#{{ $instanceResult['database'] }} - {{ $instanceResult['clientName'] }}">{{ $instanceResult['database'] }}</a></td>
                                     <td><a href="/{{ $clientURL }}" target="_blank">{{ $instanceResult['clientName'] }}</a></td>
-                                    <td>{{ $instanceResult['resultStatus'] }}</td>
+                                    <td style="font-family: Courier">{{ $resultStatus['message'] }}</td>
                                     <td>{{ $instanceResult['affectedRows'] }}</td>
                                 </tr>
                             @endforeach
