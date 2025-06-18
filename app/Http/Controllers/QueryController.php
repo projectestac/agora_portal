@@ -254,6 +254,11 @@ class QueryController extends Controller {
         config(["database.connections.$serviceNameLower.password" => $userPassword]);
         $userPrefix = config("app.agora.$serviceKey.userprefix");
 
+        // If doing a select on several instances, we need to ensure that at least one instance has a unique column to summarize results.
+        // If doing a select query on various instances, we will summarize the results by a unique column.
+        // Needs to work even if some instances doesn't have the table.
+        $atLeastOneInstanceHasUniqueColumn = false;
+
         foreach ($instances as $instance) {
             $dbName = $userPrefix . $instance['db_id'];
             $userName = ($serviceName === 'Nodes') ? $userName : $dbName;
@@ -291,6 +296,10 @@ class QueryController extends Controller {
 
             [$fullResult, $attributes, $result, $numRows] = $this->processQueryResults($execResult, $dbName, $instance['client_name']);
             $fullResults[] = $fullResult;
+
+            if(count($attributes) === 1) {
+                $atLeastOneInstanceHasUniqueColumn = true;
+            }
 
             if (count($attributes) === 1 && is_array($execResult)) {
                 foreach ($execResult as $row) {
@@ -347,7 +356,7 @@ class QueryController extends Controller {
             ->with('summary', $summary)
             ->with('resultPreviewList', $resultPreviewList)
             ->with('numRows', $numRows)
-            ->with('showSummary', count($attributes) === 1)
+            ->with('showSummary', $atLeastOneInstanceHasUniqueColumn)
             ->with('showResults', true)
             ->with('isSelect', $isSelect);
     }
