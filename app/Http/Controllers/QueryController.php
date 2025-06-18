@@ -258,6 +258,7 @@ class QueryController extends Controller {
         // If doing a select query on various instances, we will summarize the results by a unique column.
         // Needs to work even if some instances doesn't have the table.
         $atLeastOneInstanceHasUniqueColumn = false;
+        $securedAttributes = [];
 
         foreach ($instances as $instance) {
             $dbName = $userPrefix . $instance['db_id'];
@@ -299,6 +300,11 @@ class QueryController extends Controller {
 
             if(count($attributes) === 1) {
                 $atLeastOneInstanceHasUniqueColumn = true;
+            }
+
+            // In case the next instance doesn't have the table for example, we need to insure that we have the list of attributes
+            if(count($attributes) > 1) {
+                $securedAttributes = $attributes;
             }
 
             if (count($attributes) === 1 && is_array($execResult)) {
@@ -352,7 +358,7 @@ class QueryController extends Controller {
             ->with('image', $image)
             ->with('globalResults', $globalResults)
             ->with('fullResults', $fullResults)
-            ->with('attributes', $attributes)
+            ->with('attributes', $securedAttributes)
             ->with('summary', $summary)
             ->with('resultPreviewList', $resultPreviewList)
             ->with('numRows', $numRows)
