@@ -93,6 +93,15 @@
                 </table>
             </div>
         </div>
+    @else
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                {{ __('batch.execution_summary') }}
+            </div>
+            <div class="panel-body">
+                <p>{{ __('batch.result') }}: {{ $globalResults['portal']['result'] }}</p>
+            </div>
+        </div>
     @endif
 
     {{-- Results table --}}
