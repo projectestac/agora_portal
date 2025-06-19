@@ -197,6 +197,8 @@ class QueryController extends Controller {
         $globalResults = [];
         $fullResults = [];
         $summary = [];
+        $summaryAffectedRows = [];
+        $summaryInstances = [];
         $attributes = [];
         $resultPreviewList = [];
 
@@ -205,6 +207,7 @@ class QueryController extends Controller {
             $execResult = $isSelect ? DB::select($sqlQuery) : DB::statement($sqlQuery);
 
             [$fullResultsData, $attributes, $result] = $this->processQueryResults($execResult, env('DB_DATABASE'), 'Portal');
+
             $globalResults[env('DB_DATABASE')] = [
                 'database' => env('DB_DATABASE'),
                 'clientName' => 'Portal',
@@ -224,7 +227,8 @@ class QueryController extends Controller {
                 ->with('attributes', $attributes)
                 ->with('numRows', -1)
                 ->with('showSummary', false)
-                ->with('showResults', empty($fullResultsData));
+                ->with('showResults', empty($fullResultsData))
+                ->with('isSelect', $isSelect);
         }
 
         $userName = '';
@@ -308,10 +312,17 @@ class QueryController extends Controller {
             }
 
             if (count($attributes) === 1 && is_array($execResult)) {
+                $seenValues = [];
+
                 foreach ($execResult as $row) {
                     $value = $row->{$attributes[0]} ?? null;
                     if ($value !== null) {
                         $summary[$value] = isset($summary[$value]) ? $summary[$value] + 1 : 1;
+
+                        if (!isset($seenValues[$value])) {
+                            $summaryInstances[$value] = isset($summaryInstances[$value]) ? $summaryInstances[$value] + 1 : 1;
+                            $seenValues[$value] = true;
+                        }
                     }
                 }
             }
@@ -350,6 +361,12 @@ class QueryController extends Controller {
                 'serviceSlug' => $instance['service_slug'],
                 'result' => $result,
             ];
+
+            if (!isset($summaryAffectedRows[$affectedRows])) {
+                $summaryAffectedRows[$affectedRows] = 0;
+            }
+
+            $summaryAffectedRows[$affectedRows]++;
         }
 
         return view('admin.batch.query-execute')
@@ -360,6 +377,8 @@ class QueryController extends Controller {
             ->with('fullResults', $fullResults)
             ->with('attributes', $securedAttributes)
             ->with('summary', $summary)
+            ->with('summaryAffectedRows', $summaryAffectedRows)
+            ->with('summaryInstances', $summaryInstances ?? [])
             ->with('resultPreviewList', $resultPreviewList)
             ->with('numRows', $numRows)
             ->with('showSummary', $atLeastOneInstanceHasUniqueColumn)
