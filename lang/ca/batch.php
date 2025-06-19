@@ -6,7 +6,7 @@ return [
     'query_execution' => 'Executa una consulta',
     'query_execution_confirm' => 'Confirma l\'execució de la consulta',
     'query_to_execute' => 'Consulta a executar',
-    'query_executed' => 'Consulta executada en :count instància|Consulta executada en :count instàncies',
+    'query_executed' => 'Consulta executada',
     'client_selection' => 'Selecció de clients',
     'all_clients' => 'Tots els clients',
     'only_selected' => 'Només els seleccionats',
