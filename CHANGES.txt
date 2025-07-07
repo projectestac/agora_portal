@@ -4,6 +4,14 @@ More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/agora_portal
 
 
+Changes 25.07.07
+---------------------------------------------------------------------------------------
+- Clients: Implemented client switching functionality and updated menu view
+- Instances: Fixed global search in instance list
+- MyAgora: Avoid error after an admin who is not a manager logs in
+- Updated images for new global error page for Àgora
+
+
 Changes 25.06.02
 ---------------------------------------------------------------------------------------
 - Clients and Instances: Added a button to reset search filters
