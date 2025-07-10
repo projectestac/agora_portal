@@ -86,7 +86,12 @@ class MyAgoraController extends Controller {
             return view('myagora.no_access')->with('message', __('myagora.no_client_access'));
         }
 
-        $currentClient = Cache::getCurrentClient($request);
+        $currentClient = $this->getCurrentClient($request);
+
+        if (empty($currentClient)) {
+            return view('myagora.file')->with('files', [])->with('instanceId', null);
+        }
+
         $currentInstance = Instance::where('client_id', $currentClient['id'])
             ->where('service_id', Service::select('id')->where('name', 'Moodle')->get()->toArray())
             ->where('status', 'active')
@@ -334,7 +339,7 @@ class MyAgoraController extends Controller {
         }
 
         if (empty($currentClient)) {
-            return view('myagora.request')->with('requests', []);
+            return view('myagora.request')->with('requests', [])->with('availableRequests', []);
         }
 
         $availableRequests = [];
@@ -491,7 +496,8 @@ class MyAgoraController extends Controller {
         }
 
         if (empty($currentClient)) {
-            $data = (new Util())->getSchoolFromWS(Auth::user()['name']);
+            $username = Auth::user()['name'];
+            $data = (new Util())->getSchoolFromWS($username);
 
             if ($data['error'] === 1) {
                 $request->session()->flash('error', $data['message']);

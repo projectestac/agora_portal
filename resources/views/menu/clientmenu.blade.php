@@ -1,4 +1,5 @@
 @canany(['Administrate site', 'Manage own managers', 'Manage clients'])
+
     <nav class="navbar-default admin-menu" role="navigation">
         <ul class="nav navbar-nav primary">
             <li>
@@ -29,5 +30,21 @@
                 </a>
             </li>
         </ul>
+
+        @if (isset($clients) && $clients->count() > 1)
+            <div class="client-switcher">
+                <form method="POST" action="{{ route('clients.switch') }}" class="form-inline mb-3">
+                    @csrf
+                    <select name="client_id" id="clientSwitcher" class="form-control" onchange="this.form.submit()">
+                        @foreach ($clients as $client)
+                            <option value="{{ $client->id }}" {{ isset($currentClient['id']) && $currentClient['id'] === $client->id ? 'selected' : '' }}>
+                                {{ $client->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+            </div>
+        @endif
+
     </nav>
 @endcan
