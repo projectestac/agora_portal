@@ -10,6 +10,7 @@ return [
     'client_selection' => 'Selecció de clients',
     'all_clients' => 'Tots els clients',
     'only_selected' => 'Només els seleccionats',
+    'select_file_clients' => 'Selecciona el fitxer de clients',
     'order_by' => 'Ordena per',
     'search_engine' => 'Cercador',
     'sql_query' => 'Consulta SQL',

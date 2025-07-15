@@ -97,6 +97,14 @@
                     success: function (response) {
                         $('#clientslist').html(response.html);
                         $('#reload').html('');
+
+                        // Binding file selector to logic
+                        $('#fileInput').on('change', function() {
+                            const file = this.files[0];
+                            if (file) {
+                                selectClientsFromFile(file);
+                            }
+                        });
                     },
                     error: function (xhr, status, error) {
                         console.error(error);
@@ -117,6 +125,58 @@
             if (serviceSel === '0') {
                 $('#searchEngine').hide();
                 $('#serviceSelector').val('all');
+            }
+        });
+
+        function selectClientsFromFile(file) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const text = e.target.result;
+
+                // Split into lines, remove empty lines
+                const lines = text.split(/\r?\n/).filter(line => line.trim().length > 0);
+
+                // Remove the header line
+                lines.shift();
+
+                // Extract the 'code' column (2nd column, index 1)
+                const codesFromFile = lines.map(line => line.split(',')[1].trim());
+
+                console.log(codesFromFile);
+
+                let selectedCount = 0;
+
+                // Select options in the #clientslist select whose value matches one of the codes from the file
+                // Assuming each <option>'s value is the client code
+                $('#clientslist option').each(function() {
+                    const optionText = $(this).text().trim();
+
+                    // Extract the code from text like "1 - a0000001 - Client 1 - centre-1"
+                    // We split by ' - ' and take the second part (index 1)
+                    const codeInText = optionText.split(' - ')[1];
+
+                    console.log(codeInText);
+
+                    if (codesFromFile.includes(codeInText)) {
+                        $(this).prop('selected', true);
+                        selectedCount++;
+                    } else {
+                        $(this).prop('selected', false);
+                    }
+                });
+
+                $('#selectedClientsCount').text(`S'han seleccionat ${selectedCount} client(s).`);
+            };
+
+            reader.readAsText(file);
+        }
+
+        // Binding file selector to logic
+        $('#fileInput').on('change', function() {
+            const file = this.files[0];
+            if (file) {
+                selectClientsFromFile(file);
             }
         });
     });

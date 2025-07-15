@@ -1,4 +1,10 @@
 <div class="form-group">
+    <label for="fileInput">{{ __('batch.select_file_clients') }}</label>
+    <input type="file" id="fileInput" accept=".txt,.csv" class="form-control-file" />
+    <i><p id="selectedClientsCount"></p></i>
+</div>
+
+<div class="form-group">
     <label for="clientsSel">
         {{ count($viewData['instances']) }} {{ __('client.clients') }} [{{ $viewData['selectedService']['name'] }}]
     </label>
