@@ -28,10 +28,8 @@
 <script>
     function selectClientsFromFile(file) {
         const reader = new FileReader();
-        console.log('selectClientsFromFile');
 
         reader.onload = function(e) {
-            console.log('onload');
             const text = e.target.result;
 
             // Split into lines, remove empty lines
@@ -41,7 +39,19 @@
             lines.shift();
 
             // Extract the 'code' column (2nd column, index 1)
-            const codesFromFile = lines.map(line => line.split(',')[1].trim());
+
+            const codesFromFile = lines.map(line => {
+                // Regex to match CSV fields, including quoted fields
+                const regex = /(?:\"([^\"]*)\")|([^,]+)/g;
+                const values = [];
+                let match;
+
+                while ((match = regex.exec(line)) !== null) {
+                    values.push(match[1] || match[2]);
+                }
+
+                return values[1]?.trim(); // 2nd column
+            }).filter(code => code); // Removes invalid or incomplete lines
 
             let selectedCount = 0;
 
