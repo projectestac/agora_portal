@@ -11,6 +11,7 @@ return [
     'all_clients' => 'Tots els clients',
     'only_selected' => 'Només els seleccionats',
     'select_file_clients' => 'Selecciona el fitxer de clients',
+    'deselect_all' => 'Deseleccionar-ho tot',
     'order_by' => 'Ordena per',
     'search_engine' => 'Cercador',
     'sql_query' => 'Consulta SQL',

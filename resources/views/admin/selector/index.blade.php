@@ -172,12 +172,23 @@
             reader.readAsText(file);
         }
 
+        // Button to select file
+        $('#btnSelectFile').on('click', function() {
+            $('#fileInput').click();
+        });
+
         // Binding file selector to logic
         $('#fileInput').on('change', function() {
             const file = this.files[0];
             if (file) {
                 selectClientsFromFile(file);
             }
+        });
+
+        // Button to deselect all
+        $('#btnDeselectAll').on('click', function() {
+            $('#clientsSel option').prop('selected', false);
+            $('#selectedClientsCount').text('');
         });
     });
 </script>
