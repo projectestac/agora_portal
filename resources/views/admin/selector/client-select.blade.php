@@ -32,39 +32,59 @@
         reader.onload = function(e) {
             const text = e.target.result;
 
-            // Split into lines, remove empty lines
+            // Split the text into lines and remove empty lines
             const lines = text.split(/\r?\n/).filter(line => line.trim().length > 0);
 
-            // Remove the header line
-            lines.shift();
+            // Get the header and normalize it
+            let headerLine = lines.shift().trim();
 
-            // Extract the 'code' column (2nd column, index 1)
+            // Remove optional quotes around header
+            const header = headerLine.replace(/^"(.*)"$/, '$1').toLowerCase();
 
-            const codesFromFile = lines.map(line => {
-                // Regex to match CSV fields, including quoted fields
-                const regex = /(?:\"([^\"]*)\")|([^,]+)/g;
-                const values = [];
-                let match;
+            // Validate the header
+            if (!['db_id', 'code', 'dns'].includes(header)) {
+                alert("La capçalera del fitxer CSV ha de ser 'db_id', 'code' o 'dns'.");
+                return;
+            }
 
-                while ((match = regex.exec(line)) !== null) {
-                    values.push(match[1] || match[2]);
-                }
-
-                return values[1]?.trim(); // 2nd column
-            }).filter(code => code); // Removes invalid or incomplete lines
+            // Extract values from each line, removing optional quotes
+            const valuesFromFile = lines.map(line => {
+                const trimmed = line.trim();
+                // Remove quotes if present
+                return trimmed.replace(/^"(.*)"$/, '$1');
+            }).filter(val => val);
 
             let selectedCount = 0;
 
-            // Select options in the #clientslist select whose value matches one of the codes from the file
-            // Assuming each <option>'s value is the client code
+            // Iterate over each <option> in the select element
             $('#clientslist option').each(function() {
                 const optionText = $(this).text().trim();
 
-                // Extract the code from text like "1 - a0000001 - Client 1 - centre-1"
-                // We split by ' - ' and take the second part (index 1)
-                const codeInText = optionText.split(' - ')[1];
+                // Split the option text like "1 - a0000001 - Client 1 - centre-1"
+                const parts = optionText.split(' - ').map(p => p.trim());
 
-                if (codesFromFile.includes(codeInText)) {
+                // Ensure the option has the expected format
+                if (parts.length < 4) {
+                    $(this).prop('selected', false);
+                    return;
+                }
+
+                // Choose the correct part of the option based on the CSV header
+                let valueToCompare;
+                switch (header) {
+                    case 'db_id':
+                        valueToCompare = parts[0];
+                        break;
+                    case 'code':
+                        valueToCompare = parts[1];
+                        break;
+                    case 'dns':
+                        valueToCompare = parts[3];
+                        break;
+                }
+
+                // Select the option if its value is in the list from the file
+                if (valuesFromFile.includes(valueToCompare)) {
                     $(this).prop('selected', true);
                     selectedCount++;
                 } else {
@@ -72,6 +92,7 @@
                 }
             });
 
+            // Update the UI with the number of selected clients
             $('#selectedClientsCount').text(`S'han seleccionat ${selectedCount} client(s).`);
         };
 
