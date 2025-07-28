@@ -72,21 +72,8 @@ textarea {
     animation: spin 1000ms infinite linear;
 }
 
-@-moz-keyframes spin {
-    100% {
-        -moz-transform: rotate(360deg);
-    }
-}
-
-@-webkit-keyframes spin {
-    100% {
-        -webkit-transform: rotate(360deg);
-    }
-}
-
 @keyframes spin {
     100% {
-        -webkit-transform: rotate(360deg);
         transform: rotate(360deg);
     }
 }
@@ -125,13 +112,6 @@ header h1 {
 
 #navbar_top {
     background-color: #fafafa;
-    background-image: -moz-linear-gradient(top, #fff, #f2f2f2);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#fff), to(#f2f2f2));
-    background-image: -webkit-linear-gradient(top, #fff, #f2f2f2);
-    background-image: -o-linear-gradient(top, #fff, #f2f2f2);
-    background-image: linear-gradient(to bottom, #fff, #f2f2f2);
-    background-repeat: repeat-x;
-    -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
     border-bottom: 2px solid #AC2013;
 }
@@ -196,8 +176,6 @@ header h1 {
     -webkit-border-radius: 3px;
     border-radius: 3px;
     background: #fafafa;
-    background: -webkit-gradient(linear, left top, left bottom, from(#fafafa), to(#f2f2f2));
-    background: -moz-linear-gradient(top, #fafafa, #f2f2f2);
     background: linear-gradient(#fafafa, #f2f2f2);
 }
 
@@ -282,6 +260,10 @@ footer {
 
 .margin-1 {
     margin: 1em;
+}
+
+.margin-top-1 {
+    margin-top: 1em;
 }
 
 .margin-top-2 {
@@ -380,7 +362,7 @@ table.datatable tbody tr th:hover {
 
 #theme_content ul.navlist {
     margin: 0;
-    padding-top: 0px;
+    padding-top: 0;
 }
 
 
@@ -394,9 +376,7 @@ COLOR4: #59110A #008888 #145C61 #000000 #4E7104 #457FB9
 COLOR5: #D0D0D0 #BBEEEE #87BDC1 #FFEDBA #B3CD7B #B3CADB
 */
 
-
-/** Admin menu **/
-
+/* Admin menu */
 .admin-menu-container {
     overflow: auto;
 }
@@ -452,23 +432,19 @@ COLOR5: #D0D0D0 #BBEEEE #87BDC1 #FFEDBA #B3CD7B #B3CADB
     background-color: #bbb;
 }
 
-
-/** Pagination **/
-
+/* Pagination */
 .pagination {
     margin: 0;
 }
 
-
-/** My Agora **/
-
+/* My Agora */
 .myagora-menu-container {
     margin: 0.8em 0;
     min-height: 50px;
 }
 
 
-/** Queries **/
+/* Queries */
 .query-list {
     max-height: 500px;
     overflow: auto;
@@ -501,6 +477,7 @@ input#querySearch {
     width: 96%;
 }
 
+/* Client switcher */
 div.client-switcher {
     float: right;
     margin-top: -42px;
@@ -512,4 +489,9 @@ div.client-switcher {
 div.client-switcher:hover {
     background-color: #eee !important;
     color: #59110A !important;
+}
+
+/* Client selector in batch */
+.italic {
+    font-style: italic;
 }
