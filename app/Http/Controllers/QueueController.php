@@ -49,10 +49,21 @@ class QueueController extends Controller {
     /**
      * @throws \JsonException
      */
-    public function getSuccess(): View {
-        $jobs = DB::table('success_jobs')->orderByDesc('id')->paginate(self::PER_PAGE);
-        $data = [];
+    public function getSuccess(Request $request): View {
+        $query = $request->input('q');
 
+        $jobs = DB::table('success_jobs')
+            ->when($query, function($q) use ($query) {
+                $q->where(function($q2) use ($query) {
+                    $q2->where('payload', 'like', "%{$query}%")
+                    ->orWhere('payload', 'like', "%{$query}%") // ou autres colonnes si besoin
+                    ->orWhere('result', 'like', "%{$query}%");
+                });
+            })
+            ->orderByDesc('id')
+            ->paginate(self::PER_PAGE);
+
+        $data = [];
         foreach ($jobs as $job) {
             $payLoad = json_decode($job->payload, false, 512, JSON_THROW_ON_ERROR);
             $operationData = unserialize($payLoad->data->command, ['allowed_classes' => [ProcessOperation::class]]);
@@ -78,13 +89,23 @@ class QueueController extends Controller {
 
         return view('admin.batch.queue-success')
             ->with('data', $data)
-            ->with('links', $jobs->links('pagination::bootstrap-4'));
+            ->with('links', $jobs->appends(['q' => $query])->links('pagination::bootstrap-4'));
     }
 
-    public function getFail(): View {
-        $jobs = DB::table('failed_jobs')->orderByDesc('id')->paginate(self::PER_PAGE);
-        $data = [];
+    public function getFail(Request $request): View {
+        $query = $request->input('q');
 
+        $jobs = DB::table('failed_jobs')
+            ->when($query, function($q) use ($query) {
+                $q->where(function($q2) use ($query) {
+                    $q2->where('payload', 'like', "%{$query}%")
+                    ->orWhere('exception', 'like', "%{$query}%");
+                });
+            })
+            ->orderByDesc('id')
+            ->paginate(self::PER_PAGE);
+
+        $data = [];
         foreach ($jobs as $job) {
             $payLoad = json_decode($job->payload, false, 512, JSON_THROW_ON_ERROR);
             $operationData = unserialize($payLoad->data->command, ['allowed_classes' => [ProcessOperation::class]]);
@@ -108,7 +129,7 @@ class QueueController extends Controller {
 
         return view('admin.batch.queue-fail')
             ->with('data', $data)
-            ->with('links', $jobs->links('pagination::bootstrap-4'));
+            ->with('links', $jobs->appends(['q' => $query])->links('pagination::bootstrap-4'));
     }
 
     public function destroy(int $jobId): RedirectResponse {
