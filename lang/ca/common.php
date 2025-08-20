@@ -34,6 +34,8 @@ return [
     'dates' => 'Dates',
     'town' => 'Població',
     'search' => 'Cerca',
+    'reset' => 'Restaura',
+    'keyword' => 'Paraula clau',
     'close' => 'Tanca',
     'database' => 'Base de dades',
     'choose_an_option' => 'Tria una opció',
