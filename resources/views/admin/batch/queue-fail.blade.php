@@ -25,7 +25,11 @@
 
             <div id="tab3" class="tab-pane fade in active">
                 @if(is_array($data))
+
                     <br>
+
+                    <x-batch-search :action="url()->current()" />
+
                     <div class="pull-right">
                         {!! $links !!}
                     </div>
