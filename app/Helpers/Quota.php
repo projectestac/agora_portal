@@ -75,7 +75,10 @@ class Quota {
         $quotaPercentUsed = round($instance->used_quota / $instance->quota, 4);
         $quotaRemaining = round(($instance->quota - $instance->used_quota) / (1024 * 1024 * 1024), 4);
 
-        return ($quotaPercentUsed > $quotaPercentLimit) && ($quotaRemaining < $quotaFreeLimit);
+        return
+            ($instance->status === 'active') &&
+            ($quotaPercentUsed > $quotaPercentLimit) &&
+            ($quotaRemaining < $quotaFreeLimit);
 
     }
 
