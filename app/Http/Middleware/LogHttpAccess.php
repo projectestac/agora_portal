@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Session;
 
 class LogHttpAccess
 {
+    // Maximum length for the payload.
     public const TRUNCATE_LENGTH = 4000;
 
     /**
@@ -17,6 +18,7 @@ class LogHttpAccess
      */
     public function handle(Request $request, Closure $next)
     {
+        // For confidentiality, do not log passwords or password confirmations.
         $input = $request->except(['_token', 'password', 'password_confirmation']);
         $payload = json_encode($input, JSON_THROW_ON_ERROR);
         $payload = strlen($payload) > $this::TRUNCATE_LENGTH
