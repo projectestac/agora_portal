@@ -18,6 +18,8 @@ class HttpAccessLog extends Model
         'url',
         'method',
         'payload',
+        'session',
+        'username',
     ];
 
     public $timestamps = false;

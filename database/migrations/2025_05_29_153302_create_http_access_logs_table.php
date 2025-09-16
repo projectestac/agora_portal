@@ -16,6 +16,8 @@ return new class extends Migration
             $table->text('url');
             $table->string('method', 10);
             $table->text('payload')->nullable();
+            $table->text('session')->nullable();
+            $table->text('username')->nullable();
         });
     }
 
