@@ -45,6 +45,6 @@ return new class extends Migration {
      * Reverse the migrations.
      */
     public function down(): void {
-        Schema::dropIfExists('client_services');
+        Schema::dropIfExists('instances');
     }
 };
