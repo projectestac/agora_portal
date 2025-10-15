@@ -22,7 +22,7 @@
     <nav class="navbar navbar-fixed-top" id="navbar_top">
         <div class="container-fluid">
             <a href="https://educacio.gencat.cat/ca/inici/" target="_blank" class="brand departament hidden-phone">
-                <img src="{{ secure_asset('images/departament.png') }}" alt="{{ __('home.department') }}" title="{{ __('home.department') }}"/>
+                <img src="{{ secure_asset('images/logo_defp.png') }}" alt="{{ __('home.department') }}" title="{{ __('home.department') }}"/>
             </a>
             <a href="https://xtec.gencat.cat/ca/inici" target="_blank" class="brand xtec hidden-phone">
                 <img src="{{ secure_asset('images/xtec.png') }}" alt="{{ __('home.xtec') }}" title="{{ __('home.xtec') }}"/>
@@ -43,7 +43,7 @@
 
 <footer>
     <a href="https://xtec.gencat.cat/ca/inici" target="_blank">
-        <img src="{{ secure_asset('images/departament.png') }}" alt="{{ __('home.department') }}" title="{{ __('home.department') }}"/>
+        <img src="{{ secure_asset('images/logo_defp.png') }}" alt="{{ __('home.department') }}" title="{{ __('home.department') }}"/>
     </a>
 </footer>
 </body>
