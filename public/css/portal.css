@@ -103,6 +103,10 @@ header h1 {
     font-weight: bold;
 }
 
+header .departament img {
+    height: 25px;
+}
+
 /* Remove header on small screens */
 @media (max-width: 992px) {
     header {
