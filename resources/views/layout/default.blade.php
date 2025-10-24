@@ -25,7 +25,7 @@
                 <img src="{{ secure_asset('images/logo_defp.png') }}" alt="{{ __('home.department') }}" title="{{ __('home.department') }}"/>
             </a>
             <a href="https://xtec.gencat.cat/ca/inici" target="_blank" class="brand xtec hidden-phone">
-                <img src="{{ secure_asset('images/xtec.png') }}" alt="{{ __('home.xtec') }}" title="{{ __('home.xtec') }}"/>
+                <img src="{{ secure_asset('images/logo_xtec.svg') }}" alt="{{ __('home.xtec') }}" title="{{ __('home.xtec') }}"/>
             </a>
             <div class="pull-right">
                 @include('menu.usermenu')
