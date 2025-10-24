@@ -14,7 +14,10 @@
             <div class="col-md-6 login-block center-image">
                 <a href="{{ route('login.google') }}" class="text-center">
                     <div>
-                        <img src="{{ secure_asset('images/xtec.png') }}" alt="{{ __('home.xtec') }}" title="{{ __('home.xtec') }}"/>
+                        <img src="{{ secure_asset('images/logo_xtec.svg') }}"
+                             alt="{{ __('home.xtec') }}"
+                             title="{{ __('home.xtec') }}"
+                             style="height: 30px; margin-top: 16px;" />
                     </div>
                     {{ __('login.login_xtec') }}
                 </a>
@@ -23,7 +26,9 @@
             <div class="col-md-6 login-block center-image">
                 <a href="{{ route('login') }}" class="text-center">
                     <div>
-                        <img src="{{ secure_asset('images/agora.png') }}" alt="{{ __('login.login_local') }}" title="{{ __('login.login_local') }}"/>
+                        <img src="{{ secure_asset('images/logo_agora.png') }}"
+                             alt="{{ __('login.login_local') }}"
+                             title="{{ __('login.login_local') }}"/>
                     </div>
                     {{ __('login.login_local') }}
                 </a>
