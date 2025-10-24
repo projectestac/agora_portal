@@ -103,8 +103,9 @@ header h1 {
     font-weight: bold;
 }
 
-header .departament img {
-    height: 25px;
+header .departament img,
+header .xtec img {
+    height: 40px;
 }
 
 /* Remove header on small screens */
@@ -132,7 +133,7 @@ header .departament img {
     font-weight: 200;
     color: #777;
     text-shadow: 0 1px 0 #fff;
-    padding: 10px 20px;
+    padding: 5px 20px;
 }
 
 #navbar_top .brand.xtec {
