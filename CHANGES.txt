@@ -4,7 +4,12 @@ More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/agora_portal
 
 
-Changes 25.12.03
+Changes 26.01.13
+---------------------------------------------------------------------------------------
+No changes
+
+
+Changes 25.12.18
 ---------------------------------------------------------------------------------------
 - Adjusted sizes of logos
 - Added application log for all HTTP requests for audit.
