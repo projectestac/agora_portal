@@ -4,9 +4,15 @@ More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/agora_portal
 
 
+Changes 26.01.27
+---------------------------------------------------------------------------------------
+- Jobs: Added support for searching in successful and failed jobs
+- Util: Fixed error in file manager in My Agora in some cases
+
+
 Changes 26.01.13
 ---------------------------------------------------------------------------------------
-No changes
+(No changes)
 
 
 Changes 25.12.18
