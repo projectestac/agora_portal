@@ -226,14 +226,19 @@ class Util {
 
     public static function getFiles(string $dir = ''): array {
 
-        if (empty($dir)) {
+        if (empty($dir) || !is_dir($dir) || !is_readable($dir)) {
             return [];
         }
 
         $files = array_diff(scandir($dir), ['.', '..']);
+        $result = [];
 
         foreach ($files as $file) {
-            $path = $dir . '/' . $file;
+            $path = rtrim($dir, '/') . '/' . $file;
+            if (!is_file($path)) {
+                continue;
+            }
+
             $result[] = [
                 'name' => $file,
                 'size' => filesize($path),
@@ -241,7 +246,7 @@ class Util {
             ];
         }
 
-        return $result ?? [];
+        return $result;
 
     }
 
