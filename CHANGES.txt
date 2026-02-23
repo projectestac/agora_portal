@@ -4,6 +4,16 @@ More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/agora_portal
 
 
+Changes 26.03.03
+---------------------------------------------------------------------------------------
+- Laravel Framework: Upgraded to version 10.50.0
+- Laravel Breeze: Upgraded to version 1.29.1
+- Laravel Datatables Oracle: Upgraded to version 10.11.4
+- Laravel Permission: Upgraded to version 5.11.1
+- Laravel Socialite: Upgraded to version 5.24.2
+- quota-report: Improved table styles in e-mail
+
+
 Changes 26.01.27
 ---------------------------------------------------------------------------------------
 - Jobs: Added support for searching in successful and failed jobs
