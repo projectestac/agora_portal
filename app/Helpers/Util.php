@@ -224,7 +224,7 @@ class Util {
         };
     }
 
-    public static function getFiles(string $dir = ''): array {
+    public static function getFiles(string $dir = '', bool $include_dirs = false): array {
 
         if (empty($dir) || !is_dir($dir) || !is_readable($dir)) {
             return [];
@@ -235,7 +235,10 @@ class Util {
 
         foreach ($files as $file) {
             $path = rtrim($dir, '/') . '/' . $file;
-            if (!is_file($path)) {
+
+            // Include files always, but directories only when $include_dirs is true.
+            $is_valid = is_file($path) || ($include_dirs && is_dir($path));
+            if (!$is_valid) {
                 continue;
             }
 
@@ -244,6 +247,9 @@ class Util {
                 'size' => filesize($path),
                 'updated_at' => date('d/m/Y H:i', filemtime($path)),
             ];
+
+            // Order $result by name (case-insensitive).
+            usort($result, static fn($a, $b) => strcasecmp($a['name'], $b['name']));
         }
 
         return $result;

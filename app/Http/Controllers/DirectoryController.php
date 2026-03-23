@@ -40,7 +40,7 @@ class DirectoryController extends Controller {
         }
 
         // Get the list of files and directories in the directory.
-        $files = Util::getFiles($directory);
+        $files = Util::getFiles($directory, true);
 
         $extensions = Util::getConfigParam('file_extensions_allowed');
 
