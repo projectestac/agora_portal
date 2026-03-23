@@ -598,12 +598,19 @@ class InstanceController extends Controller {
             }
 
             if ($serviceName === 'Moodle') {
-                // If is not an insert, and it has a semicolon at the end, it's the end of the query.
-                // If it is an insert, the end of the query is ');', but there is an exception for '});', which is the end
-                // of line in H5P definitions.
-                $executeQuery = ((!str_starts_with($currentSQL, 'INSERT')) && (str_ends_with(trim($line), ';')))
-                    || ((str_starts_with($currentSQL, 'INSERT')) && (str_ends_with(trim($line), ');'))
-                        && (!str_ends_with(trim($line), '});')));
+                // Detect the end of the query. INSERT is the complicated case.
+                $trimmedLine = trim($line);
+                $isInsert = str_starts_with($currentSQL, 'INSERT');
+
+                $executeQuery = (!$isInsert && str_ends_with($trimmedLine, ';')) // Not an INSERT. Just find the semicolon.
+                    || ($isInsert
+                        && str_ends_with($trimmedLine, ');') // End of the query.
+                        && !str_ends_with($trimmedLine, '});') // Exception: H5P
+                        && !str_ends_with($trimmedLine, '();') // Exception: Coderunner
+                        && !str_ends_with($trimmedLine, 'SEPARATOR);') // Exception: Coderunner
+                        && !str_ends_with($trimmedLine, '#\'\');') // Exception: Coderunner
+                        && !str_ends_with($trimmedLine, '#\n");') // Exception: Coderunner
+                    );
             }
 
             // Note: this script is not able to create the database. It must previously exist.
