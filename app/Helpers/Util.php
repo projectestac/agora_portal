@@ -379,7 +379,8 @@ class Util {
             ];
         }
 
-        $clientData = utf8_encode(trim($buffer));
+        // Convert encoding only if it is necessary.
+        $clientData = mb_convert_encoding(trim($buffer), 'UTF-8', ['UTF-8', 'ISO-8859-1']);
 
         // Error #3: Client is not registered in master clients table.
         if (str_contains($clientData, 'ERROR')) {
