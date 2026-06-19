@@ -4,6 +4,13 @@ More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/agora_portal
 
 
+Changes 26.06.22
+---------------------------------------------------------------------------------------
+- Instance: Fixed dump of Moodle model database on instance activation
+- Util: Fixed encoding of text received via WS
+- Util: Set a flag to control if directories should be included in getFiles()
+
+
 Changes 26.03.03
 ---------------------------------------------------------------------------------------
 - quota-report: Improved table styles in e-mail
