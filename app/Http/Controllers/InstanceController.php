@@ -266,9 +266,9 @@ class InstanceController extends Controller {
         $search = $request->validate(['search.value' => 'string|max:50|nullable']);
         $searchValue = $search['search']['value'] ?? '';
 
-        $columns = $request->input('columns');
-        $order = $request->input('order')[0];
-        $orderColumn = 'instances.' . $columns[$order['column']]['data'] ?? 'instances.updated_at';
+        $order = $request->input('order.0', ['column' => 0, 'dir' => 'asc']);
+        $columnaData = $request->input("columns.{$order['column']}.data");
+        $orderColumn = $columnaData ? 'instances.' . $columnaData : 'instances.updated_at';
         $orderDirection = $order['dir'] ?? 'desc';
 
         $serviceId = $request->input('service') ?? 0;
