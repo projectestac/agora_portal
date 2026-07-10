@@ -67,7 +67,7 @@ class MyAgoraController extends Controller {
             $newDNS = explode('$$', $data['message'])[1];
         }
 
-        $configQuota = floatval(Util::getConfigParam('quota_usage_to_request'));
+        $configQuota = (float)Util::getConfigParam('quota_usage_to_request');
 
         return view('myagora.instance')
             ->with('instances', $instances)
