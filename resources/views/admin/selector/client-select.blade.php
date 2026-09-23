@@ -79,7 +79,9 @@
                         valueToCompare = parts[1];
                         break;
                     case 'dns':
-                        valueToCompare = parts[3];
+                        // The split text " - " may lead to false positives if the name contains " - ", like in "Client 1 - ZER 1",
+                        // so we take the last part for DNS.
+                        valueToCompare = parts[parts.length - 1];
                         break;
                 }
 
