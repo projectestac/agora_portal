@@ -4,6 +4,15 @@ More information on each of the fixes can be found in the project
 development home at https://github.com/projectestac/agora_portal
 
 
+Changes 26.09.29
+---------------------------------------------------------------------------------------
+- Batch: Fixed error in selection with CSV due to hyphens in client names
+- Factories: Added definitions for testing
+- Instances: Make getInstances() more robust
+- MyAgora: Replaced floatval() by type cast
+- Unit Tests: Added ClientServicesTest and AdminInstanceTest
+
+
 Changes 26.06.22
 ---------------------------------------------------------------------------------------
 - Instance: Fixed dump of Moodle model database on instance activation
