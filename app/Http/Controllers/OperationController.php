@@ -10,6 +10,7 @@ use App\Models\Service;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use JsonException;
 
@@ -37,7 +38,8 @@ class OperationController extends Controller {
     }
 
     /**
-     * @throws JsonException
+     * Get the list of operations of the service from its list.php script. On failure, the details are logged and
+     * an error message is returned instead of the list.
      */
     public function get_operations_list(array $service): array|string {
 
@@ -67,28 +69,59 @@ class OperationController extends Controller {
         curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
         $actions = curl_exec($curl_handle);
+        $httpCode = (int)curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($curl_handle);
         curl_close($curl_handle);
+
+        if ($actions === false) {
+            $detail = __('batch.actions_curl_error', ['error' => $curlError]);
+            return $this->operations_list_error($operationsUrl, $detail, $httpCode, $curlError, '');
+        }
+
+        if ($httpCode !== 200) {
+            $detail = __('batch.actions_http_error', ['code' => $httpCode]);
+            return $this->operations_list_error($operationsUrl, $detail, $httpCode, $curlError, $actions);
+        }
 
         try {
             $decodedActions = json_decode($actions, true, 512, JSON_THROW_ON_ERROR);
-            if ($decodedActions) {
-                return $decodedActions;
-            }
-        } catch (JsonException) {
-            return __('batch.url_has_not_returned_actions', ['url' => $operationsUrl]);
+        } catch (JsonException $e) {
+            $detail = __('batch.actions_invalid_json', ['error' => $e->getMessage()]);
+            return $this->operations_list_error($operationsUrl, $detail, $httpCode, $curlError, $actions);
         }
 
-        return __('batch.url_has_not_returned_actions', ['url' => $operationsUrl]);
+        if (empty($decodedActions) || !is_array($decodedActions)) {
+            $detail = __('batch.actions_empty_list');
+            return $this->operations_list_error($operationsUrl, $detail, $httpCode, $curlError, $actions);
+        }
+
+        return $decodedActions;
     }
 
     /**
-     * @throws JsonException
+     * Log the details of a failed request to the operations list and build the message to show to the user.
      */
+    private function operations_list_error(string $url, string $detail, int $httpCode, string $curlError, string $body): string {
+        Log::error('Could not retrieve the operations list', [
+            'url' => $url,
+            'http_code' => $httpCode,
+            'curl_error' => $curlError,
+            'body' => mb_substr($body, 0, 500),
+        ]);
+
+        return __('batch.url_has_not_returned_actions', ['url' => $url, 'detail' => $detail]);
+    }
+
     public function getOperationHtml(Request $request, string $actionName = ''): JsonResponse {
 
         $serviceId = $request->get('serviceId');
         $service = Service::find($serviceId)->toArray();
         $operations = $this->get_operations_list($service);
+
+        // The list could not be retrieved. Show the reason instead of the selector.
+        if (!is_array($operations)) {
+            return response()->json(['html' => '<div class="alert alert-danger" role="alert">' . e($operations) . '</div>']);
+        }
 
         if (!empty($actionName)) {
             // $actionName may contain the name of the operation. Should that happen, the operation is copied from the array.

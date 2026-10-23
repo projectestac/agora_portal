@@ -13,7 +13,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use JsonException;
 
 class BatchController extends Controller {
     public function __construct() {
@@ -37,9 +36,6 @@ class BatchController extends Controller {
             ->with('queryTypes', QueryController::getTypeList());
     }
 
-    /**
-     * @throws JsonException
-     */
     public function operation(Request $request): View {
         $selector = new SelectorController();
         $viewData = $selector->getSelector($request, 'Moodle', false);
