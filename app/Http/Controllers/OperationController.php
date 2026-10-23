@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\Util;
 use App\Jobs\ProcessOperation;
 use App\Models\Client;
 use App\Models\Instance;
@@ -10,107 +9,113 @@ use App\Models\Service;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Process\Exceptions\ProcessTimedOutException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Process;
 use Illuminate\View\View;
 use JsonException;
 
 class OperationController extends Controller {
 
-    public const MOODLE_OPERATIONS_LIST_FILE = 'local/agora/scripts/list.php';
-    public const NODES_OPERATIONS_LIST_FILE = 'wp-includes/xtec/scripts/list.php';
-    public const MOODLE_OPERATIONS_EXEC_FILE = '/dades/html/moodle2/local/agora/scripts/cli.php';
-    public const NODES_OPERATIONS_EXEC_FILE = '/dades/html/wordpress/wp-includes/xtec/scripts/cli.php';
+    // Paths relative to $agora['server']['root'].
+    public const MOODLE_OPERATIONS_EXEC_FILE = 'html/moodle2/local/agora/scripts/cli.php';
+    public const NODES_OPERATIONS_EXEC_FILE = 'html/wordpress/wp-includes/xtec/scripts/cli.php';
 
-    public static function get_operations_file(string $service): string {
-        return match ($service) {
-            'Moodle' => self::MOODLE_OPERATIONS_LIST_FILE,
-            'Nodes' => self::NODES_OPERATIONS_LIST_FILE,
-            default => '',
-        };
-    }
+    // Maximum time, in seconds, to get the list of operations.
+    public const OPERATIONS_LIST_TIMEOUT = 60;
+
+    // Environment variables passed to the script that gets the list of operations.
+    public const OPERATIONS_LIST_ENVIRONMENT = ['PATH', 'HOME', 'USER', 'LANG', 'LC_ALL', 'TZ', 'TMPDIR'];
 
     public static function get_operations_exec_file(string $service): string {
-        return match ($service) {
+
+        global $agora;
+
+        $file = match ($service) {
             'Moodle' => self::MOODLE_OPERATIONS_EXEC_FILE,
             'Nodes' => self::NODES_OPERATIONS_EXEC_FILE,
             default => '',
         };
+
+        return empty($file) ? '' : $agora['server']['root'] . $file;
     }
 
     /**
-     * Get the list of operations of the service from its list.php script. On failure, the details are logged and
-     * an error message is returned instead of the list.
+     * Get the list of operations of the service executing locally its cli.php script with the option --list. On
+     * failure, the details are logged and an error message is returned instead of the list.
      */
     public function get_operations_list(array $service): array|string {
 
-        // Get the URL of the first instance of the service.
+        // The script needs an active instance of the service to bootstrap the platform.
         $instance = Instance::select('clients.dns')
             ->join('clients', 'instances.client_id', '=', 'clients.id')
             ->where('instances.service_id', $service['id'])
             ->where('instances.status', 'active')
             ->orderBy('instances.db_id')
-            ->first()
-            ->toArray();
+            ->first();
 
-        $dns = $instance['dns'];
-        $slug = $service['slug'];
-        $domain = Util::getAgoraVar(mb_strtolower($service['name']) . '_domain');
-        $operationsFile = self::get_operations_file($service['name']);
-
-        $operationsUrl = $domain . '/' . $dns . '/';
-        $operationsUrl .= empty($slug) ? '' : $slug . '/';
-        $operationsUrl .= $operationsFile;
-
-        $curl_handle = curl_init();
-        curl_setopt($curl_handle, CURLOPT_URL, $operationsUrl);
-        curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 30);
-        curl_setopt($curl_handle, CURLOPT_USERAGENT, Util::USER_AGENT);
-        curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl_handle, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($curl_handle, CURLOPT_SSL_VERIFYPEER, false);
-        $actions = curl_exec($curl_handle);
-        $httpCode = (int)curl_getinfo($curl_handle, CURLINFO_HTTP_CODE);
-        $curlError = curl_error($curl_handle);
-        curl_close($curl_handle);
-
-        if ($actions === false) {
-            $detail = __('batch.actions_curl_error', ['error' => $curlError]);
-            return $this->operations_list_error($operationsUrl, $detail, $httpCode, $curlError, '');
+        if (is_null($instance)) {
+            return __('batch.no_active_instance', ['service' => $service['name']]);
         }
 
-        if ($httpCode !== 200) {
-            $detail = __('batch.actions_http_error', ['code' => $httpCode]);
-            return $this->operations_list_error($operationsUrl, $detail, $httpCode, $curlError, $actions);
+        $command = ['php', self::get_operations_exec_file($service['name']), '--list', '--ccentre=' . $instance->dns];
+
+        // Under php-fpm, the variables of the HTTP request (REMOTE_ADDR, HTTP_HOST...) are part of the environment and
+        // would be inherited by the script. Moodle refuses to run CLI scripts when REMOTE_ADDR is set, so all of them
+        // are removed except the basic ones. A value of false removes the variable.
+        $environment = array_map(
+            static fn() => false,
+            array_diff_key(getenv(), array_flip(self::OPERATIONS_LIST_ENVIRONMENT))
+        );
+
+        // The working directory must be neutral. Otherwise, relative includes in the scripts may load wrong files.
+        try {
+            $result = Process::path(sys_get_temp_dir())
+                ->env($environment)
+                ->timeout(self::OPERATIONS_LIST_TIMEOUT)
+                ->run($command);
+        } catch (ProcessTimedOutException) {
+            $detail = __('batch.actions_timeout', ['seconds' => self::OPERATIONS_LIST_TIMEOUT]);
+            return $this->operations_list_error($command, $detail);
+        }
+
+        $output = $result->output();
+
+        if (!$result->successful()) {
+            $detail = __('batch.actions_exec_error', ['code' => $result->exitCode()]);
+            return $this->operations_list_error($command, $detail, $result->exitCode(), $output, $result->errorOutput());
         }
 
         try {
-            $decodedActions = json_decode($actions, true, 512, JSON_THROW_ON_ERROR);
+            $decodedActions = json_decode($output, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             $detail = __('batch.actions_invalid_json', ['error' => $e->getMessage()]);
-            return $this->operations_list_error($operationsUrl, $detail, $httpCode, $curlError, $actions);
+            return $this->operations_list_error($command, $detail, $result->exitCode(), $output, $result->errorOutput());
         }
 
         if (empty($decodedActions) || !is_array($decodedActions)) {
             $detail = __('batch.actions_empty_list');
-            return $this->operations_list_error($operationsUrl, $detail, $httpCode, $curlError, $actions);
+            return $this->operations_list_error($command, $detail, $result->exitCode(), $output, $result->errorOutput());
         }
 
         return $decodedActions;
     }
 
     /**
-     * Log the details of a failed request to the operations list and build the message to show to the user.
+     * Log the details of a failed execution of the operations list and build the message to show to the user.
      */
-    private function operations_list_error(string $url, string $detail, int $httpCode, string $curlError, string $body): string {
+    private function operations_list_error(array $command, string $detail, ?int $exitCode = null, string $output = '',
+                                           string $errorOutput = ''): string {
+        $commandLine = implode(' ', $command);
+
         Log::error('Could not retrieve the operations list', [
-            'url' => $url,
-            'http_code' => $httpCode,
-            'curl_error' => $curlError,
-            'body' => mb_substr($body, 0, 500),
+            'command' => $commandLine,
+            'exit_code' => $exitCode,
+            'output' => mb_substr($output, 0, 500),
+            'error_output' => mb_substr($errorOutput, 0, 500),
         ]);
 
-        return __('batch.url_has_not_returned_actions', ['url' => $url, 'detail' => $detail]);
+        return __('batch.command_has_not_returned_actions', ['command' => $commandLine, 'detail' => $detail]);
     }
 
     public function getOperationHtml(Request $request, string $actionName = ''): JsonResponse {
