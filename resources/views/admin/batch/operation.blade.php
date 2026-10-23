@@ -13,6 +13,9 @@
         @if(empty($action))
             <div class="alert alert-danger" role="alert">
                 {{ __('batch.no_action') }}
+                @if(is_string($operations))
+                    <br>{{ $operations }}
+                @endif
             </div>
         @else
             <form action="{{ route('batch.operation.confirm', ['action' => $action['action']]) }}" method="POST">
