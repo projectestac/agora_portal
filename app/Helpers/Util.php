@@ -15,6 +15,9 @@ class Util {
     public const EOI_TYPE_ID = 6;
     public const PROJECTES_TYPE_ID = 12;
 
+    // User agent used to identify the portal in the HTTP requests made with curl.
+    public const USER_AGENT = 'AgoraPortal/1.0';
+
     /**
      * Get the client from the URL if it is available and valid.
      *
@@ -357,6 +360,7 @@ class Util {
         $handle = curl_init();
         curl_setopt($handle, CURLOPT_URL, $url);
         curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 8);
+        curl_setopt($handle, CURLOPT_USERAGENT, self::USER_AGENT);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
         $buffer = curl_exec($handle);
         curl_close($handle);

@@ -64,6 +64,7 @@ class OperationController extends Controller {
         $curl_handle = curl_init();
         curl_setopt($curl_handle, CURLOPT_URL, $operationsUrl);
         curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 30);
+        curl_setopt($curl_handle, CURLOPT_USERAGENT, Util::USER_AGENT);
         curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl_handle, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($curl_handle, CURLOPT_SSL_VERIFYHOST, false);
